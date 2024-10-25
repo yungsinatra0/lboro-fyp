@@ -6,12 +6,66 @@ This chapter will provide a review of the existing literature, which will be use
 
 \noindent As such, it will be covering the following areas:
 \begin{itemize}
-    \item Hybrid approaches to software development
+    \item Software development methodologies
     \item Requirement gathering techniques
     \item Accesibility considerations
     \item Tech stack
     \item EHR systems
+    \item Machine Learning Summarization models
+    \item Speech Recognition models
 \end{itemize}
 
 
-\section{Hybrid approaches to software development}
+\section{Software development methodologies}
+
+\subsection{Software Development Life Cycle}
+
+The Software Development Life Cycle (SDLC) is a process used to guide the development of software applications or systems \parencite{sdlc1}. The SDLC consists of multiple phases, each with its own set of activities and deliverables. \textcite{sdlc2} outline the phases of the SDLC as follows:
+\begin{enumerate}
+    \item Requirement gathering and analysis phase - This phase involves gathering and analyzing the requirements of the software to be developed. These requirements are gathered from the project stakeholders and saved in a specific document. Based on the requirements gathered, a development plan is created and a feasibility study is conducted.
+    \item Design phase - This phase involves representing the previously gathered requirements in a project design written in a more technical manner, that will later guide the developers to create and implement the software. 
+    \item Implementation phase - This phase involves the actual development of the software. Additionally, some smaller unit tests may occur during this phase as parts of the software are developed.
+    \item Testing phase - This phase focuses on testing the software to ensure that it meets the requirements and is free of bugs. This phase may involve multiple types of testing, such as unit testing, integration testing,  and system testing. \textcite{testing} describes the different types of tests as following:
+    \begin{itemize}
+    \item Unit testing - This type of test is done on the lowest level of the software, testing individual units or components of the software.
+    \item Integration testing - This type of test is performed on two or more units combined together, usually focusing on the interfaces between these components.
+    \item System testing - This type of test focuses on the `end-to-end quality of the entire system', testing it as a whole based on the system requirement specification.
+    \end{itemize}
+    \item Maintenance phase - This phase involves the deployment and maintenance of the software. Additionally, this phase may include user acceptance testing, where the software is handed over to the end-users to ensure that it meets their needs \parencite{testing}. 
+\end{enumerate}
+
+
+\subsection{SDLC Models}
+
+The literature describes several SDLC models that have been used in the development of software applications. \textcite{sdlc1, sdlc2} outline the most common SDLC models:
+\begin{itemize}
+    \item Waterfall Model
+    \item V Model
+    \item Spiral Model
+    \item Iterative Model
+    \item Agile model
+\end{itemize}
+
+Due to the nature of the project being different to traditional software development projects, and the student's familiarity with only Waterfall and Agile models, the next sections will only focus on these two models.
+
+\subsubsection{Waterfall Model}
+
+The Waterfall Model is probably the most well-known SDLC model. Waterfall is a linear model, where the development process is divided into distinct, sequential phases that follow the SDLC. As such, each phase must be completed before the next phase can begin.
+
+The Waterfall Model's strengths lie in its simplicty of use, ease of understanding and providing a structured approach to a project \parencite{waterfall}. An additional stregth of the Waterfall model that the authors note is its extensive documentation and planning, which is done in the early stages of a project, but also maintened throughout the project's lifecycle. These two factors also help minimize the overhead that comes with planning and management of a project, which in the case of Waterfall is done in the early stages of the project.
+
+However, the Waterfall model is not perfect. One of its main weaknesses, mentioned by \textcite{waterfall}, is its lack of flexibility in regards to change of requirements. As such, once the project leaves the requirements analysis or design phase, it may be difficult to make any changes to the project deliverable. Thus, this model is not suitable for projects where the requirements are not well understood or are likely to change. Finally, the deliverable is only available at the end of the project, so the end-users are unable to see the final product until the end of the project, nor can they provide any feedback during its development \parencite{waterfall}.
+
+\subsubsection{Agile Model}
+
+Another well-known SDLC model is the Agile model. Taking its roots from the Agile Manifesto, it describes a different way of developing software from the Waterfall model, with a focus on:
+
+\begin{quote}
+    \textit{Individuals and interactions over processes and tools, \\
+    Working software over comprehensive documentation, \\
+    Customer collaboration over contract negotiation, \\
+    Responding to change over following a plan}
+    \parencite{agile2}.
+\end{quote}
+
+The Agile model focuses on the ideas that requirements are not always well-known or cannot be predicted, accepting that change is inevitable and emphasis should be put on being able to accommodate any changes that may arise \parencite{agile}. Similarly, as the author mentions, the focus of this methodology is on continuous delivery of software and value to the customer. As such, it is integral for an Agile project to have a close customer involvement in the development process, to ensure that constant feedback is received.
