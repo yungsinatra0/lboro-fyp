@@ -347,3 +347,5 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.gitignore.io/api/tex,linux,macos,windows
+report files/thesis.bcf-SAVE-ERROR
+report files/thesis.bbl-SAVE-ERROR
