@@ -7,9 +7,8 @@ This chapter will provide a review of the existing literature, which will be use
 \noindent As such, it will be covering the following areas:
 \begin{itemize}
     \item Software development methodologies
-    \item Requirement gathering techniques
+    \item Requirement gathering
     \item System design
-    \item Accesibility considerations
     \item Tech stack
     \item Machine Learning models
     \item Gap Analysis
@@ -74,9 +73,9 @@ Agile does come with its own drawbacks. One of the main issues with Agile is its
 
 Agile has multiple frameworks that can be used to guide the development process, such as Scrum, Kanban, Lean, and Extreme Programming (XP).\ \textcite{scrumban} mention that Scrum is the most widely used Agile framework in software development. As such, the next sections will focus on Scrum and Kanban, due to their popularity and student's familiarity with these frameworks.
 
-Scrum is an Agile framework, with its core idea being the division of the project into smaller, manageable parts called sprints. Each sprint usually lasts between 2-4 weeks and each sprint focuses on delivering value to the customer through working software features and close communication with client stakeholders \parencite{scrumban, agile}. Scrum employs a set of artifacts, that are used to guide the development process, such as the product backlog, sprint backlog, and burndown charts. Additionally, Scrum also has a set of roles, such as the Scrum Master, Product Owner, and the Development Team, that are responsible for the development process \parencite{scrumban}. As such, Scrum may be more suitable for projects with at least a couple of team members, as it requires a team and their roles to work together to deliver the project and adherence to specific events within the project lifecycle.
+Scrum is an Agile framework, with its core idea being the division of the project into smaller, manageable parts called sprints. Each sprint usually lasts between 2-4 weeks and each sprint focuses on delivering value to the customer through working software features and close communication with client stakeholders \parencite{scrumban, agile}. Scrum employs a set of artifacts and ceremonies, that are used to guide the development process, such as the sprint and product backlog, daily scrums, backlog grooming/prioritization, and many more. Scrum also has a set of team roles, such as the Scrum Master, Product Owner, and the Development Team, that are responsible for the development process \parencite{scrumban}. 
 
-On the other hand, Kanban is not as prescriptive as Scrum is. Kanban focuses on visualizing the workflow of the project through a visual board with columns, swimlanes, etc. Additionally, Kanban helps limit the work in progress and maximize the flow of work through the system \parencite{agile}. Kanban does not have specific roles or artifacts, but instead focuses on the continuous delivery of value to the customer through smaller batching and daily prioritizations \parencite{scrumban}.
+On the other hand, Kanban is not as prescriptive as Scrum. Kanban focuses on visualizing the workflow of the project through a visual board with columns, cards and swimlanes. Kanban's main goal is to limit the work in progress through column WIP limits and a pull system to maximize the flow of work through the system \parencite{agile}. Kanban does not have specific roles or artifacts, but instead focuses on the continuous delivery of value to the customer through smaller batching and daily prioritizations \parencite{scrumban}.
 
 Finally, there is also a possibility of combining these two frameworks into one, called Scrumban. Nowadays, the use of Scrum and Kanban together is becoming quite popular, with many teams employing both frameworks in their projects. As \textcite{scrumban} mention, it can be quite beneficial as it allows the team to `adopt the appropriate practices of both methods based on different situations to meet their needs'. The authors emphasize that the team members need to understand which elements of either framework bring value to the project and adapt them accordingly.
 
@@ -104,13 +103,21 @@ Based on the research above, the student has decided that he will be using a hyb
 
 The student will use Jira Software as their project management tool, which is one of the most popular project management tool for software development projects that supports working with Agile frameworks such as Scrum and Kanban \parencite{atlassian}.
 
-\section{Requirement gathering techniques}
+\section{Requirements gathering}
+
+As noted in the previous section, the requirements gathering phase is the first step in the software development process, whether it is done in a traditional, Waterfall, approach or in an Agile approach. As described by \textcite{reqanalysis2}, a requirement is a `necessary attribute in a system\ldots that identifies a capability, characteristic, or quality factor of a system in order for it to have value and utility to a user'. Multiple studies mention how proper requirement gathering and analysis play a pivotal role in the project quality and success, with a majority of project failures being attributed to poor requirements gathering \parencite{reqanalysis1, reqanalysis3, reqanalysis5}.
+
+\textcite{reqanalysis2} explains that requirements should be `necessary, verifiable, attainable, unambiguous, complete, consistent, traceable, concise, implementation-free and have a unique identifier'. The author mentions that the requirement should focus on the `what' and not the `how', as the `how' is usually left to the developers to decide. Additionally, the author recommends focusing on the rationale behind the requirement, as it can help in understanding the requirement better and reduce the overall number of requirements. Finally, the author recommends beginning the process with an understanding the business requirements, which will help in creating the vision and scope that explains the background of the project and describes the system that needs to be developed.
+
+INSERT INFO ABOUT REQUIREMENT ATTRIBUTES/TYPES HERE + AGILE USER STORIES
+
+There are multiple requirement gathering techniques, the most popular ones being interviews, collaborative meetings, prototyping, modeling, brainstorming, storyboards, document analysis and ethnography (observing users interacting with an existing system) \parencite{reqanalysis1,reqanalysis2, reqanalysis3, reqanalysis4}. One of the studies interviewed  several individuals with multiple years of experience in the field of requirement gathering and analysis. As a result, the authors found that the most used requirement gathering techniques were collaborative meetings, interviews, ethnography and modeling \parencite{reqanalysis1}. Another study by \textcite{reqanalysis6} proposes a framework for improved requirement gathering in Scrum with a real-life case study of an IT project in Norway. The authors introduce the framework as being a series of 3 sections: pre-elicitation phase, where a high-level overview and breakdown of the requirements is done during an interview with the stakeholders, a mid-elicitation phase, where the a deep dive into the requirements is done through the usage of mind maps and a post-elicitation phase, where the output of the previous phase is used to feed into a Scrum Product Backlog and later a Sprint Backlog.
+
+\subsection{Interview technique considerations}
 
 
 
 \section{System design}
-
-\section{Accesibility considerations}
 
 \section{Tech stack}
 
