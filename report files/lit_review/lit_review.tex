@@ -89,33 +89,57 @@ So how would a hybrid approach work versus Waterfall or Agile? \textcite{hybrid2
 
 \textcite{hybrid1} note that projects using either Agile, traditional or hybrid approach show similar levels of success in terms of budget, time and quality. However, the authors have found that agile and hybrid approaches perform much better on the customer satisfaction metric than the traditional counterpart.
 
-\subsection{Conclusion}
-
-Based on the research above, the student has decided that he will be using a hybrid approach, with Waterfall as the main methodology for planning managing the project. The development part of the project will be done using ScrumBan, so that the student will be able to utilise elements from both frameworks. There are several reasons for this choice:
-
-\begin{enumerate}
-    \item The nature of the project - the student is working on a project that has a limited timeframe (about 6-7 months) and is of a smaller scale. 
-    \item Documentation requirements - the student is required to document the progress during the project in this report, including the requirements gathered, design considerations and implementation decisions and outcomes. 
-    \item Regulatory requirements - the student is required to adhere to the regulations and standards of the healthcare industry, which may require extensive documentation and planning.
-    \item Customer involvement - the student will be working closely with the project stakeholder, who will be providing feedback and guidance throughout the project.
-    \item Familiarity with both Agile and Waterfall - the student has experience with both Agile (specifically Scrum and Kanban) and Waterfall methodologies, and has worked on projects that have used both approaches.
-\end{enumerate}
-
-The student will use Jira Software as their project management tool, which is one of the most popular project management tool for software development projects that supports working with Agile frameworks such as Scrum and Kanban \parencite{atlassian}.
-
 \section{Requirements gathering}
 
 As noted in the previous section, the requirements gathering phase is the first step in the software development process, whether it is done in a traditional, Waterfall, approach or in an Agile approach. As described by \textcite{reqanalysis2}, a requirement is a `necessary attribute in a system\ldots that identifies a capability, characteristic, or quality factor of a system in order for it to have value and utility to a user'. Multiple studies mention how proper requirement gathering and analysis play a pivotal role in the project quality and success, with a majority of project failures being attributed to poor requirements gathering \parencite{reqanalysis1, reqanalysis3, reqanalysis5}.
 
 \textcite{reqanalysis2} explains that requirements should be `necessary, verifiable, attainable, unambiguous, complete, consistent, traceable, concise, implementation-free and have a unique identifier'. The author mentions that the requirement should focus on the `what' and not the `how', as the `how' is usually left to the developers to decide. Additionally, the author recommends focusing on the rationale behind the requirement, as it can help in understanding the requirement better and reduce the overall number of requirements. Finally, the author recommends beginning the process with an understanding the business requirements, which will help in creating the vision and scope that explains the background of the project and describes the system that needs to be developed.
 
-INSERT INFO ABOUT REQUIREMENT ATTRIBUTES/TYPES HERE + AGILE USER STORIES
+\subsection{Requirement types and attributes}
+
+
+
+\subsection{Requirement gathering techniques}
 
 There are multiple requirement gathering techniques, the most popular ones being interviews, collaborative meetings, prototyping, modeling, brainstorming, storyboards, document analysis and ethnography (observing users interacting with an existing system) \parencite{reqanalysis1,reqanalysis2, reqanalysis3, reqanalysis4}. One of the studies interviewed  several individuals with multiple years of experience in the field of requirement gathering and analysis. As a result, the authors found that the most used requirement gathering techniques were collaborative meetings, interviews, ethnography and modeling \parencite{reqanalysis1}. Another study by \textcite{reqanalysis6} proposes a framework for improved requirement gathering in Scrum with a real-life case study of an IT project in Norway. The authors introduce the framework as being a series of 3 sections: pre-elicitation phase, where a high-level overview and breakdown of the requirements is done during an interview with the stakeholders, a mid-elicitation phase, where the a deep dive into the requirements is done through the usage of mind maps and a post-elicitation phase, where the output of the previous phase is used to feed into a Scrum Product Backlog and later a Sprint Backlog.
 
 \subsection{Interview technique considerations}
 
+Multiple research papers point to interviews being recognised as the most commonly used technique for requirement gathering \parencite{interviews5,interviews1,interviews2}. Interviews can be divided into 3 different types: structured, semi-structured and unstructured, with the first type being more effective at gathering information from stakeholders versus the other 2 types \parencite{interviews5,interviews6}. 
 
+Two articles by \textcite{interviews4, interviews3} suggest a list of recommended practices for conducting interviews, such as:
+\begin{enumerate}
+    \item Encouraging deep thinking through situational thinking or providing rationales.
+    \item Avoiding ambiguity by asking clarifying questions.
+    \item Being flexible by probing into relevant topics that have arisen during the discussion and not being rigidly attached to the interview script.
+    \item Verifying that the conclusion/summary aligns with the customer's vision.
+    \item Using projective techniques, such as analogies, scenarios, stories, and role-playing.
+    \item Having the stakeholder teach the analyst about a specific topic or a complex concept.
+    \item Stating the goals of the interview at the beginning and offering stakeholders time at the end to add any missing information.
+\end{enumerate}
+
+On the other hand, two studies have been found that provide some insights into the potential mistakes that student analysts may do during requirement gathering sessions. One such study done by \textcite{interviews1} mentions the following mistakes:
+\begin{enumerate}
+    \item Wrong opening - need to understand the context of the problem first, so it is important to understand the system as-is and how it would change with the new system before talking about the system itself.
+    \item Not leveraging ambiguity - ambiguity can reveal gaps in the knowledge between the analyst and the customer and be used to elicit important system-related knowledge.
+    \item Implicit goals - it is important to either explicitly ask/suggest clear goals or at least ask for more clarification.
+    \item Implicit stakeholders - not taking into account 3rd party stakeholders.
+    \item Non-functional requirements not considered
+    \item Interviews sounding like interrogations - to combat this, the authors recommend using techniques such as imagining, scenarios and teaching to let the customer explain their vision.
+    \item Problems in phrasing questions - some questions can be direct, so they need some background information to be understood.
+    \item Wrong closing - the authors stress the importance of a interview summary at the end of the session, to receive feedback from the customer if necessary.
+\end{enumerate}
+
+A similar study by \textcite{interviews2} suggests the following mistakes that can be made during interviews:
+
+\begin{enumerate}
+    \item Question formulation - asking vague, technical, irrelevant or long questions.
+    \item Question omission - not asking about stakeholders or existing business processes or not doing follow-up questions.
+    \item Order of interview - incorrect opening (no introductions, no description of the current situation) or ending (no summary)
+    \item Communication skills - too much technical jargon, not listening to the customer, interview sounding too strict or passiveness of the analyst.
+    \item Customer interaction - not building rapport with the customer
+    \item Planning - lack of planning in terms of sequence of questions to ask
+\end{enumerate}
 
 \section{System design}
 
