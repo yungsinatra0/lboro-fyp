@@ -93,11 +93,69 @@ So how would a hybrid approach work versus Waterfall or Agile? \textcite{hybrid2
 
 As noted in the previous section, the requirements gathering phase is the first step in the software development process, whether it is done in a traditional, Waterfall, approach or in an Agile approach. As described by \textcite{reqanalysis2}, a requirement is a `necessary attribute in a system\ldots that identifies a capability, characteristic, or quality factor of a system in order for it to have value and utility to a user'. Multiple studies mention how proper requirement gathering and analysis play a pivotal role in the project quality and success, with a majority of project failures being attributed to poor requirements gathering \parencite{reqanalysis1, reqanalysis3, reqanalysis5}.
 
-\textcite{reqanalysis2} explains that requirements should be `necessary, verifiable, attainable, unambiguous, complete, consistent, traceable, concise, implementation-free and have a unique identifier'. The author mentions that the requirement should focus on the `what' and not the `how', as the `how' is usually left to the developers to decide. Additionally, the author recommends focusing on the rationale behind the requirement, as it can help in understanding the requirement better and reduce the overall number of requirements. Finally, the author recommends beginning the process with an understanding the business requirements, which will help in creating the vision and scope that explains the background of the project and describes the system that needs to be developed.
+\subsection{Requirement types}
 
-\subsection{Requirement types and attributes}
+\textcite[4]{requirements} classifies requirements into 3 levels of abstraction: User requirements, System requirements and Design specifications. User requirements are the highest level of abstraction, are written in natural language and describe what services that system is expected to provide to the user. System requirements are more detailed, structured and precise, sometimes referred as functional specifications. Finally, design specifications are used by developers to implement the system, and is derived from analysis of system and design documentation. There 3 levels of abstraction are then later used during testing, each level corresponding to the respective testing level: User requirements are used in acceptance testing, System requirements are used in system and integration testing and Design specifications are used in unit testing \parencite[4]{requirements}.
 
+The author also mentions that requirements can be classified into 2 categories: functional and non-functional requirements. Functional requirements describe the system's behavior, such as what the system should do and how it will react to different inputs, while non-functional requirements describe the system's quality attributes, such as performance, security, reliability, etc. \parencite[6]{requirements}.
 
+When writing the requirements in a document, it is important to ensure that everything is written in a clear and concise manner to avoid any ambiguity. As such, \textcite[112]{requirements} comes with a some recommendations for writing requirements:
+\begin{enumerate}
+    \item Using a standard format for writing all requirements
+    \item Using simple language in a consistent manner
+    \item Avoiding the use of technical language unless necessary
+    \item Avoiding vague or speculative terms such as `generally', `sometimes', instead using precise terms or even ranges/values
+    \item Avoiding use of conjuctions such as `and', `or', `but' in a single requirement to not create multiple requirements in a single statement
+\end{enumerate}
+
+Additionally, the author points to \textcite{requirements2}, which provides a list of characteristics of individual requirements:
+\begin{enumerate}
+    \item Necessary
+    \item Appropriate
+    \item Unambiguous
+    \item Complete
+    \item Singular
+    \item Feasible
+    \item Verifiable
+    \item Correct
+    \item Conforming
+\end{enumerate}
+
+The same standard also provides some examples of requirements attributes within a requirement document, such as:
+\begin{enumerate}
+    \item Identification
+    \item Owner
+    \item Priority
+    \item Risk
+    \item Rationale
+    \item Difficulty
+    \item Type (functional/non-functional)
+\end{enumerate}
+
+\subsubsection{Requirements in Agile}
+
+\textcite[191]{requirements} provides an explanation of requirements within Agile projects. The author mentions that in Agile projects, the most basic unit of requirements are usually written in the form of User Stories, which are short, simple descriptions of a feature desired by the customer. User Stories are written in a specific format, such as `As a [user], I want to [action] so that [benefit]'. A list of other User Story components is given by the author:
+\begin{enumerate}
+    \item Title
+    \item Acceptance test/criteria - a list of conditions that must be met for the story to be considered complete
+    \item Priority
+    \item Story points - estimated time to implement the user story
+    \item Description
+\end{enumerate}
+
+User stories are part of the Product and Sprint backlog - the former one containing the list of requirements for the whole project and the latter containing the list of requirements for the current sprint/iteration.
+
+\subsection{Stakeholders}
+
+\textcite[34]{requirements} explains that stakeholders represent the `set of individuals who have some interest (a stake) in the success (or failure) of the system in question'. The author continues that there may be many types of stakeholders and stresses the importance of accurately and completely identifying all possible stakeholders for a system. Identification of all possible stakeholders needs to be done in the early stages of the project, as leaving out key stakeholder could lead to missing out on important requirements or constraints later on the project. 
+
+After identifying the stakeholders, it is important to do a stakeholder analysis by understanding the stakeholders' interests, needs, expectations, and influence on the project and then mapping them on a stakeholder matrix. One such matrix is the Influence/Interest grid, which classifies stakeholders based on their power and interest in the project \parencite{stakeholders}. The matrix divides stakeholders into 4 categories:
+\begin{enumerate}
+    \item Low influence, low interest - try to increase interest
+    \item Low influence, high interest - keep informed 
+    \item High influence, low interest - engage and consult on interest area
+    \item High influence, high interest - key players, involve in decision making and engage regularly
+\end{enumerate}
 
 \subsection{Requirement gathering techniques}
 
