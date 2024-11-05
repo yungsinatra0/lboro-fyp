@@ -59,8 +59,9 @@ At the moment, the requirements are kept at a high level, and will be further re
 \begin{itemize}
     \item The system must have an audit log that records all changes made to the patient records by the system users
     \item The system must have role-based access control, with different roles for doctors, nurses, and administrative staff
+    \item The system must allow other doctors to view the patient's records, but not edit them
     \item The system must restrict edit access to patient records for other doctors and nurses, except for the doctor who is assigned to the patient
-    \item The system must restrict editing of patient history after it was taken by the doctor
+    \item The system must restrict editing of past patient history records to every user except the system administrator
 \end{itemize}
 
 \subsubsection{Vitals and test results}
@@ -86,24 +87,24 @@ At the moment, the requirements are kept at a high level, and will be further re
     \item The system must allow doctors to view the patient's previous hospitalization records at the same hospital
     \item The system must allow doctors to create hospitalization-related records for the patient: admission, discharge and transfer
     \item The system must allow doctors to create daily record entries for the hospitalized patient
-    \item The system must provide a free text field for doctors to create record entries
+    \item The system must provide a free text field for doctors to create record entries 
     \item The system must store and display the patient's personal information
     \item The system must allow doctors to change the patient's diagnosis after the patient has been discharged
     \item The system could allow doctors to manually upload patient records from paper-based records
-    \item The system could allow doctors to build an empty document template by choosing the required fields or sections from a pre-defined list
+    \item The system could allow doctors to build an empty record template by choosing the required fields or sections from a pre-defined list
 \end{itemize}
 
 \subsubsection{Insurance}
 \begin{itemize}
     \item The system mult allow doctors to view the patient's insurance information
     \item The system must allow doctors to assign an ICD-10 code to the patient's diagnosis
-    \item The system must allow doctors to add free text notes to the patient's diagnosis
+    \item The system must allow doctors to add additional free text notes to the patient's diagnosis for more detailed information
 \end{itemize}
 
 \subsubsection{Administration}
 
 \begin{itemize}
-    \item The system must communicate with ASP system to extract patient personal data using IDNP at the time of patient registration
+    \item The system must communicate with the ASP system to extract patient personal data using personal identification number (IDNP) at the time of patient registration
     \item The system must allow administrative staff to register new patients
     \item The system must allow administrative staff to generate analytics reports based on aggreggate patient data
 \end{itemize}
