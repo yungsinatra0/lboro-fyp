@@ -96,49 +96,23 @@ As noted in the previous section, the requirements gathering phase is the first 
 
 The author also mentions that requirements can be classified into 2 categories: functional and non-functional requirements. Functional requirements describe the system's behavior, such as what the system should do and how it will react to different inputs, while non-functional requirements describe the system's quality attributes, such as performance, security, reliability, etc. \parencite[6]{requirements}.
 
-When writing the requirements in a document, it is important to ensure that everything is written in a clear and concise manner to avoid any ambiguity. As such, \textcite[112]{requirements} comes with a some recommendations for writing requirements:
-\begin{enumerate}
-    \item Using a standard format for writing all requirements
-    \item Using simple language in a consistent manner
-    \item Avoiding the use of technical language unless necessary
-    \item Avoiding vague or speculative terms such as `generally', `sometimes', instead using precise terms or even ranges/values
-    \item Avoiding use of conjuctions such as `and', `or', `but' in a single requirement to not create multiple requirements in a single statement
-\end{enumerate}
+When writing the requirements in a document, it is important to ensure that everything is written in a clear and concise manner to avoid any ambiguity. As such, \textcite[112]{requirements} recommends using a standard format for writing all requirements, using simple language in a consistent manner, avoiding the use of technical language unless necessary, avoiding vague or speculative terms such as 'generally' or 'sometimes' and instead using precise terms or even ranges/values, and avoiding the use of conjunctions such as 'and', 'or', 'but' in a single requirement to not create multiple requirements in a single statement.
 
-Additionally, the author points to \textcite{requirements2}, which provides a list of characteristics of individual requirements:
-\begin{enumerate}
-    \item Necessary
-    \item Appropriate
-    \item Unambiguous
-    \item Complete
-    \item Singular
-    \item Feasible
-    \item Verifiable
-    \item Correct
-    \item Conforming
-\end{enumerate}
+Additionally, the author points to \textcite{requirements2}, which provides a list of characteristics of individual requirements: necessary, appropriate, unambiguous, complete, singular, feasible, verifiable, correct, and conforming.
 
-The same standard also provides some examples of requirements attributes within a requirement document, such as:
-\begin{enumerate}
-    \item Identification
-    \item Owner
-    \item Priority
-    \item Risk
-    \item Rationale
-    \item Difficulty
-    \item Type (functional/non-functional)
-\end{enumerate}
+The same standard also provides some examples of requirements attributes within a requirement document, such as identification, owner, priority, risk, rationale, difficulty, and type (functional/non-functional).
+
+Finally, prioritizing requirements is crucial, especially in projects with numerous requirements. Several techniques can help determine which requirements to address first. Simple methods include categorizing requirements as low, medium, or high priority, or assigning a numerical value within a specific range \parencite{moscow}. In addition to the previously mentioned techniques, the author mentions another approach - the MoSCoW method, which classifies requirements into four categories: 
+\begin{itemize}
+    \item Must have - must be implemented in the software before being released
+    \item Should have - important but not necessary for the software to be released
+    \item Could have - desirable but not necessary for the software to be released
+    \item Won't have - requirements that are not included in the current release
+\end{itemize}
 
 \subsubsection{Requirements in Agile}
 
-\textcite[191]{requirements} provides an explanation of requirements within Agile projects. The author mentions that in Agile projects, the most basic unit of requirements are usually written in the form of User Stories, which are short, simple descriptions of a feature desired by the customer. User Stories are written in a specific format, such as `As a [user], I want to [action] so that [benefit]'. A list of other User Story components is given by the author:
-\begin{enumerate}
-    \item Title
-    \item Acceptance test/criteria - a list of conditions that must be met for the story to be considered complete
-    \item Priority
-    \item Story points - estimated time to implement the user story
-    \item Description
-\end{enumerate}
+\textcite[191]{requirements} provides an explanation of requirements within Agile projects. The author mentions that in Agile projects, the most basic unit of requirements are usually written in the form of User Stories, which are short, simple descriptions of a feature desired by the customer. User Stories are written in a specific format, such as `As a [user], I want to [action] so that [benefit]'. Other components of a User Story include a title, acceptance test/criteria (a list of conditions that must be met for the story to be considered complete), priority, story points (estimated time to implement the user story), and description.
 
 User stories are part of the Product and Sprint backlog - the former one containing the list of requirements for the whole project and the latter containing the list of requirements for the current sprint/iteration.
 
