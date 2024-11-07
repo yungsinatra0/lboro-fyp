@@ -57,11 +57,14 @@ At the moment, the requirements are kept at a high level, and will be further re
 
 \subsubsection{Security}
 \begin{itemize}
-    \item The system must have an audit log that records all changes made to the patient records by the system users
+    \item The system must have an audit log that records edits made to the patient records
+    \item The system must have an audit log that records creation of patient records
+    \item The system must have an audit log that records approval of medication orders
+    \item The system must have an audit log that records order of medication
     \item The system must have role-based access control, with different roles for doctors, nurses, and administrative staff
     \item The system must allow other doctors to view the patient's records, but not edit them
     \item The system must restrict edit access to patient records for other doctors and nurses, except for the doctor who is assigned to the patient
-    \item The system must restrict editing of past patient history records to every user except the system administrator
+%    \item The system must restrict editing of past patient history records to every user except the system administrator
 \end{itemize}
 
 \subsubsection{Vitals and test results}
@@ -89,7 +92,7 @@ At the moment, the requirements are kept at a high level, and will be further re
     \item The system must allow doctors to create daily record entries for the hospitalized patient
     \item The system must provide a free text field for doctors to create record entries 
     \item The system must store and display the patient's personal information
-    \item The system must allow doctors to change the patient's diagnosis after the patient has been discharged
+    \item The system must allow doctors to change the patient's diagnosis during the discharge process
     \item The system could allow doctors to manually upload patient records from paper-based records
     \item The system could allow doctors to build an empty record template by choosing the required fields or sections from a pre-defined list
 \end{itemize}
