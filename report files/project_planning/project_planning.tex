@@ -16,19 +16,23 @@ The student will use Jira Software as their project management tool, which is on
 
 \section{Requirements and Stakeholder Analysis}
 
+To gain a more complete understanding of the current situation in Moldova, the existing problems and possible needs of the people involved, it is important to start with an analysis to identify the possible key stakeholders for this project. As previously mentioned in the literature review, a diverse group of stakeholders is essential to ensure that the currrent situation is reviewed from multiple perspectives. 
+
+Afterwards, the next step is to utilise the chosen stakeholders to gather as much information as possible from various perspective to ensure that the project is aligned with the needs of both patients and healthcare professionals in Moldova and solves the existing problems.
+
 \subsection{Stakeholder Analysis}
 
-To gain a more complete understanding of the current situation and the needs of the stakeholders, the student has conducted a stakeholder analysis. The student has identified the following stakeholders:
+The student has identified the following stakeholders for the project:
 
 \begin{enumerate}
     \item A doctor working at the Republican Hospital - the main stakeholder, who will be providing guidance and feedback throughout the project on the perspective of the end users, the doctors and nurses who will be using the EHR system.
     \item The Vice-Director of CNAM (National Health Insurance Company) - the person who will be providing feedback from the perspective of the health insurance company.
     \item Senior IT staff member at CNAM - a person who also has previously worked within the Ministry of Health, and who will be providing feedback on the technical aspects of the integration between the EHR system and the health insurance system.
     \item Department head at the Republican Hospital - a person who will be providing feedback on the administrative aspects of the EHR system.
-    \item Patients - while they are not directly involved in the project, the EHR system will have a direct impact on them, as it will help improve the quality of care they receive.
+    \item Patients - both of public and private healthcare institutions, who will be providing feedback on the usability and accessibility of an EHR system prototype.
 \end{enumerate}
 
-These stakeholders have been identified so that they can provide a bigger picture on the needs and requirements of the project, and to ensure that the project is aligned with the needs of the healthcare industry in Moldova. 
+These stakeholders have been identified so that they can provide a bigger picture on the needs and requirements of the project, and to ensure that the project is aligned with the needs of the healthcare industry in Moldova from both the provider and patient perspective. 
 
 The stakeholders have also been placed the stakeholder influence-interest grid, to help the student understand the level of influence and interest that each stakeholder has in the project:
 
@@ -36,101 +40,25 @@ The stakeholders have also been placed the stakeholder influence-interest grid, 
     \item The doctor working at the Republican Hospital - low influence, high interest
     \item The Vice-Director of CNAM - high influence, high interest
     \item Senior IT staff member at CNAM - high influence, low interest
-    \item Department head at the Republican Hospital - high influence, high interest
-    \item Patient - low influence, low interest
+    \item Department head at the Republican Hospital - high influence, low interest
+    \item Patient - low influence, high interest
 \end{enumerate}
+
+\subsection{Current situation analysis}
+
+Following the stakeholder analysis, the student has conducted several exploratory interviews with the chosen people to provide insights into the current issues with the IT systems used in the healthcare sector. After the conclusion of the interviews, several main themes for problems and potential solutions have been identified:
+
+\begin{enumerate}
+    \item Current system is outdated, not user friendly and only accessible via Internet Explorer or legacy version of Microsoft Edge. A potential solution is to develop a new, modernized version of the existing system (thus retaining the core functionality) that is accessible via modern browsers and devices and can be augmented with additional features if necessary.
+    \item Lack of interoperability between medical institutions due to a lack of a nationally-wide integrated system. A potential solution is to create a new systems where patients can upload their own medical records (such as lab tests, previous medical history, etc) and share them with any medical practitioner, regardless of the institution they work at. 
+    \item Some systems are not digitalized at all, and still rely on paper-based records or very rudimentary data structures, such as the transplant registry. A potential solution is a the creation of a digitalized system, as is in the case of the transplant registry, that can be accessed by any medical practitioner in Moldova.
+\end{enumerate}
+
+After analysing the current issues and potential solutions, the student has determined that the solutions for issues \#1 and \#3 are too complex, as they require an overhaul of the system and integration with other existing systems. As such, the student has decided to focus on issue \#2, as it is the most feasible and can be implemented within the timeframe of the project. 
+
+After the decision has been made, more interviews were conducted with stakeholders to focus on the requirements for the chosen solution. The requirements have been gathered and documented in the next section.
 
 \subsection{Requirements}
-
-Following the stakeholder analysis, the student has conducted several interviews with the key stakeholders to gather the requirements for the project. The student has identified the following requirements, which are prioritized using the MoSCoW method. The requirements have been categorized in various sections based on the area of the system they are related to. 
-
-At the moment, the requirements are kept at a high level, and will be further refined when they will be moved to the product backlog and then individually during their respective Sprints.
-
-\subsubsection{Accessibility}
-\begin{itemize}
-    \item The system must be accessible using any desktop-based web browser
-    \item The system must be accessible from any location, as long as the user has an internet connection
-    \item The system should be accessible on mobile devices using a web browser
-    \item The system could allow doctors to access test results and vitals using a mobile web browser
-    \item The system could allow doctors to create basic daily record entries using a mobile web browser
-\end{itemize}
-
-\subsubsection{Security}
-\begin{itemize}
-    \item The system must have an audit log that records edits made to the patient records
-    \item The system must have an audit log that records creation of patient records
-    \item The system must have an audit log that records approval of medication orders
-    \item The system must have an audit log that records order of medication
-    \item The system must have role-based access control, with different roles for doctors, nurses, and administrative staff
-    \item The system must allow other doctors to view the patient's records, but not edit them
-    \item The system must restrict edit access to patient records for other doctors and nurses, except for the doctor who is assigned to the patient
-%    \item The system must restrict editing of past patient history records to every user except the system administrator
-\end{itemize}
-
-\subsubsection{Vitals and test results}
-\begin{itemize}
-    \item The system must allow doctors to view the history of the hospitalized patient's test results in a graphical and numerical format
-    \item The system must allow doctors to view the history of the hospitalized patient's vitals in a graphical and numerical format
-    \item The system must load the patient's vitals and test results within 3 seconds of the doctor opening the patient's record
-    \item The system must allow doctors to order lab tests for the patient
-    \item The system should allow doctors to export the patient's test results and vitals in Excel format
-    \item The system could allow doctors to generate a barcode to be printed and attached to the patient's sample
-\end{itemize}
-
-\subsubsection{Prescriptions}
-\begin{itemize}
-    \item The system must allow doctors to order medications
-    \item The system must allow allow doctors to assign medications to the hospitalized patient
-    \item The system must allow doctors and nurses to track the assigned hospitalized patient's medication intake
-    \item The system should allow doctors to specify the dosage, frequency, duration and method of administration of the medication
-\end{itemize}
-
-\subsubsection{Patient records}
-\begin{itemize}
-    \item The system must allow doctors to view the patient's previous hospitalization records at the same hospital
-    \item The system must allow doctors to create hospitalization-related records for the patient: admission, discharge and transfer
-    \item The system must allow doctors to create daily record entries for the hospitalized patient
-    \item The system must provide a free text field for doctors to create record entries 
-    \item The system must store and display the patient's personal information
-    \item The system must allow doctors to change the patient's diagnosis during the discharge process
-    \item The system could allow doctors to manually upload patient records from paper-based records
-    \item The system could allow doctors to build an empty record template by choosing the required fields or sections from a pre-defined list
-\end{itemize}
-
-\subsubsection{Insurance}
-\begin{itemize}
-    \item The system mult allow doctors to view the patient's insurance information
-    \item The system must allow doctors to assign an ICD-10 code to the patient's diagnosis
-    \item The system must allow doctors to add additional free text notes to the patient's diagnosis for more detailed information
-\end{itemize}
-
-\subsubsection{Administration}
-
-\begin{itemize}
-    \item The system must communicate with the ASP system to extract patient personal data using personal identification number (IDNP) at the time of patient registration
-    \item The system must allow administrative staff to register new patients
-    \item The system must allow administrative staff to generate analytics reports based on aggreggate patient data
-\end{itemize}
-
-\subsubsection{Additional Features}
-\begin{itemize}
-    \item The system could generate a summary of the previous patient's hospitalization records using artificial intelligence
-    \item The system could utilise a speech recognition system to allow doctors to dictate daily record entries
-    \item The system could utilise artificial intelligence to provide general recommendations to patients based on their diagnosis
-    \item The system could utilise OCR (Optical Character Recognition) to extract data from paper-based records
-\end{itemize}
-
-Based on the requirements above, the student has established the following user categories and their respective roles:
-\begin{enumerate}
-    \item Doctor - the main user of the system, who will be responsible for creating and managing the patient records
-    \item Nurse - the user who will be responsible for tracking the patient's medication intake
-    \item Administrative staff - the user who will be responsible for registering new patients and generating analytics reports
-    \item Patient - will not have direct access to the system, but will contain all the information related to the patient
-    \item Pharmacist - the user who will be responsible for approving and dispensing the medications orders
-    \item Laboratory technician - the user who will be responsible for conducting the lab tests and entering the results into the system
-    \item Insurance company - the user who will be responsible for approving the patient's insurance claims
-    \item System administrator - the user who will be responsible for managing the system, including user roles and permissions
-\end{enumerate}
 
 \subsection{Product Backlog}
 
