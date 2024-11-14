@@ -170,18 +170,6 @@ A similar study by \textcite{interviews2} suggests the following mistakes that c
     \item Planning - lack of planning in terms of sequence of questions to ask
 \end{enumerate}
 
-\section{System design}
-
-UML, or Unified Modeling Language, is a standardized modeling language that consists of a set of diagrams used for modeling business processes and visualizing and documenting software systems \parencite{uml}. UML employs graphical notations to represent a system, aiding teams in better communicating potential designs and architectural decisions. Utilizing UML can enhance quality, reduce costs, and provide multiple perspectives on the system.
-
-UML offers various diagrams, each serving a specific purpose. The most common diagrams include:
-\begin{itemize}
-    \item \textbf{Use Case Diagram} - Illustrates the system's intended functionality in terms of actors, use cases, and their relationships, showing how the system delivers value to users.
-    \item \textbf{Class Diagram} - Depicts the structure of the system by showing classes, attributes, operations, and static relationships between classes.
-    \item \textbf{Sequence Diagram} - Demonstrates how objects interact in a particular, timed sequence scenario, focusing on the messages passed between objects.
-    \item \textbf{Activity Diagram} - Represents the workflow of a target use case or business process through a series of activities, emphasizing steps, choices, iterations, and concurrency.
-\end{itemize}
-
 \section{Tech stack}
 
 \subsection{Database}
@@ -190,23 +178,77 @@ There are several types of databases, such as: relational (SQL), NoSQL databases
 
 \subsubsection{Relational databases}
 
-Relational databases are collections of data where the data is stored in rows and tables, linked through keys that allow different types of relationships: one-to-one, one-to-many and many-to-many \parencite{databases}. SQL (Structured Query Language) is the programming language used to query relational databases. \textcite{databases} mention the advantages of using relational databases is in their ability to handle structured data in well-organized manner by using schemas and tables, making it easy to query, even for complex queries. Additionally, the authors argue that by following the ACID (Atomicity, Consistency, Isolation, Durability) properties, relational databases ensure that the data within is consistent and reliable. Finally, relational databases are widely used and have a large community of users, which makes it easier to find support and resources. Example of relational databases include MySQL, PostgreSQL, Oracle, and Microsoft SQL Server.
+Relational databases store structured data in tables, linked through keys to create relationships like one-to-one and one-to-many \parencite{databases}. They use SQL (Structured Query Language) to create powerful queries and schemas to help organise and manage data efficiently. \textcite{databases} highlight that relational databases, by following ACID (Atomicity, Consistency, Isolation, Durability) principles, ensure high data integrity for industries like finance and healthcare. Relational databases are widely used and have a large community, making it easier to find support and resources. However, the rigid schema limits adaptability to rapid data changes, and scaling horizontally in distributed systems can be challenging. Examples include MySQL, PostgreSQL, Oracle, and Microsoft SQL Server.
 
 \subsubsection{NoSQL databases}
 
-NoSQL databases, on the other hand, are databases that allow developers to work with unstructured data (such as documents, images, etc) without relying on rigid schemas, tables or relationships between data \parencite{databases}. As described by the authors, NoSQL databases generally fall into four different structures: key-value stores, document stores, column-family stores, and graph databases. Similarly to relational databases, NoSQL databases follow their own set of properties, such as the CAP (Consistency, Availability, Partition Tolerance) theorem, which states that a distributed system can only guarantee two of the three properties at the same time. While NoSQL databases are not as widely used as relational databases, they are gaining popularity due to their ability to handle large amounts of data and their flexibility in handling unstructured data. Examples of NoSQL databases include MongoDB, Cassandra, Couchbase, and Redis.
+NoSQL databases manage unstructured or semi-structured data without rigid schemas or relationships \parencite{databases}. As the authors describe, NoSQL databases, such as key-value, document, column-family, and graph databases, excel in flexibility and scalability. Guided by the CAP (Consistency, Availability, Partition Tolerance) theorem, NoSQL databases often prioritize performance over strict consistency, making them suitable for large, varied datasets of unstructured data but less ideal for complex transactions. Although growing in popularity, NoSQL systems lack SQL’s mature standardization and support. Examples include MongoDB, Cassandra, Couchbase, and Redis.
 
 \subsection{Backend framework}
 
-It is important to choose the right backend framework for the project, as it is responsible for handling multiple functions on the server side of the application, such as routing, database access, authentication, real-time functionality and more \parencite{backend}. The author mentions that an advantage of choosing a backend framework is that it provides better security and scalability, but also improves the quality and speed of development thanks to existing community support through libraries or tools. However, due to the number of existing frameworks, the choice of a framework is not an easy task - experience and familiarity with the programming language is important, but also how well the framework fits the project requirements. Currently, the most popular backend frameworks are Express.js, Koa, Django, Ruby on Rails, Flask, Spring or Laravel \parencite{backend}. 
+Choosing the right backend framework is crucial for the development of the project deliverable. The backend framework is responsible for handling the business logic of the application, such as processing requests, interacting with the database, and returning responses to the client. A good framework can also come with the added benefit of included features such as security and authentication, database support through an ORM (Object-Relational Mapping) and community support through existing documentation, library of extensions and a user base that can provide support if necessary. 
 
-Some frameworks are more suited for smaller projects, while others are more suited for larger, complex projects. For example, Express.js, Flask or Koa are more minimalistic frameworks that are easy to use and are well suited for smaller projects, while Django, Ruby on Rails, Spring or Laravel are more comprehensive frameworks that offer a range of built-in features, are more structured and subsequently better suited for larger, complex projects \parencite{backend}. As the student is not well versed in Java, Ruby or PHP, and the project is expected to be more complex due to the nature of the healthcare industry, Django seems to be the most suitable choice for the project.
+Based on recent a recent survey by \textcite{statista-webframeworks}, the most popular backend frameworks are Express, Flask, Spring Boot, Django and Laravel. This data is also supported by the Stack Overflow Developer Survey 2024, which lists the most popular programming languages as JavaScript (Express), Python (Flask, Django), Java (Spring Boot) and PHP (Laravel) \parencite{stackoverflow}. 
 
-\subsubsection{Django}
+Due to their high popularity among developers, the decision was made to compare the above frameworks, as the student will be able to much easier find support and online resources if necessary. Utilising the information from \textcite{spring,laravel,express,django}, the table below will compare the most popular backend frameworks based on the following criteria: programming language used, learning curve, community support, security features, database features, and project size suitability.
 
-Django is a high-level Python framework, with a range of built-in features such as an ORM, authentication and admin interface \parencite{django}. The key features of using Django are its comprehensive suite of built-in features, its focus on security (which includes both user authentication but also protection from common web attacks), its versatility but also scalability. As such, Django seems to be well suited for mostly large, complex projects that will utilise its range of built-in features. However, the framework does have its downsides, such as lack of support for non-relational databases, its steeper learning curve and limited RESTful architecture support \parencite{pythonframwork}. 
+\begin{table}[h]
+    \centering
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{|l|l|l|l|l|}
+    \hline
+        \textbf{Framework} & \textbf{Django} & \textbf{Laravel} & \textbf{Spring Boot} & \textbf{Express} \\ 
+    \hline 
+        \textbf{Language} & Python & PHP & Java & JavaScript \\ 
+    \hline
+        \textbf{Learning curve} & Medium & Low & High & Low \\ 
+    \hline
+        \textbf{Community Support} & High & High & High & High \\ 
+    \hline
+        \textbf{Security features} & High & High & High & Medium \\ 
+    \hline
+        \textbf{Database features} & Medium & Medium & High & Medium \\ 
+    \hline
+        \textbf{Project size suitability} & Small to medium & Small to medium & Medium to large & Small to medium \\ 
+    \hline
+    \end{tabular}%
+    }
+    \caption{Comparison of backend frameworks}
+    \label{tab:backend}
+\end{table}
 
 \subsection{Frontend framework}
+
+Similar to the backend frameworks, choosing a suitable frontend framework is equally important. The frontend framework is responsible for the user interface of the application, such as displaying data, handling user interactions, and making requests to the backend. A good frontend framework can also come with the added benefit of included features such as routing, state management, and component libraries. 
+
+Based on the same survey by \textcite{statista-webframeworks}, the most popular frontend frameworks are React, Angular, Vue.js, and Svelte. This data is also supported by the Stack Overflow Developer Survey 2024, where the above frameworks rank among the highest for developers wishing to continue using them \parencite{stackoverflow}.
+
+As such, the table below will utilise the information from \textcite{react,angular,vue,svelte} to compare the most popular frontend frameworks based on the following criteria: learning curve, community and documentation, ecosystem and tooling support, performance, state management, and project size suitability.
+
+\begin{table}[h]
+    \centering
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{|l|l|l|l|l|}
+    \hline
+        \textbf{Framework} & \textbf{React} & \textbf{Angular} & \textbf{Vue.js} & \textbf{Svelte} \\ 
+    \hline 
+        \textbf{Learning curve} & Low & High & Medium & Low \\ 
+    \hline
+        \textbf{Community and documentation} & High & High & High & Medium \\ 
+    \hline
+        \textbf{Ecosystem and tooling support} & High & High & Medium & Low \\ 
+    \hline
+        \textbf{Performance} & High & Medium & Medium & High \\ 
+    \hline
+        \textbf{State management} & High & High & Medium & Low \\ 
+    \hline
+        \textbf{Project size suitability} & Small to large & Medium to large & Small to medium & Small to medium \\ 
+    \hline
+    \end{tabular}%
+    }
+    \caption{Comparison of frontend frameworks}
+    \label{tab:frontend}
+\end{table}
 
 \section{Machine Learning models}
 
