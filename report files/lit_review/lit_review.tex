@@ -64,41 +64,33 @@ One of its main weaknesses, mentioned by \textcite{waterfall}, is its lack of fl
 
 \subsubsection{Agile Model}
 
-Another well-known SDLC model is the Agile model. The model focuses on the idea that requirements are not always well-known and accepting that change is inevitable \parencite{agile}. Similarly, as the author mentions, the focus of this methodology is on continuous delivery of software and value to the customer. As such, it is integral for an Agile project to have a close customer involvement in the development process, to ensure that constant feedback is received.
+Another well-known model is Agile. It focuses on the idea that requirements are not always well-known and accepting that change is inevitable \parencite{agile}. Similarly, as the author mentions, the focus of this methodology is on continuous delivery of software and interaction with the customer to get feedback. The author mentions that Agile is well known for its flexibility and adaptability to change, its ability to deliver working software in short iterations and its focus on customer satisfaction.
 
-Agile does come with its own drawbacks. One of the main issues with Agile is its lack of documentation and formal planning, especially in the early stages of the project \parencite{sdlc1}. Consequently, the Agile methodology may not be suitable for large scale projects, where extensive documentation and planning are required \parencite{agile, sdlc2}. Similarly, the Agile model may not be suitable for projects where the requirements are well understood or where there may be strict regulations that guide how the project should be developed.
+Agile has multiple frameworks that can be used to guide the development process, such as Scrum or Kanban. Scrum is an Agile framework, where the project is divided into sprints, each lasting between 2-4 weeks and focusing on delivering value to the customer through incremental software features \parencite{scrumban, agile}. On the other hand, Kanban focuses on visualizing the project workflow through a visual board by using columns, cards and swimlanes. Kanban's main goal is to limit the work in progress through column limits and a pull system to maximize the flow of work through the system \parencite{agile}.
 
-Agile has multiple frameworks that can be used to guide the development process, such as Scrum, Kanban, Lean, and Extreme Programming (XP). \textcite{scrumban} mention that Scrum is the most widely used Agile framework in software development.
+Agile does have some drawbacks - its lack of documentation and formal planning, especially in the early stages of the project, may not be suitable for large scale projects, where extensive documentation and planning are required \parencite{sdlc1, agile, sdlc2}. Similarly, the Agile model may not be suitable for projects where the requirements are well understood or where there may be strict regulations that guide how the project should be developed.
 
-Scrum is an Agile framework, where the projec is divided into smaller, manageable increments called sprints. Each sprint lasts between 2-4 weeks and focuses on delivering value to the customer through working software features and close communication with stakeholders \parencite{scrumban, agile}. Scrum employs a set of artifacts and ceremonies, that are used to guide the development process, such as the sprint and product backlog or daily scrums. Scrum also has a set of team roles, such as the Scrum Master, Product Owner, and the Development Team, that have different responsibilities in the project \parencite{scrumban}. 
-
-On the other hand, Kanban is not as prescriptive as Scrum. Kanban focuses on visualizing the workflow of the project through a visual board with columns, cards and swimlanes. Kanban's main goal is to limit the work in progress through column limits and a pull system to maximize the flow of work through the system \parencite{agile}. Kanban does not have specific roles or artifacts, but instead focuses on the continuous delivery of value to the customer through smaller batching and daily prioritizations \parencite{scrumban}.
-
-Finally, there is also a possibility of combining these two frameworks into one, called Scrumban. Nowadays, the use of Scrum and Kanban together is becoming quite popular, with many teams employing both frameworks in their projects. As \textcite{scrumban} mention, it can be quite beneficial as it allows the team to `adopt the appropriate practices of both methods based on different situations to meet their needs'. The authors emphasize that the team members need to understand which elements of either framework bring value to the project and adapt them accordingly.
+Nowadays, the use of Scrum and Kanban together is becoming quite popular, with many teams employing both frameworks in their projects. As \textcite{scrumban} mention, this can be quite beneficial as it allows teams to adopt the appropriate practices of both methods and adapt them accordingly based on their needs.
 
 % Add some figures for Scrum and Kanban
 
 \subsection{A hybrid approach}
 
-For many years, Waterfall (or the traditional approach) has been the most widely used model in software development projects, with Agile approaches gaining a lot of popularity in the recent years \parencite{hybrid1}. However, the authors note that a hybrid approach has also been emerging. Results from various surveys show that the hybrid approach has been used by over 50\% of respondents \parencite{hybrid1,hybrid2}. The most common combinations that form this hybrid approach are `Scrum, Iterative Development, Kanban, Waterfall and DevOps', with the approach that combines Waterfall and Scrum being the most popular \parencite{hybrid2}.
-
-Pure Agile approaches have been found to rarely exist, with hybrid Agile approaches being in reality most Agile implementations \parencite{hybrid1}. This may be due to multiple reasons, some of which may include regulations or safety standards in areas such as healthcare or defense systems documentation requirements or even time constraints. Only the development part is usually done in an `Agile way' - with the rest of the project using the traditional approach as a `backbone' \parencite{hybrid2}.
-
-\textcite{hybrid2} explain that the hybrid approach uses Waterfall as its main methodology - still retaining the 6 general phases that were mentioned above. The authors note that the approach begins with the classic requirements analysis phase, followed by a design phase. Next, the previously gathered requirements are broken down in smaller pieces (like User Stories or Epics) and transferred to the Product Backlog. Following this, the development phase starts, usually based on the Scrum framework that was described above. Finally, the project ends with a testing phase, followed by a operations or maintenance phase, where the software is deployed and maintenance support is offered.
+For many years, Waterfall has been the most widely used model in software development projects, with Agile approaches gaining popularity in the recent years \parencite{hybrid1}. However, a hybrid approach has also been emerging, with various surveys reporting a combined approach being used in project work \parencite{hybrid1,hybrid2}. The most common combinations that form this hybrid approach are Scrum, Iterative Development, Kanban, Waterfall and DevOps, with the approach that combines Waterfall and Scrum being the most popular \parencite{hybrid2}. In that case, only the development part is usually done in an Agile way - with the rest of the project using the traditional approach as a backbone \parencite{hybrid2}.
 
 \textcite{hybrid1} note that projects using either Agile, traditional or hybrid approach show similar levels of success in terms of budget, time and quality. However, the authors have found that agile and hybrid approaches perform much better on the customer satisfaction metric than the traditional counterpart.
 
 \section{Requirements gathering}
 
-As noted in the previous section, the requirements gathering phase is the first step in the software development process, whether it is done in a traditional or an Agile approach. As described by \textcite{reqanalysis2}, a requirement is a `necessary attribute in a system\ldots that identifies a capability, characteristic, or quality factor of a system in order for it to have value and utility to a user'. Multiple studies mention how proper requirement gathering and analysis play a pivotal role in the project quality and success, with a majority of project failures being attributed to poor requirements gathering \parencite{reqanalysis1, reqanalysis3, reqanalysis5}.
+Regardless of the approaach used, the requirements gathering phase is the first step in any software development process. As described by \textcite{reqanalysis2}, a requirement is a `necessary attribute in a system\ldots that identifies a capability, characteristic, or quality factor of a system in order for it to have value and utility to a user'. Multiple studies mention how proper requirement gathering plays a pivotal role in the project quality and success, with a majority of project failures being attributed to poor requirements gathering \parencite{reqanalysis1, reqanalysis3, reqanalysis5}.
 
 \subsection{Requirement types}
 
 Requirements can be classified into 2 categories: functional and non-functional requirements. Functional requirements describe the system's behavior, such as what the system should do and how it will react to different inputs, while non-functional requirements describe the system's quality attributes, such as performance, security, reliability, etc. \parencite[6]{requirements}.
 
-When writing the requirements in a document, it is important to ensure that everything is written in a clear and concise manner to avoid any ambiguity. As such, \textcite[112]{requirements} recommends using a standard format for writing all requirements, using simple language in a consistent manner, avoiding the use of technical and vague terms, instead using precise terms, and not creating multiple requirements in a single statement.
+When writing the requirements in a document, it is important to ensure that everything is written in a clear and concise manner to avoid any ambiguity. As such, \textcite[112]{requirements} recommends using a standard format for writing all requirements: using simple language in a consistent manner, avoiding the use of technical jargon, vague terms and not creating multiple requirements in a single statement.
 
-Similar principles of writing requirements can be found in \textcite{requirements2} which also provides a list of requirement characteristics: necessary, appropriate, unambiguous, complete, singular, feasible and verifiable. The same standard recommends using some requirements attributes within a requirement document, such as identification, owner, priority, risk, rationale, difficulty, and type (functional/non-functional).
+Similar principles of writing requirements can be found in \textcite{requirements2} which also provides a list of requirement characteristics: necessary, appropriate, unambiguous, complete, singular, feasible and verifiable. The same standard recommends using attributes to describe each requirement, such as an identification, owner, priority, risk, rationale, difficulty, and type (functional/non-functional).
 
 Prioritizing requirements is another crucial task, especially in projects with numerous requirements. Some methods include using a low to high priority, assigning a numerical value within a specific range or MoSCoW, which classifies requirements into four categories: 
 \begin{itemize}
@@ -135,7 +127,7 @@ There are multiple requirement gathering techniques, the most popular ones being
 
 \subsection{Interview technique considerations}
 
-Multiple research papers point to interviews being recognised as the most commonly used technique for requirement gathering \parencite{interviews5,interviews1,interviews2}. Interviews can be divided into 3 different types: structured, semi-structured and unstructured, with the first type being more effective at gathering information versus the other 2 types \parencite{interviews5,interviews6}. 
+Multiple research papers point to interviews being recognised as the most commonly used technique for requirement gathering \parencite{interviews5,interviews1,interviews2}.  
 
 Two articles by \textcite{interviews4, interviews3} suggest a list of recommended practices for conducting interviews, such as:
 \begin{enumerate}
@@ -148,7 +140,7 @@ Two articles by \textcite{interviews4, interviews3} suggest a list of recommende
     \item Stating the goals of the interview at the beginning and offering stakeholders time at the end to add any missing information.
 \end{enumerate}
 
-One study by \textcite{interviews1} provided some insights into potential mistakes that can be don during requirements gathering interviews:
+One study by \textcite{interviews1} provided some insights into potential mistakes that can be done during requirements gathering interviews:
 \begin{enumerate}
     \item Wrong opening - need to understand the context of the problem first, so it is important to understand the system as-is and how it would change with the new system before talking about the system itself.
     \item Not leveraging ambiguity - ambiguity can reveal gaps in the knowledge between the analyst and the customer and be used to elicit important system-related knowledge.
@@ -252,6 +244,11 @@ As such, the table below will utilise the information from \textcite{react,angul
 \end{table}
 
 \section{Machine Learning models}
+
+% Add section about:
+% - LLMs
+% - Multimodal models
+% - Prompt engineering
 
 \section{Gap Analysis}
 
