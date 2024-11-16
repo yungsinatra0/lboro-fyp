@@ -60,6 +60,8 @@ The Waterfall Model's strengths lie in its simplicty of use, ease of understandi
 
 One of its main weaknesses, mentioned by \textcite{waterfall}, is its lack of flexibility in regards to change of requirements. As such, once the project leaves the requirements analysis or design phase, it may be difficult to make any changes to the project deliverable. Thus, this model is not suitable for projects where the requirements are not well understood or are likely to change. Finally, the deliverable is only available at the end of the project, so the end-users can provide any feedback during its development \parencite{waterfall}.
 
+% Add a figure maybe?
+
 \subsubsection{Agile Model}
 
 Another well-known SDLC model is the Agile model. The model focuses on the idea that requirements are not always well-known and accepting that change is inevitable \parencite{agile}. Similarly, as the author mentions, the focus of this methodology is on continuous delivery of software and value to the customer. As such, it is integral for an Agile project to have a close customer involvement in the development process, to ensure that constant feedback is received.
@@ -73,6 +75,8 @@ Scrum is an Agile framework, where the projec is divided into smaller, manageabl
 On the other hand, Kanban is not as prescriptive as Scrum. Kanban focuses on visualizing the workflow of the project through a visual board with columns, cards and swimlanes. Kanban's main goal is to limit the work in progress through column limits and a pull system to maximize the flow of work through the system \parencite{agile}. Kanban does not have specific roles or artifacts, but instead focuses on the continuous delivery of value to the customer through smaller batching and daily prioritizations \parencite{scrumban}.
 
 Finally, there is also a possibility of combining these two frameworks into one, called Scrumban. Nowadays, the use of Scrum and Kanban together is becoming quite popular, with many teams employing both frameworks in their projects. As \textcite{scrumban} mention, it can be quite beneficial as it allows the team to `adopt the appropriate practices of both methods based on different situations to meet their needs'. The authors emphasize that the team members need to understand which elements of either framework bring value to the project and adapt them accordingly.
+
+% Add some figures for Scrum and Kanban
 
 \subsection{A hybrid approach}
 
@@ -90,15 +94,13 @@ As noted in the previous section, the requirements gathering phase is the first 
 
 \subsection{Requirement types}
 
-\textcite[4]{requirements} classifies requirements into 3 levels of abstraction: User requirements, System requirements and Design specifications. User requirements are the highest level of abstraction, written in natural language and describe what services that system is expected to provide. System requirements are more detailed, sometimes referred as functional specifications. Finally, design specifications, which are derived from analysis of system and design documentation, are used by developers to implement the system. These 3 levels are also later used during testing, each level corresponding to the respective type: User requirements are used in acceptance testing, System requirements are used in system and integration testing and Design specifications are used in unit testing \parencite[4]{requirements}.
+Requirements can be classified into 2 categories: functional and non-functional requirements. Functional requirements describe the system's behavior, such as what the system should do and how it will react to different inputs, while non-functional requirements describe the system's quality attributes, such as performance, security, reliability, etc. \parencite[6]{requirements}.
 
-The author also mentions that requirements can be classified into 2 categories: functional and non-functional requirements. Functional requirements describe the system's behavior, such as what the system should do and how it will react to different inputs, while non-functional requirements describe the system's quality attributes, such as performance, security, reliability, etc. \parencite[6]{requirements}.
+When writing the requirements in a document, it is important to ensure that everything is written in a clear and concise manner to avoid any ambiguity. As such, \textcite[112]{requirements} recommends using a standard format for writing all requirements, using simple language in a consistent manner, avoiding the use of technical and vague terms, instead using precise terms, and not creating multiple requirements in a single statement.
 
-When writing the requirements in a document, it is important to ensure that everything is written in a clear and concise manner to avoid any ambiguity. As such, \textcite[112]{requirements} recommends using a standard format for writing all requirements, using simple language in a consistent manner, avoiding the use of technical language unless necessary, avoiding vague terms and using precise terms, and not creating multiple requirements in a single statement.
+Similar principles of writing requirements can be found in \textcite{requirements2} which also provides a list of requirement characteristics: necessary, appropriate, unambiguous, complete, singular, feasible and verifiable. The same standard recommends using some requirements attributes within a requirement document, such as identification, owner, priority, risk, rationale, difficulty, and type (functional/non-functional).
 
-Additionally, the author points to \textcite{requirements2}, which provides a list of characteristics of individual requirements: necessary, appropriate, unambiguous, complete, singular, feasible, verifiable, correct, and conforming. The same standard also provides some examples of requirements attributes within a requirement document, such as identification, owner, priority, risk, rationale, difficulty, and type (functional/non-functional).
-
-Prioritizing requirements is another crucial task, especially in projects with numerous requirements. Several techniques can help determine which requirements to address first. Simple methods include categorizing requirements as low, medium, or high priority, or assigning a numerical value within a specific range \parencite{moscow}. In addition to the previously mentioned techniques, the author mentions another approach - the MoSCoW method, which classifies requirements into four categories: 
+Prioritizing requirements is another crucial task, especially in projects with numerous requirements. Some methods include using a low to high priority, assigning a numerical value within a specific range or MoSCoW, which classifies requirements into four categories: 
 \begin{itemize}
     \item Must have - must be implemented in the software before being released
     \item Should have - important but not necessary for the software to be released
@@ -108,17 +110,18 @@ Prioritizing requirements is another crucial task, especially in projects with n
 
 \subsubsection{Requirements in Agile}
 
-\textcite[191]{requirements} provides an explanation of requirements within Agile projects. The author mentions that in Agile projects, the most basic unit of requirements are usually written in the form of User Stories, which are simple descriptions of a feature desired by the customer. User Stories are written in a specific format, such as `As a [user], I want to [action] so that [benefit]'. Other components of a User Story include a title, acceptance test/criteria (a list of conditions that must be met for the story to be considered complete), priority, story points (estimated time to implement), and description.
+In Agile projects, the most basic unit of requirements are usually written in the form of User Stories, which are simple descriptions of a feature desired by the customer \parencite[191]{requirements}. User Stories are written in a specific format, such as `As a [user], I want to [action] so that [benefit]'. Other components of a User Story include a title, acceptance criteria (conditions that must be met for the story to be complete), priority, story points (estimated time to implement), and description. Epics are larger user stories that cannot be completed in a single sprint. Epics can be broken down into smaller user stories, which are then added to the Product or Sprint Backlog.
 
-User stories are part of the Product and Sprint backlog - the former one containing the list of requirements for the whole project and the latter containing the list of requirements for the current sprint/iteration.
-
-The author also describes Epics in Agile projects, which are large user stories that cannot be completed in a single sprint. Epics can be broken down into smaller user stories, which are then added to the Product or Sprint Backlog.
+Both Epics and User Stories are part of the Product and Sprint backlog - the former one containing the list of requirements for the whole project and the latter containing the list of requirements for the current sprint/iteration.
 
 \subsection{Stakeholders}
 
-\textcite[34]{requirements} explains that stakeholders represent the `set of individuals who have some interest (a stake) in the success (or failure) of the system in question'. The author continues that there may be many types of stakeholders and stresses the importance of accurately and completely identifying all possible stakeholders for a system. Identification of all possible stakeholders needs to be done in the early stages of the project, as leaving out key stakeholder could lead to missing out on important requirements or constraints later on the project. 
+Stakeholders represent the `set of individuals who have some interest (a stake) in the success (or failure) of the system in question' \parencite[34]{requirements}. The author stresses the importance of accurately identifying all possible stakeholders in the early stages of the project, as leaving out key stakeholder could lead to missing out on important requirements or constraints later on the project. 
 
-After identifying the stakeholders, it is important to do a stakeholder analysis by understanding the stakeholders' needs, expectations, and influence on the project and then mapping them on a stakeholder matrix. One such matrix is the Influence/Interest grid, which classifies stakeholders based on their power and interest in the project \parencite{stakeholders}. The matrix divides stakeholders into 4 categories:
+After identifying the stakeholders, it is important to do a stakeholder analysis by understanding the stakeholders' needs, expectations, and influence on the project. One way of doing it is by using a stakeholder matrix, such as the Influence/Interest grid (see figure X), which classifies stakeholders based on their power and interest in the project \parencite{stakeholders}.
+
+%Replace with a figure instead of bullet points
+
 \begin{enumerate}
     \item Low influence, low interest - try to increase interest
     \item Low influence, high interest - keep informed 
@@ -128,11 +131,11 @@ After identifying the stakeholders, it is important to do a stakeholder analysis
 
 \subsection{Requirement gathering techniques}
 
-There are multiple requirement gathering techniques, the most popular ones being interviews, collaborative meetings, prototyping, modeling, brainstorming, storyboards, document analysis and ethnography (observing users interacting with an existing system) \parencite{reqanalysis1,reqanalysis2, reqanalysis3, reqanalysis4}. One of the studies interviewed several individuals with multiple years of experience in the field of requirement gathering and analysis. As a result, the authors found that the most used requirement gathering techniques were collaborative meetings, interviews, ethnography and modeling \parencite{reqanalysis1}. Another study by \textcite{reqanalysis6} proposes a framework for improved requirement gathering in Scrum with a real-life case study of an IT project in Norway. The authors introduce the framework as being a series of 3 sections: pre-elicitation phase, where a high-level overview and breakdown of the requirements is done during an interview with the stakeholders, a mid-elicitation phase, where the a deep dive into the requirements is done through the usage of mind maps and a post-elicitation phase, where the output of the previous phase is used to feed into a Scrum Product Backlog and later a Sprint Backlog.
+There are multiple requirement gathering techniques, the most popular ones being interviews, workshops, prototyping, modelling, brainstorming, storyboards and observing users \parencite{reqanalysis1,reqanalysis2, reqanalysis3, reqanalysis4}. One of the studies interviewed several individuals with multiple years of experience in the field of requirement gathering and analysis. As a result, the authors found that the most used requirement gathering techniques were collaborative meetings, interviews, ethnography and modeling \parencite{reqanalysis1}.
 
 \subsection{Interview technique considerations}
 
-Multiple research papers point to interviews being recognised as the most commonly used technique for requirement gathering \parencite{interviews5,interviews1,interviews2}. Interviews can be divided into 3 different types: structured, semi-structured and unstructured, with the first type being more effective at gathering information from stakeholders versus the other 2 types \parencite{interviews5,interviews6}. 
+Multiple research papers point to interviews being recognised as the most commonly used technique for requirement gathering \parencite{interviews5,interviews1,interviews2}. Interviews can be divided into 3 different types: structured, semi-structured and unstructured, with the first type being more effective at gathering information versus the other 2 types \parencite{interviews5,interviews6}. 
 
 Two articles by \textcite{interviews4, interviews3} suggest a list of recommended practices for conducting interviews, such as:
 \begin{enumerate}
@@ -145,7 +148,7 @@ Two articles by \textcite{interviews4, interviews3} suggest a list of recommende
     \item Stating the goals of the interview at the beginning and offering stakeholders time at the end to add any missing information.
 \end{enumerate}
 
-On the other hand, two studies have been found that provide some insights into the potential mistakes that student analysts may do during requirement gathering sessions. One such study done by \textcite{interviews1} mentions the following mistakes:
+One study by \textcite{interviews1} provided some insights into potential mistakes that can be don during requirements gathering interviews:
 \begin{enumerate}
     \item Wrong opening - need to understand the context of the problem first, so it is important to understand the system as-is and how it would change with the new system before talking about the system itself.
     \item Not leveraging ambiguity - ambiguity can reveal gaps in the knowledge between the analyst and the customer and be used to elicit important system-related knowledge.
@@ -172,19 +175,19 @@ A similar study by \textcite{interviews2} suggests the following mistakes that c
 
 \subsection{Database}
 
-There are several types of databases, such as: relational (SQL), NoSQL databases, graph databases or object-oriented databases \parencite{databases2}. Due to the prototype nature of the project, it is not expected that the data used in the system will be complex, so the next subsections will focus on the two most common types of databases - relational and NoSQL databases.
+There are several types of databases, such as: relational (SQL), NoSQL databases, graph databases or object-oriented databases \parencite{databases2}. The choice of database depends on the project or organisation requirements, such as the amount of data, the complexity of the data, the need for scalability, etc. 
 
 \subsubsection{Relational databases}
 
-Relational databases store structured data in tables, linked through keys to create relationships like one-to-one and one-to-many \parencite{databases}. They use SQL (Structured Query Language) to create powerful queries and schemas to help organise and manage data efficiently. \textcite{databases} highlight that relational databases, by following ACID (Atomicity, Consistency, Isolation, Durability) principles, ensure high data integrity for industries like finance and healthcare. Relational databases are widely used and have a large community, making it easier to find support and resources. However, the rigid schema limits adaptability to rapid data changes, and scaling horizontally in distributed systems can be challenging. Examples include MySQL, PostgreSQL, Oracle, and Microsoft SQL Server.
+Relational databases store structured data in tables, linked through keys to create relationships between entries \parencite{databases}. They use SQL (Structured Query Language) to create queries and schemas to help organise and manage data efficiently. \textcite{databases} highlight that relational databases are used, thanks to their high data integrity, for industries like finance and healthcare. Relational databases are widely used and have a large community, making it easier to find support and resources. However, the rigid schema limits adaptability to rapid data changes, and scaling horizontally in distributed systems can be challenging. Examples include MySQL, PostgreSQL, Oracle, and Microsoft SQL Server.
 
 \subsubsection{NoSQL databases}
 
-NoSQL databases manage unstructured or semi-structured data without rigid schemas or relationships \parencite{databases}. As the authors describe, NoSQL databases, such as key-value, document, column-family, and graph databases, excel in flexibility and scalability. Guided by the CAP (Consistency, Availability, Partition Tolerance) theorem, NoSQL databases often prioritize performance over strict consistency, making them suitable for large, varied datasets of unstructured data but less ideal for complex transactions. Although growing in popularity, NoSQL systems lack SQL’s mature standardization and support. Examples include MongoDB, Cassandra, Couchbase, and Redis.
+NoSQL databases manage unstructured or semi-structured data without rigid schemas or relationships \parencite{databases}. As the authors describe, NoSQL databases, such as key-value, document, column-family, and graph databases, excel in flexibility and scalability. NoSQL databases often prioritize performance over strict consistency, making them suitable for large, varied datasets of unstructured data but less ideal for complex transactions. Although growing in popularity, NoSQL systems lack SQL’s mature standardization and support. Examples include MongoDB, Cassandra, Couchbase, and Redis.
 
 \subsection{Backend framework}
 
-Choosing the right backend framework is crucial for the development of the project deliverable. The backend framework is responsible for handling the business logic of the application, such as processing requests, interacting with the database, and returning responses to the client. A good framework can also come with the added benefit of included features such as security and authentication, database support through an ORM (Object-Relational Mapping) and community support through existing documentation, library of extensions and a user base that can provide support if necessary. 
+Choosing the right backend framework is crucial for the development of the project deliverable. The backend framework is responsible for handling the business logic of the application, such as processing requests, interacting with the database, and returning responses to the client. A good framework can also come with the added benefit of included features such as security and authentication, database support and a vast user base that can help through documentation or additional tooling. 
 
 Based on recent a recent survey by \textcite{statista-webframeworks}, the most popular backend frameworks are Express, Flask, Spring Boot, Django and Laravel. This data is also supported by the Stack Overflow Developer Survey 2024, which lists the most popular programming languages as JavaScript (Express), Python (Flask, Django), Java (Spring Boot) and PHP (Laravel) \parencite{stackoverflow}. 
 
@@ -217,9 +220,9 @@ Due to their high popularity among developers, the decision was made to compare 
 
 \subsection{Frontend framework}
 
-Similar to the backend frameworks, choosing a suitable frontend framework is equally important. The frontend framework is responsible for the user interface of the application, such as displaying data, handling user interactions, and making requests to the backend. A good frontend framework can also come with the added benefit of included features such as routing, state management, and component libraries. 
+Similar to the backend frameworks, choosing a suitable frontend framework is equally important. The frontend framework is responsible for the user interface of the application, such as displaying data, handling user interactions, and making requests to the backend. 
 
-Based on the same survey by \textcite{statista-webframeworks}, the most popular frontend frameworks are React, Angular, Vue.js, and Svelte. This data is also supported by the Stack Overflow Developer Survey 2024, where the above frameworks rank among the highest for developers wishing to continue using them \parencite{stackoverflow}.
+Based on the same survey by \textcite{statista-webframeworks}, the most popular frontend frameworks are React, Angular, Vue.js, and Svelte. This data is also supported by the Stack Overflow Developer Survey 2024, where the above frameworks rank among the highest for desirability and admirability among developers \parencite{stackoverflow}.
 
 As such, the table below will utilise the information from \textcite{react,angular,vue,svelte} to compare the most popular frontend frameworks based on the following criteria: learning curve, community and documentation, ecosystem and tooling support, performance, state management, and project size suitability.
 
