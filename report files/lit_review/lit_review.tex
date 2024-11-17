@@ -6,9 +6,8 @@ This chapter will provide a review of the existing literature, which will be use
 \begin{itemize}
     \item Software development methodologies
     \item Requirement gathering
-    \item System design
     \item Tech stack
-    \item Machine Learning models
+    \item Large Language Models (LLMs)
     \item Gap Analysis
 \end{itemize}
 
@@ -243,12 +242,42 @@ As such, the table below will utilise the information from \textcite{react,angul
     \label{tab:frontend}
 \end{table}
 
-\section{Machine Learning models}
+\section{Large Language Models (LLMs)}
 
-% Add section about:
-% - LLMs
-% - Multimodal models
-% - Prompt engineering
+With the advent of the Transformer architecture proposed by \textcite{llm}, large language models (LLMs) have become increasingly popular in the field of natural language processing (NLP), replacing the previously-used recurrent neural networks (RNNs) or long short-term memory networks (LSTMs) due to their limitations in capturing long-range dependencies in text. The Transformer architecture has since been used in the development of several LLMs, such as BERT or T5, which have achieved state-of-the-art results in various NLP tasks, such as text classification, question answering, and text generation \parencite{bert,t5}. 
+However, what really brought LLMs to the forefront of NLP research was the introduction of GPT-3 by OpenAI, a model which contains 175 billion parameters and that was trained on an extensive and diverse dataset \parencite{gpt3}. The model has achieved impressive results in a wide range of NLP tasks, such as translation, summarization, and question answering, but also in other applications such as text and code generation, reasoning and even some arithmetic tasks. 
+
+ChatGPT was the moment LLMs became more accessible to the general public as it allowed users to interact with the model through a simple chat interface, without the need for any technical knowledge. ChatGPT, powered by GPT-3.5 was a milestone in the development and release of LLMs, thanks to its worldwide popularity and ease of use. Since then, more powerful LLMs have been released: some closed-source such as GPT-4, Gemini, Claude and others open-source such as the Llama families or Mistral \parencite{gpt4,gemini,llama3,mistral}. The models have pushed even further the capabilities of LLMs, achieving better results in a wide range of tasks, such as NLP, text generation, reasoning, in-context learning, planning, etc. \parencite{llm2}. 
+
+Another key milestone in the development of LLMs was the introduction of multimodal models, such as GPT-4V, Gemini (1.0 and 1.5), Llama 3.2 or Claude 3.5 \parencite{claude, gpt4v, llama32, gemini2}. The introduction of multimodal capabilities in LLMs allowed the models to process and generate text, images, audio, and video, making them more versatile and capable of handling a wider range of tasks, pushing what was previously thought possible with LLMs. The multimodal models have achieved impressive results in tasks such as image captioning, text-to-image generation, audio transcription, and video summarization, among others. 
+
+\subsection{LLMs in healthcare}
+
+As more and more data is being generated in the healthcare industry, the need for more advanced tools to process and analyse this data is becoming increasingly important. 
+
+LLMs have shown great potential in this area, with their ability to process and generate text, images, audio, and video, making them versatile tools for a wide range of healthcare applications. Example of such applications include medical diagnosis based on patient symptoms, medical records or other history, patient care through personalised recommendation or treatment strategies, medical literature analysis and summarisation, drug discovery, and many others \parencite{llm_healthcare,llm_healthcare3,llm_healthcare4}. 
+
+The articles mention another big area where LLMs are often used is in the analysis of medical images, such as X-rays, MRIs, CT scans, etc. These capabilities are especially enhanced by multimodal models, as clinicins can communicate with the model by using both text and images, allowing for a more comprehensive analysis of the patient's condition through a chat interface, where clinicians can ask questions and receive answers in real-time \parencite{llm_healthcare3}. 
+
+Another big area where multimodal models can be used is in the creation of virtual assistants for patients or healthcare professionals, which can use patient-provided data in form of text or images to provide a better and more natural patient experience \parencite{llm_healthcare,llm_healthcare3}.
+
+More specific tasks also can be achieved by LLMs, such as the generation of Electronic Health Records (EHRs) or other medical documents, translation of medical terms into more understandable language, and many more \parencite{llm_healthcare4}.
+
+\subsection{Challenges and concerns}
+
+While LLMs bring a myriad of benefits when applied to the healthcare domain, it is important to note that their use does come with several challenges. 
+
+The first and most important one is the usage of patient data, which is considered highly sensitive and thus must be handled with utmost care to ensure patient privacy and confidentiality. As such, many researchers recommend to ensure that the data used to train or use the models is anonymized and that the models are compliant with regulations such as the General Data Protection Regulation (GDPR) or the Health Insurance Portability and Accountability Act (HIPAA) \parencite{llm_healthcare,llm_healthcare2, llm_healthcare4}. 
+
+Another big concern is the transparency of models, with LLMs often being described as `black boxes' due to their complexity and the difficulty in understanding how they arrive at their decisions \parencite{llm_healthcare,llm_healthcare2, llm_healthcare4}. This can be a big issue in the healthcare domain, where the decisions made by the model can have a big impact on the patient's health. 
+
+Other concern is the potential for bias in the models, which can lead to unfair or discriminatory outcomes \parencite{llm_healthcare,llm_healthcare2}. This is especially important in the healthcare domain, where the model's decisions can have a big impact on the patient's health. \textcite{llm_healthcare4} also add that toxicity in the generated text can be a big issue, especially when the model is used to generate patient-facing content. 
+
+Hallucinations are another big issue, where the model generates text that is not based on the input data, which can lead to incorrect or misleading information being provided to the patient or healthcare professional \parencite{llm_healthcare4,llm_healthcare}.
+
+Accountability is another big issue, where responsibility must be clearly communicated and understood by all parties involved in the development and use of the model \parencite{llm_healthcare2}. The author recommends the usage of clear guidelines, policies and code of conducts to ensure that all parties are aware of their responsibilities and obligations.
+
+Finally, models can be quite expensive to train and use, especially the larger models, which can require a lot of computational resources and time to train and use, which some healthcare institutions may not have the required infrastructure or the necessary funds to do so \parencite{llm_healthcare4}.
 
 \section{Gap Analysis}
 
