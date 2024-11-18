@@ -58,18 +58,51 @@ After the new stakeholders were identified, additional interviews were conducted
 The student has gathered the following requirements for the project:
 
 \subsection{Non-functional requirements}
-
 \begin{enumerate}
     \item The system must be accessible on all modern desktop and mobile based browsers.
     \item The system must be accessible from any location by using an internet connection.
-    \item When shared with the doctor via a link, the system must load within 3 seconds when accessed via a desktop browser.
-    \item The system must provide a secure login mechanism for patients via MFA or e-signature.
-    \item The system should allow patients to upload their own medical records in a variety of formats (PDF, DOC, etc).
+    \item The system must store the data in a secure manner, ensuring that only the patient and the doctor can access the data.
+    \item When shared with the doctor via a link, the system must load within 3 to 5 seconds when accessed via a desktop browser.
     \item When shared with the doctor via a link, the system should secure the data with a unique token or PIN that expires after the specified time frame.
     \item The system could be accessible on all modern mobile devices via a mobile application.
 \end{enumerate}
 
-\subsection{Patient history requirements - doctor perspective}
+\subsection{Login requirements}
+\begin{enumerate}
+    \item The system must provide a secure login mechanism for patients via Multi Factor Authentication.
+    \item If used on mobile, the system should allow the patient to use biometric authentication for logging in.
+\end{enumerate}
+
+\subsection{Document upload}
+\begin{enumerate}
+    \item The system must allow patients to upload their own medical records in a variety of formats (PDF, DOC, etc).
+    \item The system must allow the patient to specify and categorise the type of document they are uploading (lab test, doctor consultation, etc).
+    \item If used on mobile, the system should allow the patient to take a picture of the document and upload it.
+\end{enumerate}
+
+\subsection{Patient shareable link}
+\begin{enumerate}
+    \item The system must allow the patient to generate a shareable link to their medical records.
+    \item When creating the shareable link, the system must allow the patient to set an expiration date for the link.
+    \item When creating the shareable link, the system should allow the patient to set an access password for the link.
+    \item When create the shareable link, the system should allow the patient to select which records to share with the doctor.
+\end{enumerate}
+
+\subsection{Patient personal cabinet requirements}
+\begin{enumerate}
+    \item The patient personal cabinet must provide an overview of the patient's history through 3 main sections: personal information, lab tests and doctor consultations.
+    \item The system must display the patient's history in a chronological order in the form of a timeline.
+    \item The system must allow patients to add their own personal information, such as name, date of birth or address.
+    \item The system must allow the patient to add their own allergies.
+    \item The system must allow the patient to add their own vaccinations.
+    \item The system must allow patients to view their medical records, stored in 3 different categories: lab tests, other investigations and doctor consultations.
+    \item When viewing doctor consultations, the system should divide them into categories based on the domain of the doctor (cardiology, neurology, etc).
+    \item The system should allow the patient to enter vitals information, such as height, weight, blood pressure, etc.
+    \item When multiple vital entries are made, the system could display a historical graph of the patient's vitals.
+    \item The system should allow the patient to switch between viewing the lab tests in the document format or in a tabular, numerical format.
+\end{enumerate}
+
+\subsection{Shared patient information (doctor view)}
 \begin{enumerate}
     \item The system must provide an overview of the patient history through 3 main sections: personal information, lab tests and doctor consultations.
     \item The system must allow the doctor to only view the patient's history, not edit it.
@@ -77,15 +110,8 @@ The student has gathered the following requirements for the project:
     \item The system must allow the doctor to view blood tests in a numerical, tabular format.
     \item The system must allow the doctor to view the patient's history in a chronological order.
     \item The system must display the doctor consultation and every lab test,except for blood tests, in a free text or document format.
+    \item When viewing blood test results, the system should show the source document of the blood test value.
     \item For blood test results, the system should display the normal range values for each test.
-\end{enumerate}
-
-\subsection{Patient personal data requirements}
-\begin{enumerate}
-    \item The system must allow the patient to include their personal information, such as name, date of birth, address, allergies, etc.
-    \item The system must allow the patient to include their insurance information.
-    \item The system must allow the patient to enter vitals information, such as height, weight, blood pressure, etc.
-    \item When multiple vital entries are made, the system should display a historical graph of the patient's vitals.
 \end{enumerate}
 
 \subsection{Patient medication}
@@ -101,12 +127,4 @@ The student has gathered the following requirements for the project:
     \item When choosing the detailed version, the system should allow the patient to add the name, dosage, duration, reason for taking the medication, doctor who prescribed the medication, and any additional notes.
     \item After entering the medication, the system could allow the patient to track the medication intake.
     \item The system could send reminders to the patient to take the medication by using push notifications.
-\end{enumerate}
-
-\subsection{Patient shareable link}
-\begin{enumerate}
-    \item The system must allow the patient to generate a shareable link to their medical records.
-    \item When creating the shareable link, the system must allow the patient to set an expiration date for the link.
-    \item When creating the shareable link, the system should allow the patient to set an access PIN or token for the link.
-    \item When create the shareable link, the system should allow the patient to select which records to share with the doctor.
 \end{enumerate}
