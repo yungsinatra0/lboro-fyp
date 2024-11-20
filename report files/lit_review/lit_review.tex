@@ -9,14 +9,8 @@ This chapter will provide a review of the existing literature, which will be use
     \item Requirement gathering
     \item Tech stack
     \item Large Language Models (LLMs)
-    \item Gap Analysis
+    \item PHR Systems
 \end{itemize}
-
-\section{Healthcare-specific research}
-
-\subsection{Electronic Health Records (EHRs)}
-
-\subsection{Healthcare and patient laws in Moldova}
 
 \section{Software development methodologies}
 
@@ -291,9 +285,32 @@ While LLMs bring a myriad of benefits when applied to the healthcare domain, it 
     \item \textbf{High Costs and Infrastructure Needs:} Training and operating large LLMs requires extensive computational resources, which can be a limiting factor for healthcare institutions \parencite{llm_healthcare4}. Implementing LLMs in healthcare settings may necessitate significant investment in hardware, software, and staff training.
 \end{itemize}
 
-\section{Gap Analysis}
+\section{PHR Systems}
 
-\subsection{Medvalet}
+A Personal Health Record (PHR) is an electronic resource or tool used by patients to manage and share their own health information, which can be either self-generated or extracted from healthcare institutions \parencite{phrsecurity,phrlist}. PHRs are different from Electronic Health Records (EHRs) and Electronic Medical Records (EMRs) which are inter-organisational or internal systems to organise patient health records \parencite{phrdiff,phrlist}. Three different types of PHRs are described by \textcite{phrsecurity}: stand-alone, which do not connect with other systems and require manual entry to populate or update the records; instituion-specific, which are connected to a specific healthcare provider or institution; and integrated, which can connect to multiple healthcare providers and systems to aggregate data from multiple sources. 
+
+Usage of PHRs can bring many benefits to patients, such as: empowering patients to manage their self-health, improving patient outcomes, decreasing the cost of healthcare and improving the taking of medication \parencite{phrsecurity}.
+
+However, since PHRs contain health information, which is highly sensitive, it is important to ensure that the data is secure and private. In their research, which surveyed the opinion of health information management and medical informatics experts, \textcite{phrsecurity} outline 7 dimensions that need to be addressed when developing a PHR system:
+\begin{enumerate}
+    \item Confidentiality
+    \item Availability
+    \item Integrity
+    \item Authentication
+    \item Authorization
+    \item Non-repudiation
+    \item Access rights
+\end{enumerate}
+
+The authors go further and recommend mechanisms to ensure adherence to the above-mentioned dimensions, such as encrypting the data in the database, using a backup, defining users and their access to the system data, allowing the option to set or revoke access rights, among others.
+
+\subsection{Existing Solutions}
+
+PHR systems have been implemented nation-wide in many developed countries, such as the NHS App in the UK \parencite{phrlist}. Additionally, there are many privately-owned solutions that offer similar features to the one proposed in this project. 
+
+A review of these solutions will help identify the strengths and weaknesses of each of them, which can be used to guide the development of the project.
+
+\subsubsection{Medvalet}
 
 A similar solution to the one proposed in this project is Medvalet - a mobile app developed in Romania that allows patients to upload their history in the form of PDF or scanned documents to the application \parencite{medvalet}. 
 
@@ -315,7 +332,7 @@ While the application offers a robust set of features, there are several areas w
     \item The app is only available on mobile - this could be a barrier for doctors who prefer to access the app on a desktop thanks to the larger screen size.
 \end{itemize}
 
-\subsection{Andaman7}
+\subsubsection{Andaman7}
 
 Another similar solution is Andaman7, a mobile app developed by a Belgian-American eHealth company with the goal to improve communication between doctors and patients \parencite{andaman}. The application offers several features such as:
 
@@ -339,7 +356,7 @@ While the application offers a robust set of features, there are several areas w
     \item Lack of desktop version - the app is only available on mobile, which could be a barrier for doctors who prefer to access the app on a desktop thanks to the larger screen size.
 \end{itemize}
 
-\subsection{Fasten Health}
+\subsubsection{Fasten Health}
 
 Fasten Health is an open source and self-hosted electronic medical record aggregator for patients \parencite{fasten}. While the application can be locally hosted, there are also Windows and Mac versions available for a fee. The application offers several features such as:
 
