@@ -251,11 +251,21 @@ As such, the table below will utilise the information from \textcite{react,angul
 
 \section{Large Language Models (LLMs)}
 
-The introduction of Transformer architecture changed natural language processing (NLP), enabling large language models (LLMs) to surpass the previously used Machine Learning models \parencite{llm}. OpenAI expanded the scope of LLMs with GPT-3, a model containing 175 billion parameters and which excelled in a wide range of tasks, from NLP such as translation, summarization or question answering, to reasoning and even arithmetic \parencite{gpt3}. This potential was brought even further through tools like ChatGPT, which created widespread interest and quickly found use in various fields. Further advancements introduced more powerful multimodal LLMs, such as GPT-4, Gemini, Claude, and Llama, which extend LLM capabilities beyond text to include images, audio, and videos, opening up even broader applications \parencite{gpt4,gemini2,llama3,claude}.
+Large language models (LLMs) are artificial intelligence systems that are used for natural language processing (NLP) tasks such as human-like text generation, translation, summarization question answering and many more \parencite{llm2,llm_healthcare}. Additionally, LLMs have been found to have emergent capabilities, like reasoning, planning, decision-making and in-contenxt learning \parencite{llm2}. These extraordinary capabilities are achieved through extensive training on large corpus of text data, high parameter count (in the billions) and usage of techniques such as fine-tuning or prompt engineering to improve their performance \parencite{llm2,llm_healthcare}.
+
+LLMs are built on the transformer architecture, which allows them to process and understand text data by learning and remembering the relationships between words, sentences, and paragraphs \parencite{llm}. These models are first pre-trained on large amounts of unlabeled data using self-supervised learning methods, allowing them to excel in a wide variety of tasks \parencite{foundation, llm2}. These pre-trained models, known as foundation models such as the GPT or Llama families, can then be fine-tuned for specific tasks, improving their performance and accuracy even further \parencite{gpt3,llama3,llm2}.
+
+Examples of popular LLMs include GPT-4, Mistral, Llama, Claude and Gemini \parencite{gpt4,mistral,llama3,claude,gemini}.
+
+\subsection{Multimodal LLMs}
+
+One advancement in the field of LLMs has been the addition of multimodal ability to these models, allowing them to process, understand and generate not only text but also images, audio, and videos \parencite{mllm, mllm2}. These new multimodal LLMs (MLLMs) utilise the existing capabilities of LLMs as a reasoning engine, which is connected to an encoder that processes images, audio or videos and a generator that helps with generating multimodal outputs \parencite{mllm}. This integration of new modalities allows MLLMs to become much more versatile tools, expanding their possible use cases in a variety of industries and bridging the gap between human and machine communication \parencite{llm_healthcare}.
+
+Example of popular multimodal LLMs are such as GPT-4, Gemini, Claude, and Llama \parencite{gpt4,gemini,llama3,claude}.
 
 \subsection{LLMs in healthcare}
 
-One such application is in healthcare, where the growing volume and complexity of healthcare data creates the need for more advanced tools to process and analyze it. LLMs, with their ability to process and understand large amounts of data, have found use in various healthcare applications, either by using existing models or by developing new, specialized models such as Med-PaLm2, BioMistral or Med-Gemini \parencite{biomistral,medgemini,medpalm2}. Some of these applications include:
+One such application is in healthcare, where the growing volume and complexity of healthcare data creates the need for more advanced tools to process and analyze it. LLMs, with their ability to process and understand large amounts of data, have found use in various healthcare applications, either by using existing models or by developing new, specialized medical models such as Med-PaLm2, BioMistral or Med-Gemini \parencite{biomistral,medgemini,medpalm2}. Some of these applications include:
 
 \begin{itemize}
     \item \textbf{Improving medical diagnosis:} By combining patient records, existing symptoms, and medical history, LLMs can use their deep understanding, reasoning capabilities and memory to assist in diagnosing or preventing health conditions \parencite{llm_healthcare,llm_healthcare3,llm_healthcare4}.
@@ -266,7 +276,7 @@ One such application is in healthcare, where the growing volume and complexity o
 
 \subsection{Prompt Engineering}
 
-The success of LLMs depends not only on the model itself - but also on how it's effectively used by the users, such as prompt engineering, which involves designing and refining prompts to guide the output of LLMs \parencite{promptmed}. Prompts represent instructions given to the model to guide its output, such as providing context, examples, or constraints to the model \parencite{prompt}. Prompt engineering provides several ways to improve prompt writing: being as specific as possible, providing examples (one/few shot), providing context, using roles, using constraints, and many more. It is an interative process, so it is important to experiment with different prompts to see which one works best for the task at hand.
+The success of LLMs depends not only on the model itself - but also on how it's effectively used by the users, using techniques like prompt engineering, which involves designing and refining prompts to guide the output of LLMs \parencite{promptmed}. Prompts represent instructions given to the model to guide its output, such as providing context, examples, or constraints to the model \parencite{prompt}. Prompt engineering provides several ways to improve prompt writing: being as specific as possible, providing examples (one/few shot), providing context, using roles, using constraints, and many more. It is an interative process, so it is important to experiment with different prompts to see which one works best for the task at hand.
 
 \subsection{Challenges and concerns of using LLMs}
 
