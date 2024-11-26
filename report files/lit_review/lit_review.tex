@@ -127,41 +127,63 @@ There are multiple requirement gathering techniques, the most popular ones being
 
 \subsection{Interview technique considerations}
 
-Multiple research papers point to interviews being recognised as the most commonly used technique for requirement gathering \parencite{interviews5,interviews1,interviews2}.  
+Multiple research papers point to interviews being recognised as the most commonly used technique for requirement gathering \parencite{interviews5,interviews1,interviews2}. Additionally, some studies have looked at best practices and common mistakes when conducting interviews for requirement gathering - the results of which are summarized in the tables below.
 
-Two articles by \textcite{interviews4, interviews3} suggest a list of recommended practices for conducting interviews, such as:
-\begin{enumerate}
-    \item Encouraging deep thinking through situational thinking or providing rationales.
-    \item Avoiding ambiguity by asking clarifying questions.
-    \item Being flexible by probing into relevant topics that have arisen during the discussion and not being rigidly attached to the interview script.
-    \item Verifying that the conclusion/summary aligns with the customer's vision.
-    \item Using projective techniques, such as analogies, scenarios, stories, and role-playing.
-    \item Having the stakeholder teach the analyst about a specific topic or a complex concept.
-    \item Stating the goals of the interview at the beginning and offering stakeholders time at the end to add any missing information.
-\end{enumerate}
-
-One study by \textcite{interviews1} provided some insights into potential mistakes that can be done during requirements gathering interviews:
-\begin{enumerate}
-    \item Wrong opening - need to understand the context of the problem first, so it is important to understand the system as-is and how it would change with the new system before talking about the system itself.
-    \item Not leveraging ambiguity - ambiguity can reveal gaps in the knowledge between the analyst and the customer and be used to elicit important system-related knowledge.
-    \item Implicit goals - it is important to either explicitly ask/suggest clear goals or at least ask for more clarification.
-    \item Implicit stakeholders - not taking into account 3rd party stakeholders.
-    \item Non-functional requirements not considered
-    \item Interviews sounding like interrogations - to combat this, the authors recommend using techniques such as imagining, scenarios and teaching to let the customer explain their vision.
-    \item Problems in phrasing questions - some questions can be direct, so they need some background information to be understood.
-    \item Wrong closing - the authors stress the importance of a interview summary at the end of the session, to receive feedback from the customer if necessary.
-\end{enumerate}
-
-A similar study by \textcite{interviews2} suggests the following mistakes that can be made during interviews:
-
-\begin{enumerate}
-    \item Question formulation - asking vague, technical, irrelevant or long questions.
-    \item Question omission - not asking about stakeholders or existing business processes or not doing follow-up questions.
-    \item Order of interview - incorrect opening (no introductions, no description of the current situation) or ending (no summary)
-    \item Communication skills - too much technical jargon, not listening to the customer, interview sounding too strict or passiveness of the analyst.
-    \item Customer interaction - not building rapport with the customer
-    \item Planning - lack of planning in terms of sequence of questions to ask
-\end{enumerate}
+\begin{table}[h!]
+    \centering
+    \small
+    \begin{tabular}{|p{0.2\textwidth}|p{0.75\textwidth}|}
+    \hline
+    \textbf{Study} & \textbf{Recommended Practices} \\ \hline
+    
+    \textcite{interviews4, interviews3} & 
+    \begin{itemize}
+        \item Encourage deep thinking through situational thinking or rationales.
+        \item Avoid ambiguity by asking clarifying questions.
+        \item Be flexible by probing into relevant topics.
+        \item Verify alignment with the customer's vision.
+        \item Use projective techniques like scenarios or role-playing.
+        \item Allow stakeholders to teach analysts complex topics.
+        \item State goals at the beginning and allow customer input at the end.
+    \end{itemize} \\ \hline
+    
+    \end{tabular}
+    \label{tab:recommended_practices}
+    \caption{Recommended Practices for Requirements Gathering Interviews}
+\end{table}
+    
+    
+\begin{table}[h!]
+    \centering
+    \small
+    \begin{tabular}{|p{0.2\textwidth}|p{0.75\textwidth}|}
+    \hline
+    \textbf{Study} & \textbf{Common Mistakes} \\ \hline
+    
+    \textcite{interviews1} & 
+    \begin{enumerate}
+        \item Wrong opening: failing to understand the context before discussing the problem.
+        \item Not leveraging ambiguity to reveal knowledge gaps.
+        \item Implicit goals: failing to ask or clarify stakeholder goals.
+        \item Implicit stakeholders: overlooking third-party stakeholders.
+        \item Ignoring non-functional requirements.
+        \item Wrong closing: skipping interview summaries or feedback.
+    \end{enumerate} \\ \hline
+    
+    \textcite{interviews2} & 
+    \begin{enumerate}
+        \item Poor question formulation: vague, technical, irrelevant, or too long.
+        \item Question omission: not asking about business processes or doing follow-up questions.
+        \item Incorrect order:  incorrect opening (no introductions, no description of the current situation) or ending (no summary).
+        \item Weak communication: too much technical jargon usage or not listening to the customer.
+        \item Poor customer interaction: failing to build rapport.
+        \item Lack of planning: unstructured sequence of questions.
+    \end{enumerate} \\ \hline
+    
+    \end{tabular}
+    \caption{Common Mistakes in Requirements Gathering Interviews}
+    \label{tab:common_mistakes}
+\end{table}    
 
 \section{Tech stack}
 
@@ -312,71 +334,115 @@ A review of these solutions will help identify the strengths and weaknesses of e
 
 \subsubsection{Medvalet}
 
-A similar solution to the one proposed in this project is Medvalet - a mobile app developed in Romania that allows patients to upload their history in the form of PDF or scanned documents to the application \parencite{medvalet}. 
+A mobile app developed in Romania that allows patients to upload their medical history as PDFs or scanned documents \parencite{medvalet}.
 
-The application offers several features such as:
-\begin{itemize}
-    \item Upload of documents - patients can upload their medical history in the form of PDF or scanned documents
-    \item Categorization - the application allows the user to choose the type of document they are uploading, such as prescriptions, lab results, medical imaging, etc.
-    \item Patient vitals - the application allows the user to input their vitals, such as blood pressure, heart rate, weight, etc. The vitals are shown in a graphical format, allowing the user to track their progress over time.
-    \item Patient information - the application allows the user to input their personal information, such as name, age, height, weight, etc.
-    \item Doctor accounts - the application allows doctors to create accounts and access the patient's medical history directly through the app by scanning a QR code generated by the patient or by searching for the patient's name.
-\end{itemize}
+\begin{table}[h!]
+\centering
+    \begin{tabular}{|p{0.45\textwidth}|p{0.45\textwidth}|}
+    \hline
+    \textbf{Key Features/Benefits} & \textbf{Limitations/Drawbacks} \\ \hline
+    \begin{itemize}
+        \item Upload medical history as PDFs or scanned documents.
+        \item Categorize documents by type (e.g., prescriptions, lab results).
+        \item Graphically track vitals like blood pressure and weight over time.
+        \item Patients can input personal details such as name, age, and weight.
+        \item Doctors can access patient history directly via the app.
+    \end{itemize} &
+    \begin{itemize}
+        \item Requires doctors to create accounts, which may deter use.
+        \item Doctors can access patient history without explicit consent, raising privacy concerns.
+        \item App acts as document storage, which can be cumbersome to access for lengthy histories.
+        \item Lacks data extraction or summarization features from uploaded documents.
+        \item Only available as a mobile app, limiting accessibility for desktop-only users.
+    \end{itemize} \\ \hline
+    \end{tabular}
+\caption{Medvalet Features and Limitations}
+\label{tab:medvalet}
+\end{table}
+    
+\begin{figure}[h!]
+    \centering
+    \subfloat[My doctors screen]{\includegraphics[width=0.45\textwidth]{Medvalet_1.png}} \quad
+    \subfloat[Uploaded documents screen]{\includegraphics[width=0.45\textwidth]{Medvalet_2.png}}
+    \caption{Medvalet screenshots}
+    \label{fig:medvalet}
+\end{figure}
 
-While the application offers a robust set of features, there are several areas where the application could be improved:
-\begin{itemize}
-    \item Doctors need to create an account to access the patient's medical history - this could be a barrier for doctors who are not familiar with technology or do not have the time to create an account.
-    \item Doctors can always access the patient's medical history via the app - this could be a privacy concern for patients, as doctors could access the patient's medical history without their consent.
-    \item All history is stored as documents - this could be cumbersome for doctors to navigate through, especially if the patient has a long medical history.
-    \item No extraction of data or values from the documents - the application does not extract any data or values from the documents, such as lab results which could be useful for doctors to quickly access the information they need.
-    \item The app is only available on mobile - this could be a barrier for doctors who prefer to access the app on a desktop thanks to the larger screen size.
-\end{itemize}
+\newpage
 
 \subsubsection{Andaman7}
 
-Another similar solution is Andaman7, a mobile app developed by a Belgian-American eHealth company with the goal to improve communication between doctors and patients \parencite{andaman}. The application offers several features such as:
+A mobile app developed by a Belgian-American eHealth company with the goal to improve doctor-patient communication, compliant with GDPR and HIPAA \parencite{andaman}.
 
-\begin{itemize}
-    \item Multiple sections - the application contains multiple sections where patients can input their personal information, medical history, allergies, vaccinations, medication, personal logbook, etc.
-    \item Automatic collection of health data - patients using this app can access their health information from over 300 hospitals and clinics in the US and Europe.
-    \item Collection of multiple data sources - the app collects a health data from a variety of sources: doctors, hospitals, labs, smart devices and even manual input.
-    \item No access to patient data - the app does not have access to the patient's data, as the data is stored on the patient's device.
-    \item Sharing data with doctors - patients can share their health data with their doctors by using a QR code, who can access the data through the app.
-    \item Can control the shared data - patients can control what data is shared with their doctors, and can revoke access at any time.
-    \item GDPR and HIPAA compliant - the app is compliant with the General Data Protection Regulation (GDPR) and the Health Insurance Portability and Accountability Act (HIPAA).
-    \item Tracking of health data - the app allows patients to track their health data, such as blood pressure, weight, heart rate, allergies, vaccinations, etc.
-    \item AI features - the app has recently introduced 3 new AI features: a summarization tool, a translation tool and a simplified medical jargon tool.
-\end{itemize}
+\begin{table}[htbp]
+\centering
+    \begin{tabular}{|p{0.45\textwidth}|p{0.45\textwidth}|}
+    \hline
+    \textbf{Key Features/Benefits} & \textbf{Limitations/Drawbacks} \\ \hline
+    \begin{itemize}
+        \item Offers sections for personal information, medical history, allergies, vaccinations, medications, etc.
+        \item Automatically collects health data from over 300 hospitals and clinics in the US and Europe.
+        \item Supports input from diverse sources like hospitals, labs, smart devices or even manual input.
+        \item Stores data locally on patients’ devices, ensuring privacy.
+        \item Data sharing with QR codes and revokable access.
+        \item AI tools for summarization, translation, and simplifying medical jargon.
+    \end{itemize} &
+    \begin{itemize}
+        \item Requires patients and doctors to both create accounts.
+        \item Does not extract data or values from uploaded documents like lab results.
+        \item Limited to mobile platforms, which may limit usability for desktop-only users.
+    \end{itemize} \\ \hline
+    \end{tabular}
+\caption{Andaman7 Features and Limitations}
+\label{tab:andaman7}
+\end{table}
 
-While the application offers a robust set of features, there are several areas where the application could be improved:
+\begin{figure}[ht]
+    \centering
+    \subfloat[PHR Sections screen]{\includegraphics[width=0.45\textwidth]{Andaman_1.png}} \quad
+    \subfloat[Documents section screen]{\includegraphics[width=0.45\textwidth]{Andaman_2.png}}
+    \caption{Andaman7 screenshots}
+    \label{fig:andaman7}
+\end{figure}
 
-\begin{itemize}
-    \item Neccessity of an account - both patients and doctors need to create an app to be able to share and access the patient's medical history.
-    \item No automatic extraction of data - the app does not automatically extract data from the documents, such as lab results, which could be useful for doctors to quickly access the information they need.
-    \item Lack of desktop version - the app is only available on mobile, which could be a barrier for doctors who prefer to access the app on a desktop thanks to the larger screen size.
-\end{itemize}
+\FloatBarrier
 
 \subsubsection{Fasten Health}
 
-Fasten Health is an open source and self-hosted electronic medical record aggregator for patients \parencite{fasten}. While the application can be locally hosted, there are also Windows and Mac versions available for a fee. The application offers several features such as:
+An open-source, self-hosted electronic medical record aggregator with optional paid desktop versions for Windows and Mac \parencite{fasten}.
 
-\begin{itemize}
-    \item Aggregating medical records - the application allows patients to automatically aggregate their medical records from multiple healthcare providers, such as hospitals, clinics, labs, etc.
-    \item Self-hosted - the application can be self-hosted, allowing patients to have full control over their data, which is only stored locally on their device.
-    \item Support for multiple protocols - the application supports multiple protocols, such as DICOM, FHIR and OAuth2.
-    \item Manual entry of data - patients can manually enter their health data, such as allergies, vaccinations, medications, etc.
-    \item Multi-user support - the application supports multiple users, allowing families to share the same application.
-    \item Multiple dashboards - the application contains multiple dashboards where patients can view their health data, such as lab work, vitals, etc.
-    \item Robust interface - the application has a robust interface, allowing patients to easily navigate through the application and view their health data by using well-made graphs and charts.
-\end{itemize}
+\begin{table}[h!]
+\centering
+    \begin{tabular}{|p{0.45\textwidth}|p{0.45\textwidth}|}
+    \hline
+    \textbf{Key Features/Benefits} & \textbf{Limitations/Drawbacks} \\ \hline
+    \begin{itemize}
+        \item Automatically aggregates records from multiple providers, like hospitals and labs.
+        \item Supports self-hosting for complete control over data, stored locally.
+        \item Compatible with protocols such as DICOM, FHIR, and OAuth2.
+        \item Allows manual entry for allergies, vaccinations, and medications.
+        \item Offers multiple dashboards with graphs to visualize health data.
+        \item Supports multi-user functionality for families.
+    \end{itemize} &
+    \begin{itemize}
+        \item Paid desktop versions may deter users.
+        \item Manual data entry limited to new or existing encounters, complicating usage.
+        \item Does not support OCR or automatic data extraction from documents.
+        \item Lacks data-sharing capabilities with doctors.
+        \item Requires technical expertise for self-hosting.
+        \item Restricted to healthcare providers in the United States.
+    \end{itemize} \\ \hline
+    \end{tabular}
+\caption{Fasten Health Features and Limitations}
+\label{tab:fasten_health}
+\end{table}
 
-While the application offers a robust set of features, there are several areas where the application could be improved:
+\begin{figure}[ht]
+    \centering
+    \subfloat[Fasten Health dashboard]{\includegraphics[width=0.75\textwidth]{fasten_1.png}\label{fig:fasten1}} 
+    \hspace{0.05\textwidth} 
+    \subfloat[Visit history screen]{\includegraphics[scale=0.3]{fasten_2.png}\label{fig:fasten2}} 
+    \caption{Overview of Fasten Health app features}
+    \label{fig:fasten}
+\end{figure}
 
-\begin{itemize}
-    \item Paid versions - the Windows and Mac versions are paid, which could be a barrier for patients who cannot afford the application or cannot self-host it on their devices.
-    \item Manual entry of data - currently, manual entry of data is only possible through an encounter (either existing or new one), which could be cumbersome for patients to navigate through.
-    \item No OCR or text extraction - the application does not extract any data or values from the documents, such as lab results.
-    \item One-way share of data - the application does not allow patients to share their health data with their doctors.
-    \item Self-hosted set up - the application requires patients to self-host the application, which could be a barrier for patients who are not familiar with technology.
-    \item Limited to US providers - the application only supports healthcare providers in the US, which could be a barrier for patients who are not from the US.
-\end{itemize}
