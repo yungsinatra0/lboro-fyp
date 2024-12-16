@@ -13,7 +13,7 @@ This chapter will provide a review of the existing literature, which will be use
 \end{itemize}
 
 \section{Software development methodologies}
-
+% TODO: Shorten the section
 \subsection{Software Development Life Cycle}
 
 The Software Development Life Cycle (SDLC) is a process used to guide the development of software applications or systems \parencite{sdlc1}. The SDLC consists of multiple phases, each with its own set of activities and deliverables. \textcite{sdlc2} outline the phases of the SDLC as following:
@@ -108,10 +108,11 @@ In Agile projects, the most basic unit of requirements are usually written in th
 Both Epics and User Stories are part of the Product and Sprint backlog - the former one containing the list of requirements for the whole project and the latter containing the list of requirements for the current sprint/iteration.
 
 \subsection{Stakeholders}
+\label{sec:stakeholders}
 
 Stakeholders represent the `set of individuals who have some interest (a stake) in the success (or failure) of the system in question' \parencite[34]{requirements}. The author stresses the importance of accurately identifying all possible stakeholders in the early stages of the project, as leaving out key stakeholder could lead to missing out on important requirements or constraints later on the project. 
 
-After identifying the stakeholders, it is important to do a stakeholder analysis by understanding the stakeholders' needs, expectations, and influence on the project. One way of doing it is by using a stakeholder matrix, such as the Influence/Interest grid (see figure X), which classifies stakeholders based on their power and interest in the project \parencite{stakeholders}.
+After identifying the stakeholders, it is important to do a stakeholder analysis by understanding the stakeholders' needs, expectations, and influence on the project. One way of doing it is by using a stakeholder matrix, such as the Influence/Interest grid (see figure \ref{fig:stakeholder_matrix}), which classifies stakeholders based on their influence and interest in the project \parencite{stakeholders,stakeholders2}.
 
 \begin{figure}[ht]
     \centering
@@ -128,7 +129,7 @@ There are multiple requirement gathering techniques, the most popular ones being
 \subsection{Interview technique considerations}
 
 Multiple research papers point to interviews being recognised as the most commonly used technique for requirement gathering \parencite{interviews5,interviews1,interviews2}. Additionally, some studies have looked at best practices and common mistakes when conducting interviews for requirement gathering - the results of which are summarized in the tables below.
-
+%TODO: Compare these 2 studies 
 \begin{table}[h!]
     \centering
     \small
@@ -279,6 +280,8 @@ One advancement in the field of LLMs has been the addition of multimodal ability
 
 Example of popular multimodal LLMs are such as GPT-4, Gemini, Claude, and Llama \parencite{gpt4,gemini,llama3,claude}.
 
+%TODO: Create a table for API options that can be used to get access to LLMs for my thesis
+
 \subsection{LLMs in healthcare}
 
 One such application is in healthcare, where the growing volume and complexity of healthcare data creates the need for more advanced tools to process and analyze it. LLMs, with their ability to process and understand large amounts of data, have found use in various healthcare applications, either by using existing models or by developing new, specialized medical models such as Med-PaLm2, BioMistral or Med-Gemini \parencite{biomistral,medgemini,medpalm2}. Some of these applications include:
@@ -293,6 +296,8 @@ One such application is in healthcare, where the growing volume and complexity o
 \subsection{Prompt Engineering}
 
 The success of LLMs depends not only on the model itself - but also on how it's effectively used by the users, using techniques like prompt engineering, which involves designing and refining prompts to guide the output of LLMs \parencite{promptmed}. Prompts represent instructions given to the model to guide its output, such as providing context, examples, or constraints to the model \parencite{prompt}. Prompt engineering provides several ways to improve prompt writing: being as specific as possible, providing examples (one/few shot), providing context, using roles, using constraints, and many more. It is an interative process, so it is important to experiment with different prompts to see which one works best for the task at hand.
+
+%TODO: Cite papers on prompt engineering techniques and create a table for the techniques
 
 \subsection{Challenges and concerns of using LLMs}
 
