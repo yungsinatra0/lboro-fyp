@@ -128,16 +128,18 @@ There are multiple requirement gathering techniques, the most popular ones being
 
 \subsection{Interview technique considerations}
 
-Multiple research papers point to interviews being recognised as the most commonly used technique for requirement gathering \parencite{interviews5,interviews1,interviews2}. Additionally, some studies have looked at best practices and common mistakes when conducting interviews for requirement gathering - the results of which are summarized in the tables below.
+Multiple research papers recognise interviews as the most commonly used technique for requirement gathering \parencite{interviews5,interviews1,interviews2}. Consequently, some studies have looked at best practices and common mistakes when conducting requirement gathering interviews - the results are summarized in the tables below.
 %TODO: Compare these 2 studies 
 \begin{table}[h!]
     \centering
     \small
-    \begin{tabular}{|p{0.2\textwidth}|p{0.75\textwidth}|}
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{|>{\arraybackslash}m{0.2\textwidth}|>{\arraybackslash}m{0.75\textwidth}|}
     \hline
     \textbf{Study} & \textbf{Recommended Practices} \\ \hline
     
     \textcite{interviews4, interviews3} & 
+    \vspace{-\topsep}
     \begin{itemize}
         \item Encourage deep thinking through situational thinking or rationales.
         \item Avoid ambiguity by asking clarifying questions.
@@ -157,11 +159,13 @@ Multiple research papers point to interviews being recognised as the most common
 \begin{table}[h!]
     \centering
     \small
-    \begin{tabular}{|p{0.2\textwidth}|p{0.75\textwidth}|}
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{|>{\arraybackslash}m{0.2\textwidth}|>{\arraybackslash}m{0.75\textwidth}|}
     \hline
     \textbf{Study} & \textbf{Common Mistakes} \\ \hline
     
     \textcite{interviews1} & 
+    \vspace{-\topsep}
     \begin{enumerate}
         \item Wrong opening: failing to understand the context before discussing the problem.
         \item Not leveraging ambiguity to reveal knowledge gaps.
@@ -172,6 +176,7 @@ Multiple research papers point to interviews being recognised as the most common
     \end{enumerate} \\ \hline
     
     \textcite{interviews2} & 
+    \vspace{-\topsep}
     \begin{enumerate}
         \item Poor question formulation: vague, technical, irrelevant, or too long.
         \item Question omission: not asking about business processes or doing follow-up questions.
@@ -184,7 +189,7 @@ Multiple research papers point to interviews being recognised as the most common
     \end{tabular}
     \caption{Common Mistakes in Requirements Gathering Interviews}
     \label{tab:common_mistakes}
-\end{table}    
+\end{table}
 
 \section{Tech stack}
 
@@ -295,7 +300,27 @@ One such application is in healthcare, where the growing volume and complexity o
 
 \subsection{Prompt Engineering}
 
-The success of LLMs depends not only on the model itself - but also on how it's effectively used by the users, using techniques like prompt engineering, which involves designing and refining prompts to guide the output of LLMs \parencite{promptmed}. Prompts represent instructions given to the model to guide its output, such as providing context, examples, or constraints to the model \parencite{prompt}. Prompt engineering provides several ways to improve prompt writing: being as specific as possible, providing examples (one/few shot), providing context, using roles, using constraints, and many more. It is an interative process, so it is important to experiment with different prompts to see which one works best for the task at hand.
+The success of LLMs depends not only on the model itself - but also on how it's effectively used by the users, using techniques like prompt engineering, which involves the constant designing and refining of prompts to guide the output of LLMs \parencite{promptmed,prompt2}. Prompts represent instructions given to the model to guide its output, such as providing context, examples, or constraints to the model \parencite{prompt,prompt1}. 
+
+There are multiple techniques for prompt engineering, ranging from simple to more advanced. The table below outlines some of the most common techniques, as outlined by \textcite{prompt1, prompt2}.
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{p{3cm} p{7cm} p{3cm}}
+        \toprule
+        \textbf{Name of the Technique} & \textbf{Short Description} & \textbf{Source} \\
+        \midrule
+        Chain-of-Thought Prompting     & Encourages the model to break down complex problems into intermediate reasoning steps before producing an answer. & test \\
+        Few-Shot Prompting             & Provides the model with a few input-output examples in the prompt to guide its predictions for new queries. & test \\
+        Self-Consistency               & Uses multiple sampled outputs to determine the most consistent and accurate final prediction. & test \\
+        Zero-Shot Prompting            & Directly prompts the model to perform a task without providing examples, relying solely on task instructions. & test \\
+        Instruction Tuning             & Fine-tunes models on large datasets of instruction-response pairs to make them follow instructions better. & test \\
+        \bottomrule
+    \end{tabular}
+    \caption{Prompt Engineering Techniques from Academic Sources}
+    \label{tab:prompt_engineering}
+\end{table}
+
 
 %TODO: Cite papers on prompt engineering techniques and create a table for the techniques
 
