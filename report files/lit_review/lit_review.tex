@@ -275,7 +275,7 @@ As such, the table below will utilise the information from \textcite{react,angul
 
 Large language models (LLMs) are artificial intelligence systems that are used for natural language processing (NLP) tasks such as human-like text generation, translation, summarization question answering and many more \parencite{llm2,llm_healthcare}. Additionally, LLMs have been found to have emergent capabilities, like reasoning, planning, decision-making and in-contenxt learning \parencite{llm2}. These extraordinary capabilities are achieved through extensive training on large corpus of text data, high parameter count (in the billions) and usage of techniques such as fine-tuning or prompt engineering to improve their performance \parencite{llm2,llm_healthcare}.
 
-LLMs are built on the transformer architecture, which allows them to process and understand text data by learning and remembering the relationships between words, sentences, and paragraphs \parencite{llm}. These models are first pre-trained on large amounts of unlabeled data using self-supervised learning methods, allowing them to excel in a wide variety of tasks \parencite{foundation, llm2}. These pre-trained models, known as foundation models such as the GPT or Llama families, can then be fine-tuned for specific tasks, improving their performance and accuracy even further \parencite{gpt3,llama3,llm2}.
+LLMs are built on the transformer architecture, which allows them to process and understand text data by learning and remembering the relationships between words, sentences, and paragraphs \parencite{llm}. These models are first pre-trained on large amounts of unlabeled data using self-supervised learning methods, allowing them to excel in a wide variety of tasks \parencite{foundation, llm2}. These pre-trained models, known as foundation models such as the GPT or Llama families, can then be fine-tuned for specific tasks, improving their performance and accuracy even further \parencite{fewshot,llama3,llm2}.
 
 Examples of popular LLMs include GPT-4, Mistral, Llama, Claude and Gemini \parencite{gpt4,mistral,llama3,claude,gemini}.
 
@@ -300,29 +300,149 @@ One such application is in healthcare, where the growing volume and complexity o
 
 \subsection{Prompt Engineering}
 
-The success of LLMs depends not only on the model itself - but also on how it's effectively used by the users, using techniques like prompt engineering, which involves the constant designing and refining of prompts to guide the output of LLMs \parencite{promptmed,prompt2}. Prompts represent instructions given to the model to guide its output, such as providing context, examples, or constraints to the model \parencite{prompt,prompt1}. 
+The success of LLMs depends not only on the model itself - but also on how it's effectively used by the users, using techniques like prompt engineering, which involves the constant designing and refining of prompts to guide the output of LLMs \parencite{promptmed,prompt2}. Prompts represent instructions given to the model to guide its output, such as providing context, examples, or constraints to the model \parencite{prompt,prompt1,prompt2}. 
 
-There are multiple techniques for prompt engineering, ranging from simple to more advanced. The table below outlines some of the most common techniques, as outlined by \textcite{prompt1, prompt2}.
+There are multiple techniques for prompt engineering, ranging from simple to more advanced. The tables and subsections below outlines some of the most common techniques.
+
+\subsubsection{Zero-Shot Prompting}
+
+Zero-shot prompting are techniques where the LLM is given a prompt without any examples, allowing it to generate an output based on the prompt alone \parencite{prompt1}.
 
 \begin{table}[h!]
     \centering
-    \begin{tabular}{p{3cm} p{7cm} p{3cm}}
+    \begin{tabular}{p{3cm} p{8cm} p{2cm}}
         \toprule
-        \textbf{Name of the Technique} & \textbf{Short Description} & \textbf{Source} \\
+        \textbf{Technique} & \textbf{Description} & \textbf{Source} \\
         \midrule
-        Chain-of-Thought Prompting     & Encourages the model to break down complex problems into intermediate reasoning steps before producing an answer. & test \\
-        Few-Shot Prompting             & Provides the model with a few input-output examples in the prompt to guide its predictions for new queries. & test \\
-        Self-Consistency               & Uses multiple sampled outputs to determine the most consistent and accurate final prediction. & test \\
-        Zero-Shot Prompting            & Directly prompts the model to perform a task without providing examples, relying solely on task instructions. & test \\
-        Instruction Tuning             & Fine-tunes models on large datasets of instruction-response pairs to make them follow instructions better. & test \\
+        \raggedright
+        Role prompting & Assigning a specific role to the LLM in the prompt. The authors note that generally it provides mixed results but may be useful in certain settings.  & \textcite{role1} \\
+        \hline
+        \raggedright
+        Style prompting & Specifying the desired style or tone in the prompt. & \textcite{style} \\
+        \hline
+        \raggedright
+        Emotion prompting & Incorporating phrases of psychological relevance to humans in the prompt. & \textcite{emotion} \\
+        \hline
+        \raggedright
+        Re-reading & Adding the phrase `Read the question again' to the prompt in addition to repeating the question. & \textcite{rereading} \\
+        \hline
+        \raggedright
+        Self-Ask & Prompting the LLM to decide if it needs to ask any follow-up questions for a given prompt. &  \textcite{selfask} \\
         \bottomrule
     \end{tabular}
-    \caption{Prompt Engineering Techniques from Academic Sources}
-    \label{tab:prompt_engineering}
+    \caption{Zero-Shot Prompt Techniques}
+    \label{tab:zero_shot}
 \end{table}
 
+\subsubsection{Few-Shot Prompting}
 
-%TODO: Cite papers on prompt engineering techniques and create a table for the techniques
+Few-shot prompting are techniques where the LLM learns how to complete a task based on a few examples given in the input prompt \parencite{prompt1}.
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{p{3cm} p{8cm} p{2cm}}
+        \toprule
+        \textbf{Technique} & \textbf{Description} & \textbf{Source} \\
+        \midrule
+        \raggedright
+        Self-Generated In-Context Learning & Using the LLM to automatically generate examples when training/example data is not avaialable. & \textcite{self-generating} \\
+        \hline
+        \raggedright
+        Prompt Mining & Scanning the large corpus of training data to discover common prompt formats that can be used to write better prompts the model might be more familiar with. & \textcite{mining} \\
+        \bottomrule
+    \end{tabular}
+    \caption{Few-Shot Prompt Techniques}
+    \label{tab:few_shot}
+\end{table}
+
+\subsubsection{Thought Generation Prompting}
+
+Thought generation are techniques where the prompt encourages the LLM to explain its reasoning process while solving a given problem \parencite{prompt1}.
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{p{3cm} p{8cm} p{2cm}}
+        \toprule
+        \textbf{Technique} & \textbf{Description} & \textbf{Source} \\
+        \midrule
+        \raggedright
+        Chain-of-Thought (CoT) & Adding a phrase like `Let's think step by step' at the end of the prompt to encourage the LLM to describe its thought process before offering a final answer. & \textcite{cot} \\
+        \hline
+        \raggedright
+        Contrastive CoT & Using CoT and also adding both incorrect and correct examples in order to provide the LLM a more diverse example set.  & \textcite{contrastive-cot} \\
+        \hline
+        \raggedright
+        Auto-CoT & Using CoT with another LLM to automatically generate CoT examples that can be used to create few-shot CoT prompts for other LLMs. &  \textcite{auto-cot} \\
+        \hline
+        \raggedright
+        Least-to-Most & Starts with asking the model to break down a problem into sub-problems without solving them. Afterwards, it solves them one by one, appending the result each time, until it arrives at the answer. & \textcite{least-most} \\
+        \hline
+        \raggedright
+        Tree-of-Thought (ToT) & Starts with an initial problem and then generates multiple possible steps by using CoT. Then, it evaluates each step, decides which one to take and creates more thoughts until it reaches an answer. & \textcite{treeofthought} \\
+        \bottomrule
+    \end{tabular}
+    \caption{Thought Generation Prompt Techniques}
+    \label{tab:thought_gen}
+\end{table}
+
+\subsubsection{Multimodal and Multilingual Prompting}
+
+Multimodal and multilingual prompting are techniques which aim to improve an LLM's performance by leveraging multiple modalities or languages in the prompt \parencite{prompt1}.
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{p{3cm} p{8cm} p{2cm}}
+        \toprule
+        \textbf{Technique} & \textbf{Description} & \textbf{Source} \\
+        \midrule
+        \raggedright
+        Translate-first prompting & Translating the input prompt into English to leverage LLMs strengths in dealing with English inputs, compared to non-English inputs. & \textcite{translate-first} \\
+        \hline
+        \raggedright
+        English prompting & Writing the prompt in English may usually be more effective than using the task language for multilingual tasks. The authors argue it may because of the predominance of the English language in the pre-training data. & \textcite{english-prompting} \\
+        \hline
+        \raggedright
+        JSON/XML output formatting & Asking the LLM to format the response in a JSON or XML format and providing the expected schema has been found to improve the accuracy of LLM outputs  & \textcite{jsonllm} \\
+        \hline
+        \raggedright
+        Multimodal CoT & Similar to the textual CoT, this technique encourages the model to solve a given image-based problem step by step by step. & \textcite{multimodal-cot} \\
+        \hline
+        \raggedright
+        Image-as-Text & Generating or writing a textual description of an image that can then be included in a text-based prompt. & \textcite{images-as-text} \\
+        \hline
+        \raggedright
+        Chain-of-Images (CoI) & Using the CoT process to generate images as part of its thought process to reason visually. & \textcite{coi} \\
+        \bottomrule
+    \end{tabular}
+    \caption{Multimodal and Multilingual Techniques}
+    \label{tab:multi_prompt}
+\end{table}
+
+\subsubsection{Agents}
+
+Agents are techniques which encourage LLMs to use external tools or resources to complete a task \parencite{prompt1}.
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{p{3cm} p{8cm} p{2cm}}
+        \toprule
+        \textbf{Technique} & \textbf{Description} & \textbf{Source} \\
+        \midrule
+        \raggedright
+        Program-aided Language Model (PAL) & Using the LLM to translate a problem into code, which can then be sent to an interpreter to generate an answer. & \textcite{pal} \\
+        \hline
+        \raggedright
+        ReAct & Firstly, the model generates a thought based on the input. Then, the model takes an action and observes the result. This process is repeated until the model arrives at an answer. & \textcite{react} \\
+        \hline
+        \raggedright
+        Retrieval Augmented Generation (RAG) & This technique involves retrieval of information from an external source and inserting it into the prompt. & \textcite{rag} \\
+        \bottomrule
+    \end{tabular}
+    \caption{LLM Agent Techniques}
+    \label{tab:agents}
+\end{table}
+
+\FloatBarrier
 
 \subsection{Challenges and concerns of using LLMs}
 
@@ -356,6 +476,8 @@ However, since PHRs contain health information, which is highly sensitive, it is
 
 The authors go further and recommend mechanisms to ensure adherence to the above-mentioned dimensions, such as encrypting the data in the database, using a backup, defining users and their access to the system data, allowing the option to set or revoke access rights, among others.
 
+\clearpage
+
 \subsection{Existing Solutions}
 
 PHR systems have been implemented nation-wide in many developed countries, such as the NHS App in the UK \parencite{phrlist}. Additionally, there are many privately-owned solutions that offer similar features to the one proposed in this project. 
@@ -366,7 +488,7 @@ A mobile app developed in Romania that allows patients to upload their medical h
 
 \begin{table}[h!]
 \centering
-    \begin{tabular}{|p{0.45\textwidth}|p{0.45\textwidth}|}
+    \begin{tabular}{|p{0.47\textwidth}|p{0.47\textwidth}|}
     \hline
     \textbf{Key Features/Benefits} & \textbf{Limitations/Drawbacks} \\ \hline
     \begin{itemize}
@@ -389,6 +511,7 @@ A mobile app developed in Romania that allows patients to upload their medical h
 \end{table}
 
 \FloatBarrier
+\clearpage
 
 \subsubsection{Andaman7}
 
@@ -396,7 +519,7 @@ A mobile app developed by a Belgian-American eHealth company with the goal to im
 
 \begin{table}[htbp]
 \centering
-    \begin{tabular}{|p{0.45\textwidth}|p{0.45\textwidth}|}
+    \begin{tabular}{|p{0.47\textwidth}|p{0.47\textwidth}|}
     \hline
     \textbf{Key Features/Benefits} & \textbf{Limitations/Drawbacks} \\ \hline
     \begin{itemize}
@@ -426,7 +549,7 @@ An open-source, self-hosted electronic medical record aggregator with optional p
 
 \begin{table}[h!]
 \centering
-    \begin{tabular}{|p{0.45\textwidth}|p{0.45\textwidth}|}
+    \begin{tabular}{|p{0.47\textwidth}|p{0.47\textwidth}|}
     \hline
     \textbf{Key Features/Benefits} & \textbf{Limitations/Drawbacks} \\ \hline
     \begin{itemize}
