@@ -1,8 +1,6 @@
 \chapter{Project Planning and Design}
 
-\section{System Design}
-
-\subsection{UML Diagrams}
+\section{UML Diagrams}
 
 UML, or Unified Modeling Language, is a standardized modeling language that consists of a set of diagrams used for modeling business processes and documenting software systems, helping better communicating potential designs and architectural decisions \parencite{uml}. 
 
@@ -16,61 +14,204 @@ The most common UML diagrams include:
 
 The student has used UML diagrams to present the stakeholders with a visual representation of the system's design and architecture. The diagrams can be found below.
 
-\clearpage
-
-\subsubsection{Use Case Diagram}
+\subsection{Use Case Diagram}
 
 \begin{figure}[ht]
-\label{fig:uml_usecase}
     \centering
-    \includegraphics[width=\textwidth]{Use_Case.png}
-    \caption{UML Use Case Diagram} 
+    \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{Use_Case.png}
+    \caption{UML Use Case Diagram}
+    \label{fig:uml_usecase}
 \end{figure}
 
 \FloatBarrier
 \clearpage
 
-\subsubsection{Sequence Diagrams}
+\subsection{Use Case Specifications}
 
-\begin{figure}[ht]
+\subsubsection{Login}
+\begin{tabular}{|p{0.2\textwidth}|p{0.7\textwidth}|}
+\hline
+Description & The Login use case allows the app user to log in to their existing account via their credentials, with an optional use of MFA. \\
+\hline
+Actors & Patient \\
+\hline
+Preconditions & Must have an existing account \\
+\hline
+Steps & 1. User enters user and password \newline
+       2. User clicks on the login button \newline
+       3. App validates user credentials \newline
+       4. Patient enters MFA code if enabled \newline
+       5. App logs user in \\
+\hline
+\end{tabular}
+
+\subsubsection{Register}
+\begin{tabular}{|p{0.2\textwidth}|p{0.7\textwidth}|}
+\hline
+Description & The Register use case allows the app user to create a new account. \\
+\hline
+Actors & New Patient \\
+\hline
+Preconditions & No existing account with the email used to register \\
+\hline
+Steps & 1. User enters user and password \newline
+       2. User clicks on the register button \newline
+       3. App validates user credentials \newline
+       4. App logs user in \newline
+       5. App sends verification email \newline
+       6. User verifies email \\
+\hline
+\end{tabular}
+
+\subsubsection{Upload Record}
+\begin{tabular}{|p{0.2\textwidth}|p{0.7\textwidth}|}
+\hline
+Description & The Upload Record use case allows the patient to upload their medical records to the app. \\
+\hline
+Actors & Patient, LLM \\
+\hline
+Preconditions & Must be logged in \\
+\hline
+Steps & 1. User selects file upload (or camera scan) \newline
+       2. User selects the record to upload \newline
+       3. User clicks on the upload button \newline
+       4. App validates the record \newline
+       5. User selects the appropriate record type \newline
+       6. If record type is lab result, app sends the record to LLM via API for processing into JSON format \newline
+       7. App adds the record to the database \newline
+       8. App shows confirmation to user \\
+\hline
+\end{tabular}
+
+\subsubsection{Share Records}
+\begin{tabular}{|p{0.2\textwidth}|p{0.7\textwidth}|}
+\hline
+Description & The Share Records use case allows the patient to share their medical records with doctors. \\
+\hline
+Actors & Patient, Doctor \\
+\hline
+Preconditions & Must be logged in and have records uploaded \\
+\hline
+Steps & 1. User selects option to create a share link \newline
+       2. OPTIONAL: User selects the records to share \newline
+       3. OPTIONAL: User adds a PIN to the share link \newline
+       4. User selects time limit for the share link \newline
+       5. App generates the share link \newline
+       6. App sends the share link to the doctor via email \newline
+       7. App shows confirmation to user \newline
+       8. Doctor clicks on the share link \newline
+       9. Doctor enters the PIN (if required) \newline
+       10. App validates the PIN \newline
+       11. App shows the records to the doctor \\
+\hline
+\end{tabular}
+
+\subsubsection{View Records}
+\begin{tabular}{|p{0.2\textwidth}|p{0.7\textwidth}|}
+\hline
+Description & The View Records use case allows the patient to view and edit their uploaded medical records. \\
+\hline
+Actors & Patient \\
+\hline
+Preconditions & Must be logged in and have records uploaded \\
+\hline
+Steps & 1. App provides a list of records or medical history \newline
+       2. User selects record to view from list or medical history \newline
+       3. App retrieves the record from the database \newline
+       4. App shows the record to the user \newline
+       5. OPTIONAL: User can view the record in a graphical format if lab result \newline
+       6. OPTIONAL: User edits the record \newline
+       7. OPTIONAL: User deletes the record \\
+\hline
+\end{tabular}
+
+\subsubsection{View Patient Profile}
+\begin{tabular}{|p{0.2\textwidth}|p{0.7\textwidth}|}
+\hline
+Description & The View Patient Profile use case allows the patient to view and edit their profile information, including health information such as allergies, medications, vaccinations and recorded health data like blood pressure, glucose levels, etc. \\
+\hline
+Actors & Patient \\
+\hline
+Preconditions & Must be logged in \\
+\hline
+Steps & 1. User selects the profile section \newline
+       2. App retrieves the profile information from the database \newline
+       3. App shows the profile information to the user - vaccinations, allergies, medications, health data \newline
+       4. OPTIONAL: User edits the profile information \newline
+       5. OPTIONAL: User adds new health data \newline
+       6. OPTIONAL: User deletes health data \newline
+       7. OPTIONAL: User can view health data in a graphical format \\
+\hline
+\end{tabular}
+
+\FloatBarrier
+\clearpage
+
+\subsection{Class Diagram}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{Class_diagram.png}
+    \caption{UML Class Diagram}
+    \label{fig:uml_class}
+\end{figure}
+
+\FloatBarrier
+\clearpage
+
+\subsection{Sequence Diagrams}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{Sequence_upload.png}
+    \caption{UML Sequence Diagram - Upload Record Use Case}
     \label{fig:sequence1}
-        \centering
-        \includegraphics[width=\textwidth]{Sequence_upload.png}
-        \caption{UML Sequence Diagram - Upload Record Use Case}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{Sequence_share.png}
+    \caption{UML Sequence Diagram - Share Records Use Case}
     \label{fig:sequence2}
-        \centering
-        \includegraphics[width=\textwidth]{Sequence_share.png}
-        \caption{UML Sequence Diagram - Share Records Use Case}
 \end{figure}
 
 \FloatBarrier
-\clearpage
 
-\subsubsection{Activity Diagrams}
+\noindent\begin{minipage}{\textwidth}
+    \subsection{Activity Diagrams}
+    \begin{center}
+        \rotatebox[origin=c]{270}{
+            \includegraphics[width=0.9\textheight,keepaspectratio]{Activity_upload.png}
+        }
+        \captionof{figure}{UML Activity Diagram - Upload Record Use Case}
+        \label{fig:activity1}
+    \end{center}
+\end{minipage}
 
-\begin{figure}[ht]
-    \label{fig:activity1}
-        \centering
-        \includegraphics[width=\textwidth]{Activity_upload.png}
-        \caption{UML Activity Diagram - Upload Record Use Case}
-\end{figure}
-
-\begin{figure}[ht]
-    \label{fig:activity2}
-        \centering
-        \includegraphics[width=\textwidth]{Activity_link.png}
-        \caption{UML Activity Diagram - Share Records Use Case}
-\end{figure}
+\noindent\begin{minipage}{\textwidth}
+    \begin{center}
+        \rotatebox[origin=c]{270}{
+            \includegraphics[width=0.9\textheight,keepaspectratio]{Activity_link.png}
+        }
+        \captionof{figure}{UML Activity Diagram - Share Records Use Case}
+        \label{fig:activity2}
+    \end{center}
+\end{minipage}
 
 \FloatBarrier
-\clearpage
 
-\subsection{Database Design}
+\noindent\begin{minipage}{\textwidth}
+    \section{Database Design}
+    \begin{center}
+        \rotatebox[origin=c]{270}{
+            \includegraphics[width=0.9\textheight,keepaspectratio]{ERD.png}
+        }
+        \captionof{figure}{Entity Relationship Diagram}
+        \label{fig:erd}
+    \end{center}
+\end{minipage}
 
-\subsection{Wireframes}
+\FloatBarrier
+
+\section{Wireframes}
 
 \section{Project Tech Stack}
 
