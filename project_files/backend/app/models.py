@@ -1,8 +1,11 @@
 from sqlmodel import Field, SQLModel
-from passlib.hash import bcrypt
 from pydantic import EmailStr
 from datetime import date
 import uuid
+
+class Token(SQLModel):
+    access_token: str
+    token_type: str
 
 # User Table model used for table creation, also contains sensitive info like email, password hash and MFA secret
 class User(SQLModel, table=True):
@@ -12,13 +15,12 @@ class User(SQLModel, table=True):
     email: EmailStr = Field(index=True, unique=True)
     hashed_password: str
 #   MFA_secret: str | None = None # To be added later
-    
-    def verify_hash(self, password: str) -> bool:
-        return bcrypt.verify(password, self.hashed_password)
-    
-    @staticmethod
-    def create_hash(password: str) -> str:
-        return bcrypt.hash(password)
+
+class UserResponse(SQLModel):
+    id: uuid.UUID
+    name: str
+    dob: date
+    email: EmailStr
 
 # User Data model used for login    
 class UserAuth(SQLModel):
@@ -28,7 +30,7 @@ class UserAuth(SQLModel):
     name: str | None = None # Will only be used for registration
 
 # User Data model used for most API responses
-class UserResponse(SQLModel):
+class UserPublic(SQLModel):
     id: uuid.UUID
     name: str
     
