@@ -20,6 +20,7 @@ async def lifespan(app: FastAPI):
         
 app = FastAPI(lifespan=lifespan)
 
+# PUBLIC ROUTES
 # Login endpoint
 @app.post("/login", response_model=Token)
 def login(*, session: Session = Depends(get_session), login_data: UserAuth):
@@ -68,6 +69,13 @@ def register(*, session: Session = Depends(get_session), register_data: UserAuth
         session.rollback()
         raise HTTPException(status_code=500, detail=f"An error occurred when registering: {e}")
 
+
+# PROTECTED ROUTES
+# Get current user info endpoint
+@app.get("/users/me", response_model=UserResponse)
+async def read_users_me(user_id: uuid.UUID = Depends(get_current_user), session: Session = Depends(get_session)):
+    return session.get(User, user_id)
+
 # Update user endpoint - TODO: Add authentication to this endpoint   
 @app.patch("/update", response_model=UserResponse)
 def update_user(*, session: Session = Depends(get_session), user_update: UserUpdate, user_id: uuid.UUID = Depends(get_current_user)):
@@ -109,8 +117,3 @@ def get_user(user_id: uuid.UUID, session: Session = Depends(get_session), curren
         raise HTTPException(status_code=404, detail="User not found")
     
     return user_db
-
-# Get current user info endpoint
-@app.get("/users/me", response_model=UserResponse)
-async def read_users_me(user_id: uuid.UUID = Depends(get_current_user), session: Session = Depends(get_session)):
-    return session.get(User, user_id)
