@@ -117,3 +117,11 @@ def get_user(user_id: uuid.UUID, session: Session = Depends(get_session), curren
         raise HTTPException(status_code=404, detail="User not found")
     
     return user_db
+
+# Homepage/dashboard endpoint
+@app.get("/")
+async def get_dashboard(user_id: uuid.UUID = Depends(get_current_user), session: Session = Depends(get_session)):
+    user = session.get(User, user_id)
+    return {
+        "message": f"Welcome {user.name}!"
+        }
