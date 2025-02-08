@@ -85,7 +85,7 @@ def register(*, session: Session = Depends(get_session), register_data: UserAuth
 
 # PROTECTED ROUTES
 # Get current user info endpoint
-@app.get("/me", response_model=UserResponse)
+@app.get("/me", response_model=UserPublic)
 async def read_users_me(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     return session.get(User, user_id)
 

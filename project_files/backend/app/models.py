@@ -36,7 +36,6 @@ class UserAuth(SQLModel):
 # User Data model used for most API responses
 class UserPublic(SQLModel):
     id: uuid.UUID
-    name: str
     
 # User Data model used for updating user info
 class UserUpdate(SQLModel):
