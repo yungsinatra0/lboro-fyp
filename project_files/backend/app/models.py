@@ -1,11 +1,15 @@
 from sqlmodel import Field, SQLModel
 from pydantic import EmailStr
-from datetime import date
+from datetime import date, datetime
 import uuid
 
-class Token(SQLModel):
-    access_token: str
-    token_type: str
+# Session table model used for storing sessions in the database.
+class Session(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    user_id: uuid.UUID
+    expires_at: datetime
+    created_at = Field(default_factory=datetime.now(datetime.timezone.utc))    
+    
 
 # User Table model used for table creation, also contains sensitive info like email, password hash and MFA secret
 class User(SQLModel, table=True):

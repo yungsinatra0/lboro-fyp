@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Response
 from sqlmodel import Session, select
 from contextlib import asynccontextmanager
 import uuid
@@ -6,7 +6,7 @@ import uuid
 # local imports
 from database import create_db_and_tables, get_session
 from models import UserAuth, User, UserUpdate, UserPublic, UserResponse, Token
-from auth_utils import create_access_token, verify_hash, create_hash, get_current_user
+from auth_utils import verify_hash, create_hash, create_session, validate_session
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -22,8 +22,8 @@ app = FastAPI(lifespan=lifespan)
 
 # PUBLIC ROUTES
 # Login endpoint
-@app.post("/login", response_model=Token)
-def login(*, session: Session = Depends(get_session), login_data: UserAuth):
+@app.post("/login")
+async def login(*, session: Session = Depends(get_session), login_data: UserAuth):
     user_db = session.exec(select(User).where(User.email == login_data.email)).first()
     
     # Check if user exists
@@ -34,15 +34,25 @@ def login(*, session: Session = Depends(get_session), login_data: UserAuth):
     if verify_hash(login_data.password, user_db.hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password")
     
-    # Create a JWT token and return it
-    # access_token_expiretime = 1440 
-    access_token = create_access_token(
-        data={"sub": str(user_db.id)}, expires_delta=None
-        ) # Not adding expiration time for now, using default 24 hours
+    # Create a session for the user
+    session_id = await create_session(user_db.id)
     
-    return Token(
-        access_token=access_token,
-        token_type="bearer") 
+    # Set the session cookie
+    Response.set_cookie(
+        "session_id",
+        str(session_id),
+        httponly=True,
+        max_age=3600,
+        samesite="strict",
+        secure=True
+    )
+    
+    return {
+        "status": status.HTTP_200_OK,
+        "message": "Login successful",
+        "user_id": user_db.id
+    }    
+    
 
 # Register endpoint
 @app.post("/register")
@@ -62,23 +72,26 @@ def register(*, session: Session = Depends(get_session), register_data: UserAuth
         session.commit()
         session.refresh(user_db)
     
-        return {"message": "Registration successfulasda"} # TODO: Will need to change this later to return a token or something
+        return {
+            "status": status.HTTP_201_CREATED,
+            "message": "User registered successfully"
+            }
     
     # Unlikely to happen, but if an error occurs, rollback the transaction and raise an exception
     except Exception as e:
         session.rollback()
-        raise HTTPException(status_code=500, detail=f"An error occurred when registering: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"An error occurred when registering: {e}")
 
 
 # PROTECTED ROUTES
 # Get current user info endpoint
 @app.get("/users/me", response_model=UserResponse)
-async def read_users_me(user_id: uuid.UUID = Depends(get_current_user), session: Session = Depends(get_session)):
+async def read_users_me(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     return session.get(User, user_id)
 
 # Update user endpoint - TODO: Add authentication to this endpoint   
 @app.patch("/update", response_model=UserResponse)
-def update_user(*, session: Session = Depends(get_session), user_update: UserUpdate, user_id: uuid.UUID = Depends(get_current_user)):
+def update_user(*, session: Session = Depends(get_session), user_update: UserUpdate, user_id: uuid.UUID = Depends(validate_session)):
     # Find the user to be updated, if not found, raise an exception
     user_db = session.get(User, user_id)
     if not user_db:
@@ -107,7 +120,7 @@ def update_user(*, session: Session = Depends(get_session), user_update: UserUpd
 
 # Get user info endpoint
 @app.get("/users/{user_id}", response_model=UserPublic)
-def get_user(user_id: uuid.UUID, session: Session = Depends(get_session), current_user_id: uuid.UUID = Depends(get_current_user)):
+def get_user(user_id: uuid.UUID, session: Session = Depends(get_session), current_user_id: uuid.UUID = Depends(validate_session)):
     if user_id != current_user_id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You do not have permission to access this user's data") # TODO: Change this to include admin access maybe?
       
@@ -120,7 +133,7 @@ def get_user(user_id: uuid.UUID, session: Session = Depends(get_session), curren
 
 # Homepage/dashboard endpoint
 @app.get("/")
-async def get_dashboard(user_id: uuid.UUID = Depends(get_current_user), session: Session = Depends(get_session)):
+async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     user = session.get(User, user_id)
     return {
         "message": f"Welcome {user.name}!"
