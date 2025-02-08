@@ -61,12 +61,8 @@
             variant="simple"
             class="text-rose-600 text-sm"
           >
-            <ul class="my-0 flex flex-col gap-1">
-              <li v-for="(error, index) of $form.password.errors" :key="index">
-                {{ error.message }}
-              </li>
-            </ul>
-          </Message>
+            {{ $form.password.error.message }}</Message
+          >
         </div>
         <Button type="submit" severity="secondary" label="Autentificare" />
       </Form>
@@ -90,8 +86,9 @@ import Button from 'primevue/button'
 import Checkbox from 'primevue/checkbox'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
-
+import api from '../services/api'
 import { ref } from 'vue'
+import router from '@/router'
 
 const initialValues = ref({
   email: '',
@@ -102,18 +99,31 @@ const resolver = ({ values }) => {
   const errors = {}
   if (!values.email) {
     errors.email = [{ message: 'Adresa de email este obligatorie' }]
-  } 
-  
+  }
+
   if (!values.password) {
     errors.password = [{ message: 'Parola este obligatorie' }]
   }
 
   return {
-    errors,
+    errors, values
   }
 }
 
-const onFormSubmit = (e) => {
+async function login(credentials) {
+  try {
+    console.log(credentials)
+    await api.post('/login', {
+      email: credentials.email,
+      password: credentials.password,
+    })
+    router.push('/dashboard')
+  } catch {
+    console.log('Login failed')
+  }
+}
+
+const onFormSubmit = ( e ) => {
   // e.originalEvent: Represents the native form submit event.
   // e.valid: A boolean that indicates whether the form is valid or not.
   // e.states: Contains the current state of each form field, including validity status.
@@ -122,9 +132,9 @@ const onFormSubmit = (e) => {
   // e.reset: A function that resets the form to its initial state.
 
   if (e.valid) {
-    console.log('Form is valid') // Will need to change to a real API call
+    login(e.values)
   }
-}
-</script>
 
-<style scope></style>
+    // login(values)
+  }
+</script>

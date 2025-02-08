@@ -12,48 +12,50 @@ const router = createRouter({
       path: '/',
       name: 'Landing',
       component: LandingView,
-      meta: {requiresAuth: false}
+      meta: { requiresAuth: false },
     },
     {
       path: '/login',
       name: 'Login',
       component: LoginView,
-      meta: {requiresAuth: false}
+      meta: { requiresAuth: false },
     },
     {
       path: '/register',
       name: 'Register',
       component: RegisterView,
-      meta: {requiresAuth: false}
+      meta: { requiresAuth: false },
     },
     {
       path: '/dashboard',
       name: 'Dashboard',
       component: DashboardView,
-      meta: {requiresAuth: true}
+      meta: { requiresAuth: true },
     },
   ],
 })
 
 // Navigation guard
-router.beforeEach(async (to) => { // can also add from, next as arguments
+router.beforeEach(async (to) => {
+  console.log('Navigation guard triggered for route:', to.name)
   const authStore = useAuthStore()
-  await authStore.checkAuth() // TODO: Change this sometime later as it can be computationally expensive to call this on every route change
 
   if (to.meta.requiresAuth) {
+    console.log('Checking auth for:', to.name)
+    await authStore.checkAuth() // Check if user is authenticated
     if (!authStore.isAuthenticated) {
       return { name: 'Login' } // Redirect to login if not authenticated
     }
+  } else if (to.path === '/login' || to.path === '/register') {
+    console.log("I'm in the login/register page, checking if user is already authed")
+    await authStore.checkAuth()
+    if (authStore.isAuthenticated) {
+      return { name: 'Dashboard' } // Redirect to dashboard if authenticated
+    }
+    console.log("User is not authenticated, continuing to login/register page")
   }
 
-  if (authStore.isAuthenticated && (to.path === '/login' || to.path === '/register')) {
-    // Redirect to dashboard if logged in user tries to access login/register
-    return { name: 'Dashboard' }
-    
-  }  
-  else {
-    return true // Continue to requested route
-  }
+  return true // Continue to requested route
 })
 
 export default router

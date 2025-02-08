@@ -1,45 +1,49 @@
 from sqlmodel import Field, SQLModel
-from pydantic import EmailStr
+from pydantic import EmailStr, field_serializer
 from datetime import date, datetime
 import uuid
 
+# Base model that contains the field serializer for date formatting to dd-mm-yyyy
+class DateFormattingModel(SQLModel):
+    dob: date | None = None
+    
+    @field_serializer('dob')
+    def serialize_dob(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")
+
 # Session table model used for storing sessions in the database.
-class Session(SQLModel, table=True):
+class AuthSession(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     user_id: uuid.UUID
     expires_at: datetime
-    created_at = Field(default_factory=datetime.now(datetime.timezone.utc))    
+    created_at: datetime = Field(default_factory=datetime.now)    
     
 
 # User Table model used for table creation, also contains sensitive info like email, password hash and MFA secret
-class User(SQLModel, table=True):
+class User(DateFormattingModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
-    dob: date
     email: EmailStr = Field(index=True, unique=True)
     hashed_password: str
 #   MFA_secret: str | None = None # To be added later
 
-class UserResponse(SQLModel):
+class UserResponse(DateFormattingModel):
     id: uuid.UUID
     name: str
-    dob: date
     email: EmailStr
 
 # User Data model used for login    
-class UserAuth(SQLModel):
+class UserAuth(DateFormattingModel):
     email: EmailStr
     password: str
-    dob: date | None = None # Will only be used for registration
     name: str | None = None # Will only be used for registration
 
 # User Data model used for most API responses
-class UserPublic(SQLModel):
+class UserPublic(DateFormattingModel):
     id: uuid.UUID
     
 # User Data model used for updating user info
-class UserUpdate(SQLModel):
+class UserUpdate(DateFormattingModel):
     name: str | None = None
-    dob: date | None = None
     email: EmailStr | None = None
     password: str | None = None

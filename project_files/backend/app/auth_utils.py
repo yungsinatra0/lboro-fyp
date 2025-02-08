@@ -6,7 +6,7 @@ import os
 from sqlmodel import Session, select
 import uuid
 
-from models import User, Session as SessionModel
+from models import AuthSession
 from database import get_session
 
 
@@ -24,26 +24,26 @@ def verify_hash(plaintext_password: str, hashed_password: str) -> bool:
 def create_hash(plaintext_password: str) -> str:
         return bcrypt.hash(plaintext_password)
 
-async def create_session(user_id: uuid.UUID, database: Session = Depends(get_session)):
-    session = SessionModel(user_id=user_id, expires_at=datetime.now(datetime.timezone.utc) + timedelta(minutes=EXPIRE_MINUTES))
+async def create_session(user_id: uuid.UUID, session: Session = Depends(get_session)):
+    newAuthSession = AuthSession(user_id=user_id, expires_at=datetime.now() + timedelta(minutes=EXPIRE_MINUTES))
     
-    database.add(session)
-    database.commit()
-    database.refresh(session)
+    session.add(newAuthSession)
+    session.commit()
+    session.refresh(newAuthSession)
     
-    return session.id
+    return newAuthSession.id
 
-async def validate_session(request: Request, database: Session = Depends(get_session)):
+async def validate_session(request: Request, session: Session = Depends(get_session)):
     session_id = request.cookies.get("session_id")
     if not session_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session not found")
     
-    session = database.exec(select(SessionModel)
-                            .where(SessionModel.id == uuid.UUID(session_id))
-                            .where(SessionModel.expires_at > datetime.now(datetime.timezone.utc))
+    existingAuthSession = session.exec(select(AuthSession)
+                            .where(AuthSession.id == uuid.UUID(session_id))
+                            .where(AuthSession.expires_at > datetime.now())
     ).first()
     
-    if not session:
+    if not existingAuthSession:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session not found")
     
-    return session.user_id
+    return existingAuthSession.user_id

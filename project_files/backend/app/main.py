@@ -5,7 +5,7 @@ import uuid
 
 # local imports
 from database import create_db_and_tables, get_session
-from models import UserAuth, User, UserUpdate, UserPublic, UserResponse, Token
+from models import UserAuth, User, UserUpdate, UserPublic, UserResponse
 from auth_utils import verify_hash, create_hash, create_session, validate_session
 
 @asynccontextmanager
@@ -23,7 +23,7 @@ app = FastAPI(lifespan=lifespan)
 # PUBLIC ROUTES
 # Login endpoint
 @app.post("/login")
-async def login(*, session: Session = Depends(get_session), login_data: UserAuth):
+async def login(*, session: Session = Depends(get_session), login_data: UserAuth, response: Response):
     user_db = session.exec(select(User).where(User.email == login_data.email)).first()
     
     # Check if user exists
@@ -31,14 +31,14 @@ async def login(*, session: Session = Depends(get_session), login_data: UserAuth
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect email or user does not exist")
     
     # Check if password is correct
-    if verify_hash(login_data.password, user_db.hashed_password):
+    if not verify_hash(login_data.password, user_db.hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password")
     
     # Create a session for the user
-    session_id = await create_session(user_db.id)
+    session_id = await create_session(user_db.id, session)
     
     # Set the session cookie
-    Response.set_cookie(
+    response.set_cookie(
         "session_id",
         str(session_id),
         httponly=True,
