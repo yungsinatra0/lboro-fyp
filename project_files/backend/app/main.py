@@ -85,7 +85,7 @@ def register(*, session: Session = Depends(get_session), register_data: UserAuth
 
 # PROTECTED ROUTES
 # Get current user info endpoint
-@app.get("/users/me", response_model=UserResponse)
+@app.get("/me", response_model=UserResponse)
 async def read_users_me(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     return session.get(User, user_id)
 
@@ -103,7 +103,7 @@ def update_user(*, session: Session = Depends(get_session), user_update: UserUpd
     
     # If password is being updated, hash it before updating
     if "password" in user_data:
-        extra_data["hashed_password"] = User.create_hash(user_data["password"]) # Do I need to pop this from user_data?
+        extra_data["hashed_password"] = create_hash(user_data["password"]) # Do I need to pop this from user_data?
     
     # Update the user data
     try:
