@@ -1,12 +1,23 @@
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
+import api from '../api'
 
-export const useCounterStore = defineStore('counter', () => {
-  const count = ref(0)
-  const doubleCount = computed(() => count.value * 2)
-  function increment() {
-    count.value++
+// Using computed API instead of options API cause I'm already using it in my other Vue files
+export const useAuthStore = defineStore('auth', () => {
+  const isAuthenticated = ref(false)
+  const user = ref(null)
+
+  async function checkAuth() { // Function checks if user is authenticated
+    try {
+      const response = await api.get('/me') // This will return the user object if the user is authenticated
+      isAuthenticated.value = true
+      user.value = response.data.user
+    }
+    catch {
+      isAuthenticated.value = false
+      user.value = null
+    }
   }
 
-  return { count, doubleCount, increment }
+  return { isAuthenticated, user, checkAuth }
 })

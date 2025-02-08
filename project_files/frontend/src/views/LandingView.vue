@@ -281,11 +281,8 @@ import Button from 'primevue/button'
 import Menubar from 'primevue/menubar'
 import { InputText, Textarea } from 'primevue'
 import { ref, useTemplateRef } from 'vue'
-import { useRouter } from 'vue-router'
 import { useDarkMode } from '../composables/useDarkMode'
 import { Form } from '@primevue/forms'
-
-const router = useRouter()
 
 const { isDarkMode, toggleDarkMode } = useDarkMode()
 
