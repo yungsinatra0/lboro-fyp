@@ -14,11 +14,9 @@ api.interceptors.request.use(function(config) {
 // Use the interceptor to send user back to login page if their session expires as the cookie is handled automatically by the browser
 api.interceptors.response.use(
     function (response) { // From Axios documentation, this will be triggered with any response status code in the 2xx range
-        console.log('API Response:', response.status, response.config.url)
         return response; 
     }, 
     function (error) { // From Axios documentation, this will be triggered with any response status code outside the 2xx range
-        console.log('API Error:', error.response?.status, error.config?.url)
         if (error.response.status === 401 && !error.config.url.includes('/login') && !error.config.url.includes('/register') && !error.config.url.includes('/logout') && !error.config.url.includes('/me')
         ) { // Specifically checking for 401 Unauthorized status code
             router.push('/login')

@@ -37,22 +37,18 @@ const router = createRouter({
 
 // Navigation guard
 router.beforeEach(async (to) => {
-  console.log('Navigation guard triggered for route:', to.name)
   const authStore = useAuthStore()
 
   if (to.meta.requiresAuth) {
-    console.log('Checking auth for:', to.name)
     await authStore.checkAuth() // Check if user is authenticated
     if (!authStore.isAuthenticated) {
       return { name: 'Login' } // Redirect to login if not authenticated
     }
   } else if (to.path === '/login' || to.path === '/register') {
-    console.log("I'm in the login/register page, checking if user is already authed")
     await authStore.checkAuth()
     if (authStore.isAuthenticated) {
       return { name: 'Dashboard' } // Redirect to dashboard if authenticated
     }
-    console.log("User is not authenticated, continuing to login/register page")
   }
 
   return true // Continue to requested route
