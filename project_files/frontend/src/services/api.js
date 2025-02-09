@@ -17,7 +17,7 @@ api.interceptors.response.use(
         return response; 
     }, 
     function (error) { // From Axios documentation, this will be triggered with any response status code outside the 2xx range
-        if (error.response.status === 401 && !error.config.url.includes('/login') && !error.config.url.includes('/register') && !error.config.url.includes('/logout') && !error.config.url.includes('/me')
+        if (error.response.status === 401 && !error.config.url.includes('/login') && !error.config.url.includes('/register') && !error.config.url.includes('/logout') && !error.config.url.includes('/me') // Very messy, not sure how to do this better, otherwise it goes into an infinite 401 loop 
         ) { // Specifically checking for 401 Unauthorized status code
             router.push('/login')
         }

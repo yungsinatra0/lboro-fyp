@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, status, Response
+from fastapi import FastAPI, Depends, HTTPException, status, Response, Request
 from sqlmodel import Session, select
 from contextlib import asynccontextmanager
 import uuid
@@ -6,11 +6,11 @@ import uuid
 # local imports
 from database import create_db_and_tables, get_session
 from models import UserAuth, User, UserUpdate, UserPublic, UserResponse
-from auth_utils import verify_hash, create_hash, create_session, validate_session
+from auth_utils import verify_hash, create_hash, create_session, validate_session, end_session
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Try creating the database and tables, if not raise an exception
+    # Try creating the database and tables before starting the API server (will not do anything if they already exist)
     try:
         create_db_and_tables()
         print("Database and tables created successfully")
@@ -37,7 +37,7 @@ async def login(*, session: Session = Depends(get_session), login_data: UserAuth
     # Create a session for the user
     session_id = await create_session(user_db.id, session)
     
-    # Set the session cookie
+    # Set the session cookie in the response and send it to the client
     response.set_cookie(
         "session_id",
         str(session_id),
@@ -84,6 +84,26 @@ def register(*, session: Session = Depends(get_session), register_data: UserAuth
 
 
 # PROTECTED ROUTES
+# Logout endpoint
+@app.post("/logout")
+async def logout(response: Response, request: Request, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    
+    # Will use the end_session function to end the session in the database
+    end_session(request, session) # Need to pass the request and session to the function, otherwise it will not work
+    
+    # Still need to delete the session cookie from the client
+    response.delete_cookie(
+        "session_id",
+        samesite="strict",
+        secure=True,
+        httponly=True
+        )
+    
+    return {
+        "status": status.HTTP_200_OK,
+        "message": "Logout successful"
+    }
+
 # Get current user info endpoint
 @app.get("/me", response_model=UserPublic)
 async def read_users_me(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
@@ -131,7 +151,7 @@ def get_user(user_id: uuid.UUID, session: Session = Depends(get_session), curren
     
     return user_db
 
-# Homepage/dashboard endpoint
+# Homepage/dashboard endpoint TODO: Change this to a more useful endpoint
 @app.get("/")
 async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     user = session.get(User, user_id)

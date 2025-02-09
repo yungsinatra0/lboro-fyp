@@ -3,7 +3,7 @@ from pydantic import EmailStr, field_serializer
 from datetime import date, datetime
 import uuid
 
-# Base model that contains the field serializer for date formatting to dd-mm-yyyy
+# Base model that contains the field serializer for date formatting to dd-mm-yyyy and the date field itself
 class DateFormattingModel(SQLModel):
     dob: date | None = None
     
