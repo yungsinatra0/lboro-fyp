@@ -215,27 +215,39 @@ Wireframes have been used to provide a high-level overview of how the web applic
 
 \begin{figure}[ht]
     \centering
-    \subfloat[Desktop version]{\includegraphics[width=0.75\textwidth]{wireframes/Desktop_dashboard.png}\label{fig:dashboard-desktop}} 
-    \hspace{0.05\textwidth} 
-    \subfloat[Mobile version]{\includegraphics[scale=0.3]{wireframes/Mobile_dashboard.png}\label{fig:dashboard-mobile}} 
+    \begin{minipage}[c]{0.70\textwidth}
+        \subfloat[Desktop version]{\includegraphics[width=\textwidth]{wireframes/Desktop_dashboard.png}\label{fig:dashboard-desktop}}
+    \end{minipage}
+    \hspace{0.05\textwidth}
+    \begin{minipage}[c]{0.20\textwidth}
+        \subfloat[Mobile version]{\includegraphics[width=\textwidth]{wireframes/Mobile_dashboard.png}\label{fig:dashboard-mobile}}
+    \end{minipage}
     \caption{Desktop and Mobile version of the Dashboard screen}
     \label{fig:dashboard}
 \end{figure}
 
 \begin{figure}[ht]
     \centering
-    \subfloat[Desktop version]{\includegraphics[width=0.75\textwidth]{wireframes/Desktop_medHistory.png}\label{fig:medhistory-desktop}} 
-    \hspace{0.05\textwidth} 
-    \subfloat[Mobile version]{\includegraphics[scale=0.3]{wireframes/Mobile_medHistory.png}\label{fig:medhistory-mobile}} 
+    \begin{minipage}[c]{0.70\textwidth}
+        \subfloat[Desktop version]{\includegraphics[width=\textwidth]{wireframes/Desktop_medHistory.png}\label{fig:medhistory-desktop}}
+    \end{minipage}
+    \hspace{0.05\textwidth}
+    \begin{minipage}[c]{0.20\textwidth}
+        \subfloat[Mobile version]{\includegraphics[width=\textwidth]{wireframes/Mobile_medHistory.png}\label{fig:medhistory-mobile}}
+    \end{minipage}
     \caption{Desktop and Mobile version of the Medical History screen}
     \label{fig:medhistory}
 \end{figure}
 
 \begin{figure}[ht]
     \centering
-    \subfloat[Desktop version]{\includegraphics[width=0.75\textwidth]{wireframes/Desktop_labTest.png}\label{fig:lab-desktop}}
-    \hspace{0.05\textwidth} 
-    \subfloat[Mobile version]{\includegraphics[scale=0.3]{wireframes/Mobile_labTest.png}\label{fig:lab-mobile}} 
+    \begin{minipage}[c]{0.70\textwidth}
+        \subfloat[Desktop version]{\includegraphics[width=\textwidth]{wireframes/Desktop_labTest.png}\label{fig:lab-desktop}}
+    \end{minipage}
+    \hspace{0.05\textwidth}
+    \begin{minipage}[c]{0.20\textwidth}
+        \subfloat[Mobile version]{\includegraphics[width=\textwidth]{wireframes/Mobile_labTest.png}\label{fig:lab-mobile}}
+    \end{minipage}
     \caption{Desktop and Mobile version of the Lab Test Results screen}
     \label{fig:lab}
 \end{figure}
@@ -312,7 +324,7 @@ SQLModel, a Python library built on top of SQLAlchemy and Pydantic, will be used
 
 \subsection{Methodology and Tools}
 
-Based on the research above, the student has decided that he will be using a hybrid approach, with Waterfall as the main methodology for planning managing the project. The development part of the project will be done using ScrumBan, so that the student will be able to utilise elements from both frameworks. There are several reasons for this choice:
+Based on the research in section \ref{sec:methodologies}, the student has decided that he will be using a hybrid approach, with Waterfall as the main methodology for planning and managing the initial part of the project, such as requirements gathering and the design of the system. The development part of the project will be done using ScrumBan, so that the student will be able to utilise elements from both frameworks. There are several reasons for this choice:
 
 \begin{enumerate}
     \item The nature of the project - the student is working on a project that has a limited timeframe (about 6-7 months) and is of a smaller scale. 
@@ -322,8 +334,17 @@ Based on the research above, the student has decided that he will be using a hyb
     \item Familiarity with both Agile and Waterfall - the student has experience with both Agile (specifically Scrum and Kanban) and Waterfall methodologies, and has worked on projects that have used both approaches.
 \end{enumerate}
 
-The student will use Jira Software as their project management tool, which is one of the most popular project management tool for software development projects that supports working with Agile frameworks such as Scrum and Kanban \parencite{atlassian}. The student has experience with Jira Software, having used it in previous projects, and is familiar with its features and capabilities.
+The student will use Notion as their project management tool, which is a comprehensive workspace that allows for task management, documentation, collaboration and knowledge sharing. Notion provides a wide range of features, including templates for Agile project management, creation of Agile elements like user stories, epics, backlogs, sprints and boards, and maitaining of documentation if necessary \parencite{notion}. 
 
-\subsection{Project Backlogs}
+\subsection{Sprint planning}
 
-\subsection{Sprints planning}
+Based on the time remaining after the completion of the literature review, requirements gathering and system design, it was decided that only 6 sprints will be able to be completed before the project deadline. The sprints will be planned as follows:
+
+\begin{itemize}
+    \item \textbf{Sprint 1} - Will focus on choosing the tech stack, installing the necessary tools and frameworks and setting up initial project files. Additionally, a basic frontend and backend will be created, with a focus on the basic functionalities like user authentication and registration and connection with the API/database.
+    \item \textbf{Sprint 2} - Will focus on the patient profile, managing vaccines, allergies, medications and health data. The dashboard will also be created, with a basic layout and design.
+    \item \textbf{Sprint 3} - Will focus on finishing the main dashboard and the upload and viewing of medical records and medical history.
+    \item \textbf{Sprint 4} - Will focus on processing lab records with the LLM API and displaying them in tabular or graphical format.
+    \item \textbf{Sprint 5} - Will focus on sharing records with doctors through various methods like email, share links or QR codes.
+    \item \textbf{Sprint 6} - Will address any additional features or functionalities that need to be added, as well as any bugs or issues that need to be fixed.
+\end{itemize}
