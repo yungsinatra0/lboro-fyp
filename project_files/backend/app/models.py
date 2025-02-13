@@ -1,4 +1,4 @@
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, Relationship
 from pydantic import EmailStr, field_serializer
 from datetime import date, datetime
 import uuid
@@ -26,6 +26,10 @@ class User(DateFormattingModel, table=True):
     email: EmailStr = Field(index=True, unique=True)
     hashed_password: str
 #   MFA_secret: str | None = None # To be added later
+    vaccines: list["Vaccine"] = Relationship(back_populates="user")
+    allergies: list["Allergy"] = Relationship(back_populates="user")
+    medications: list["Medication"] = Relationship(back_populates="user")
+    healthdata: list["HealthData"] = Relationship(back_populates="user")
 
 class UserResponse(DateFormattingModel):
     id: uuid.UUID
@@ -47,3 +51,105 @@ class UserUpdate(DateFormattingModel):
     name: str | None = None
     email: EmailStr | None = None
     password: str | None = None
+    
+# Vaccine Table model used for table creation
+class Vaccine(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    name: str
+    provider: str
+    date_received: date
+    # Later to add a file field for storing the vaccine certificate
+    
+    user_id : uuid.UUID = Field(foreign_key="user.id")
+    user: User = Relationship(back_populates="vaccines")
+    
+    @field_serializer('date_received')
+    def serialize_date_received(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")
+    
+# Allergy Table models used for table creation
+class AllergyAllergensLink(SQLModel, table=True):
+    allergy_id: uuid.UUID = Field(foreign_key="allergy.id", primary_key=True)
+    allergen_id: uuid.UUID = Field(foreign_key="allergens.id", primary_key=True)
+    
+class AllergyReactionsLink(SQLModel, table=True):
+    allergy_id: uuid.UUID = Field(foreign_key="allergy.id", primary_key=True)
+    reaction_id: uuid.UUID = Field(foreign_key="reactions.id", primary_key=True)
+
+class Allergy(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    date_diagnosed: date
+    
+    user_id : uuid.UUID = Field(foreign_key="user.id")
+    user: User = Relationship(back_populates="allergies")
+    
+    allergens: list["Allergens"] = Relationship(back_populates="allergies", link_model=AllergyAllergensLink)
+    reactions: list["Reactions"] = Relationship(back_populates="allergies", link_model=AllergyReactionsLink)
+    
+    @field_serializer('date_diagnosed')
+    def serialize_date_diagnosed(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")
+    
+class Allergens(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    name: str
+    
+    allergies: list[Allergy] = Relationship(back_populates="allergens", link_model=AllergyAllergensLink)
+    
+class Reactions(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    name: str
+    
+    allergies: list[Allergy] = Relationship(back_populates="reactions", link_model=AllergyReactionsLink)
+    
+# Medication Table models used for table creation
+class Medication(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    name: str
+    dosage: str
+    frequency: str
+    date_prescribed: date
+    date_ending: date | None = None
+    
+    user_id : uuid.UUID = Field(foreign_key="user.id")
+    user: User = Relationship(back_populates="medications")
+    
+    form_id : uuid.UUID = Field(foreign_key="medicationform.id")
+    form: "MedicationForm" = Relationship(back_populates="medications")
+    
+    @field_serializer('date_prescribed')
+    def serialize_date_prescribed(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")
+    
+    @field_serializer('date_ending')
+    def serialize_date_ending(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")
+    
+class MedicationForm(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    name: str
+    
+    medications: list[Medication] = Relationship(back_populates="form")
+    
+# Health data Table models used for table creation    
+class HealthData(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    name: str
+    value: float
+    date_recorded: date
+    
+    user_id : uuid.UUID = Field(foreign_key="user.id")
+    user: User = Relationship(back_populates="healthdata")
+    
+    type_id : uuid.UUID = Field(foreign_key="healthdatatype.id")
+    type: "HealthDataType" = Relationship(back_populates="healthdata") 
+    
+    @field_serializer('date_recorded')
+    def serialize_date_recorded(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")
+    
+class HealthDataType(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    name: str
+    
+    healthdata: list[HealthData] = Relationship(back_populates="type")
