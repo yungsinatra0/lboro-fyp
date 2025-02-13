@@ -26,10 +26,10 @@ class User(DateFormattingModel, table=True):
     email: EmailStr = Field(index=True, unique=True)
     hashed_password: str
 #   MFA_secret: str | None = None # To be added later
-    vaccines: list["Vaccine"] = Relationship(back_populates="user")
-    allergies: list["Allergy"] = Relationship(back_populates="user")
-    medications: list["Medication"] = Relationship(back_populates="user")
-    healthdata: list["HealthData"] = Relationship(back_populates="user")
+    vaccines: list["Vaccine"] = Relationship(back_populates="user", cascade_delete=True)
+    allergies: list["Allergy"] = Relationship(back_populates="user", cascade_delete=True)
+    medications: list["Medication"] = Relationship(back_populates="user", cascade_delete=True)
+    healthdata: list["HealthData"] = Relationship(back_populates="user", cascade_delete=True)
 
 class UserResponse(DateFormattingModel):
     id: uuid.UUID
