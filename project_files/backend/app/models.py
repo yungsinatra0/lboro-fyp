@@ -78,6 +78,26 @@ class VaccineResponse(SQLModel):
     def serialize_date_received(self, value: date) -> str:
         return value.strftime("%d-%m-%Y")
 
+# Vaccine create model
+class VaccineCreate(SQLModel):
+    name: str
+    provider: str
+    date_received: date
+    
+    @field_serializer('date_received')
+    def serialize_date_received(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")
+
+# Vaccine update model
+class VaccineUpdate(SQLModel):
+    name: str | None = None
+    provider: str | None = None
+    date_received: date | None = None
+    
+    @field_serializer('date_received')
+    def serialize_date_received(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")   
+
 # Allergy Table models used for table creation
 class AllergyAllergensLink(SQLModel, table=True):
     allergy_id: uuid.UUID = Field(foreign_key="allergy.id", primary_key=True)
@@ -112,6 +132,26 @@ class AllergyResponse(SQLModel):
     def serialize_date_diagnosed(self, value: date) -> str:
         return value.strftime("%d-%m-%Y")
     
+# Allergy create model
+class AllergyCreate(SQLModel):
+    date_diagnosed: date
+    allergens: list[str]
+    reactions: list[str]
+    
+    @field_serializer('date_diagnosed')
+    def serialize_date_diagnosed(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")  
+    
+# Allergy update model
+class AllergyUpdate(SQLModel):
+    date_diagnosed: date | None = None
+    allergens: list[str] | None = None
+    reactions: list[str] | None = None
+    
+    @field_serializer('date_diagnosed')
+    def serialize_date_diagnosed(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")
+
 class Allergens(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
@@ -165,6 +205,40 @@ class MedicationResponse(SQLModel):
     def serialize_date_ending(self, value: date) -> str:
         return value.strftime("%d-%m-%Y")
     
+# Medication create model
+class MedicationCreate(SQLModel):
+    name: str
+    dosage: str
+    frequency: str
+    date_prescribed: date
+    date_ending: date | None = None
+    form: str
+    
+    @field_serializer('date_prescribed')
+    def serialize_date_prescribed(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")
+    
+    @field_serializer('date_ending')
+    def serialize_date_ending(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")
+    
+# Medication update model
+class MedicationUpdate(SQLModel):
+    name: str | None = None
+    dosage: str | None = None
+    frequency: str | None = None
+    date_prescribed: date | None = None
+    date_ending: date | None = None
+    form: str | None = None
+    
+    @field_serializer('date_prescribed')
+    def serialize_date_prescribed(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")
+    
+    @field_serializer('date_ending')
+    def serialize_date_ending(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")
+    
 class MedicationForm(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
     name: str
@@ -200,6 +274,28 @@ class HealthDataResponse(SQLModel):
     def serialize_date_recorded(self, value: date) -> str:
         return value.strftime("%d-%m-%Y")
     
+# Health data create model
+class HealthDataCreate(SQLModel):
+    name: str
+    value: float
+    date_recorded: date
+    type: str
+    
+    @field_serializer('date_recorded')
+    def serialize_date_recorded(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")
+    
+# Health data update model
+class HealthDataUpdate(SQLModel):
+    name: str | None = None
+    value: float | None = None
+    date_recorded: date | None = None
+    type: str | None = None
+    
+    @field_serializer('date_recorded')
+    def serialize_date_recorded(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")
+
 class HealthDataType(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
