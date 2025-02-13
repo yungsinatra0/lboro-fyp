@@ -5,7 +5,7 @@ import uuid
 
 # local imports
 from database import create_db_and_tables, get_session
-from models import UserAuth, User, UserUpdate, UserPublic, UserResponse
+from models import *
 from auth_utils import verify_hash, create_hash, create_session, validate_session, end_session
 
 @asynccontextmanager
@@ -83,10 +83,13 @@ def register(*, session: Session = Depends(get_session), register_data: UserAuth
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"An error occurred when registering: {e}")
 
 
-# PROTECTED ROUTES
+################# PROTECTED ROUTES
 # Logout endpoint
 @app.post("/logout")
 async def logout(response: Response, request: Request, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    
+    if request.user.id != user_id:
+        raise HTTPException(status_code=403, detail="You do not have permission to log out this user")
     
     # Will use the end_session function to end the session in the database
     end_session(request, session) # Need to pass the request and session to the function, otherwise it will not work
@@ -138,19 +141,6 @@ def update_user(*, session: Session = Depends(get_session), user_update: UserUpd
         session.rollback()
         raise HTTPException(status_code=500, detail=f"An error occurred when updating: {e}")        
 
-# Get user info endpoint
-@app.get("/users/{user_id}", response_model=UserPublic)
-def get_user(user_id: uuid.UUID, session: Session = Depends(get_session), current_user_id: uuid.UUID = Depends(validate_session)):
-    if user_id != current_user_id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You do not have permission to access this user's data") # TODO: Change this to include admin access maybe?
-      
-    user_db = session.get(User, user_id)
-    
-    if not user_db:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    return user_db
-
 # Homepage/dashboard endpoint TODO: Change this to a more useful endpoint
 @app.get("/")
 async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
@@ -158,3 +148,320 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
     return {
         "message": f"Welcome {user.name}!"
         }
+
+### Vaccine endpoints
+# Get all vaccines
+@app.get("/me/vaccines", response_model=list[VaccineResponse])
+def get_vaccines(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    user = session.get(User, user_id)
+    return user.vaccines
+
+# Add a vaccine
+@app.post("/me/vaccines")
+def add_vaccine(vaccine: VaccineCreate, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    user = session.get(User, user_id)
+    
+    new_vaccine = Vaccine(
+        name = vaccine.name,
+        provider = vaccine.provider,
+        date_received = vaccine.date_received,
+        user = user)
+    
+    session.add(new_vaccine)
+    session.commit()
+    session.refresh(new_vaccine)
+    return {
+        "status": status.HTTP_201_CREATED,
+        "message": "Vaccine added successfully"
+    }
+
+# Delete a vaccine
+@app.delete("/me/vaccines/{vaccine_id}")
+def delete_vaccine(vaccine_id: uuid.UUID, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    vaccine = session.get(Vaccine, vaccine_id)
+    
+    if not vaccine:
+        raise HTTPException(status_code=404, detail="Vaccine not found")
+    
+    if vaccine.user_id != user_id:
+        raise HTTPException(status_code=403, detail="You do not have permission to delete this vaccine")
+    
+    session.delete(vaccine)
+    session.commit()
+    return {
+        "status": status.HTTP_200_OK,
+        "message": "Vaccine deleted successfully"
+    }
+
+# Get a specific vaccine
+@app.get("/me/vaccines/{vaccine_id}", response_model=VaccineResponse)
+def get_vaccine(vaccine_id: uuid.UUID, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    vaccine = session.get(Vaccine, vaccine_id)
+    
+    if not vaccine:
+        raise HTTPException(status_code=404, detail="Vaccine not found")
+    
+    if vaccine.user_id != user_id:
+        raise HTTPException(status_code=403, detail="You do not have permission to access this vaccine")
+    
+    return vaccine
+
+
+# Update a vaccine
+@app.patch("/me/vaccines/{vaccine_id}")
+def update_vaccine(vaccine_id: uuid.UUID, vaccine_new: VaccineUpdate, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    vaccine_db = session.get(Vaccine, vaccine_id)
+    
+    if not vaccine_db:
+        raise HTTPException(status_code=404, detail="Vaccine not found")
+    
+    if vaccine_db.user_id != user_id:
+        raise HTTPException(status_code=403, detail="You do not have permission to update this vaccine")
+    
+    vaccine_data = vaccine_new.model_dump(exclude_unset=True)
+    vaccine_db.sqlmodel_update(vaccine_data)
+    session.add(vaccine_db)
+    session.commit()
+    session.refresh(vaccine_db)
+    return {
+        "status": status.HTTP_200_OK,
+        "message": "Vaccine updated successfully"
+    }
+    
+### Allergy endpoints
+# Get all allergies
+@app.get("/me/allergies", response_model=list[AllergyResponse])
+def get_allergies(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    user = session.get(User, user_id)
+    return user.allergies
+
+# Add an allergy
+@app.post("/me/allergies")
+def add_allergy(allergy: AllergyCreate, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    user = session.get(User, user_id)
+    
+    new_allergy = Allergy(
+        date_diagnosed = allergy.date_diagnosed,
+        user = user,
+        allergens = allergy.allergens,
+        reactions = allergy.reactions)
+          
+    session.add(new_allergy)
+    session.commit()
+    session.refresh(new_allergy)
+    return {
+        "status": status.HTTP_201_CREATED,
+        "message": "Allergy added successfully"
+    }
+    
+# Delete an allergy
+@app.delete("/me/allergies/{allergy_id}")
+def delete_allergy(allergy_id: uuid.UUID, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    allergy = session.get(Allergy, allergy_id)
+    
+    if not allergy:
+        raise HTTPException(status_code=404, detail="Allergy not found")
+
+    if allergy.user_id != user_id:
+        raise HTTPException(status_code=403, detail="You do not have permission to delete this allergy")
+    
+    session.delete(allergy)
+    session.commit()
+    return {
+        "status": status.HTTP_200_OK,
+        "message": "Allergy deleted successfully"
+    }
+
+# Get a specific allergy
+@app.get("/me/allergies/{allergy_id}", response_model=AllergyResponse)
+def get_allergy(allergy_id: uuid.UUID, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    allergy = session.get(Allergy, allergy_id)
+    
+    if not allergy:
+        raise HTTPException(status_code=404, detail="Allergy not found")
+    
+    if allergy.user_id != user_id:
+        raise HTTPException(status_code=403, detail="You do not have permission to access this allergy")
+    
+    return allergy
+
+# Update an allergy
+@app.patch("/me/allergies/{allergy_id}")
+def update_allergy(allergy_id: uuid.UUID, allergy_new: AllergyUpdate, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    allergy_db = session.get(Allergy, allergy_id)
+    
+    if not allergy_db:
+        raise HTTPException(status_code=404, detail="Allergy not found")
+    
+    if allergy_db.user_id != user_id:
+        raise HTTPException(status_code=403, detail="You do not have permission to update this allergy")
+    
+    allergy_data = allergy_new.model_dump(exclude_unset=True)
+    allergy_db.sqlmodel_update(allergy_data)
+    session.add(allergy_db)
+    session.commit()
+    session.refresh(allergy_db)
+    return {
+        "status": status.HTTP_200_OK,
+        "message": "Allergy updated successfully"
+    }
+    
+### Health Data endpoints
+# Get all health data
+@app.get("/me/healthdata", response_model=list[HealthDataResponse])
+def get_healthdata(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    user = session.get(User, user_id)
+    return user.healthdata
+
+# Add health data
+@app.post("/me/healthdata")
+def add_healthdata(healthdata: HealthDataCreate, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    user = session.get(User, user_id)
+    
+    new_healthdata = HealthData(
+        name = healthdata.name,
+        value = healthdata.value,
+        date_recorded = healthdata.date_recorded,
+        user = user,
+        type=healthdata.type)
+          
+    session.add(new_healthdata)
+    session.commit()
+    session.refresh(new_healthdata)
+    return {
+        "status": status.HTTP_201_CREATED,
+        "message": "Health data added successfully"
+    }
+    
+# Delete health data
+@app.delete("/me/healthdata/{healthdata_id}")
+def delete_healthdata(healthdata_id: uuid.UUID, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    healthdata = session.get(HealthData, healthdata_id)
+    
+    if not healthdata:
+        raise HTTPException(status_code=404, detail="Health data not found")
+
+    if healthdata.user_id != user_id:
+        raise HTTPException(status_code=403, detail="You do not have permission to delete this health data")
+    
+    session.delete(healthdata)
+    session.commit()
+    return {
+        "status": status.HTTP_200_OK,
+        "message": "Health data deleted successfully"
+    }
+    
+# Get a specific health data
+@app.get("/me/healthdata/{healthdata_id}", response_model=HealthDataResponse)
+def get_healthdata(healthdata_id: uuid.UUID, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    healthdata = session.get(HealthData, healthdata_id)
+    
+    if not healthdata:
+        raise HTTPException(status_code=404, detail="Health data not found")
+    
+    if healthdata.user_id != user_id:
+        raise HTTPException(status_code=403, detail="You do not have permission to access this health data")
+    
+    return healthdata
+
+# Update health data
+@app.patch("/me/healthdata/{healthdata_id}")
+def update_healthdata(healthdata_id: uuid.UUID, healthdata_new: HealthDataUpdate, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    healthdata_db = session.get(HealthData, healthdata_id)
+    
+    if not healthdata_db:
+        raise HTTPException(status_code=404, detail="Health data not found")
+    
+    if healthdata_db.user_id != user_id:
+        raise HTTPException(status_code=403, detail="You do not have permission to update this health data")
+    
+    healthdata_data = healthdata_new.model_dump(exclude_unset=True)
+    healthdata_db.sqlmodel_update(healthdata_data)
+    session.add(healthdata_db)
+    session.commit()
+    session.refresh(healthdata_db)
+    return {
+        "status": status.HTTP_200_OK,
+        "message": "Health data updated successfully"
+    }
+
+### Medication endpoints
+# Get all medications
+@app.get("/me/medications", response_model=list[MedicationResponse])
+def get_medications(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    user = session.get(User, user_id)
+    return user.medications
+
+# Add medication
+@app.post("/me/medications")
+def add_medication(medication: MedicationCreate, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    user = session.get(User, user_id)
+    
+    new_medication = Medication(
+        name = medication.name,
+        dosage = medication.dosage,
+        frequency = medication.frequency,
+        date_prescribed = medication.date_prescribed,
+        date_ending = medication.date_ending,
+        form = medication.form,
+        user = user)
+          
+    session.add(new_medication)
+    session.commit()
+    session.refresh(new_medication)
+    return {
+        "status": status.HTTP_201_CREATED,
+        "message": "Medication added successfully"
+    }
+    
+# Delete medication
+@app.delete("/me/medications/{medication_id}")
+def delete_medication(medication_id: uuid.UUID, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    medication = session.get(Medication, medication_id)
+    
+    if not medication:
+        raise HTTPException(status_code=404, detail="Medication not found")
+
+    if medication.user_id != user_id:
+        raise HTTPException(status_code=403, detail="You do not have permission to delete this medication")
+    
+    session.delete(medication)
+    session.commit()
+    return {
+        "status": status.HTTP_200_OK,
+        "message": "Medication deleted successfully"
+    }
+    
+# Get a specific medication
+@app.get("/me/medications/{medication_id}", response_model=MedicationResponse)
+def get_medication(medication_id: uuid.UUID, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    medication = session.get(Medication, medication_id)
+    
+    if not medication:
+        raise HTTPException(status_code=404, detail="Medication not found")
+    
+    if medication.user_id != user_id:
+        raise HTTPException(status_code=403, detail="You do not have permission to access this medication")
+    
+    return medication
+
+# Update medication
+@app.patch("/me/medications/{medication_id}")
+def update_medication(medication_id: uuid.UUID, medication_new: MedicationUpdate, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    medication_db = session.get(Medication, medication_id)
+    
+    if not medication_db:
+        raise HTTPException(status_code=404, detail="Medication not found")
+    
+    if medication_db.user_id != user_id:
+        raise HTTPException(status_code=403, detail="You do not have permission to update this medication")
+    
+    medication_data = medication_new.model_dump(exclude_unset=True)
+    medication_db.sqlmodel_update(medication_data)
+    session.add(medication_db)
+    session.commit()
+    session.refresh(medication_db)
+    return {
+        "status": status.HTTP_200_OK,
+        "message": "Medication updated successfully"
+    }
