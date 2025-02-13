@@ -66,7 +66,18 @@ class Vaccine(SQLModel, table=True):
     @field_serializer('date_received')
     def serialize_date_received(self, value: date) -> str:
         return value.strftime("%d-%m-%Y")
+
+# Vaccine response model
+class VaccineResponse(SQLModel):
+    id: uuid.UUID
+    name: str
+    provider: str
+    date_received: date
     
+    @field_serializer('date_received')
+    def serialize_date_received(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")
+
 # Allergy Table models used for table creation
 class AllergyAllergensLink(SQLModel, table=True):
     allergy_id: uuid.UUID = Field(foreign_key="allergy.id", primary_key=True)
@@ -85,6 +96,17 @@ class Allergy(SQLModel, table=True):
     
     allergens: list["Allergens"] = Relationship(back_populates="allergies", link_model=AllergyAllergensLink)
     reactions: list["Reactions"] = Relationship(back_populates="allergies", link_model=AllergyReactionsLink)
+    
+    @field_serializer('date_diagnosed')
+    def serialize_date_diagnosed(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")
+
+# Allergy response model
+class AllergyResponse(SQLModel):
+    id: uuid.UUID
+    date_diagnosed: date
+    allergens: list[str]
+    reactions: list[str]
     
     @field_serializer('date_diagnosed')
     def serialize_date_diagnosed(self, value: date) -> str:
@@ -125,6 +147,24 @@ class Medication(SQLModel, table=True):
     def serialize_date_ending(self, value: date) -> str:
         return value.strftime("%d-%m-%Y")
     
+# Medication response model
+class MedicationResponse(SQLModel):
+    id: uuid.UUID
+    name: str
+    dosage: str
+    frequency: str
+    date_prescribed: date
+    date_ending: date | None = None
+    form: str
+    
+    @field_serializer('date_prescribed')
+    def serialize_date_prescribed(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")
+    
+    @field_serializer('date_ending')
+    def serialize_date_ending(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")
+    
 class MedicationForm(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
     name: str
@@ -143,6 +183,18 @@ class HealthData(SQLModel, table=True):
     
     type_id : uuid.UUID = Field(foreign_key="healthdatatype.id")
     type: "HealthDataType" = Relationship(back_populates="healthdata") 
+    
+    @field_serializer('date_recorded')
+    def serialize_date_recorded(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")
+    
+# Health data response model
+class HealthDataResponse(SQLModel):
+    id: uuid.UUID
+    name: str
+    value: float
+    date_recorded: date
+    type: str
     
     @field_serializer('date_recorded')
     def serialize_date_recorded(self, value: date) -> str:
