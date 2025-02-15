@@ -12,5 +12,6 @@ app.use(pinia);
 app.use(router);
 app.use(Primevue, {
     theme: 'none',
+    ripple: true,
 });
 app.mount('#app')

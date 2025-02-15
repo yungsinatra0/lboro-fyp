@@ -240,7 +240,7 @@ class MedicationUpdate(SQLModel):
         return value.strftime("%d-%m-%Y")
     
 class MedicationForm(SQLModel, table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
     
     medications: list[Medication] = Relationship(back_populates="form")
