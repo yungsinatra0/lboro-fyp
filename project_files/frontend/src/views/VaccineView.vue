@@ -1,10 +1,11 @@
 <template>
   <NavBar />
 
-  <div class="flex items-center justify-between">  
+  <div class="flex flex-col items-center md:flex-row md:justify-between p-3 md:p-5">  
     <h1 class="text-2xl font-bold p-3 md:text-4xl md:p-5">Vaccinele mele</h1>
     <Button label="Adauga vaccin" icon="pi pi-plus" class="p-button-outlined mr-2" />
   </div>
+  
 <VaccineCard 
     :name="'COVID-19'" 
     :date-received="new Date(2024,0,10).toLocaleDateString('ro-RO')" 
