@@ -64,7 +64,7 @@
           >
         </div>
         <div class="flex flex-col gap-1">
-          <DatePicker name="dob" dateFormat="dd/mm/yy" placeholder="Data nasterii" showIcon fluid />
+          <DatePicker name="dob" dateFormat="dd/mm/yy" placeholder="Data nasterii" showIcon fluid :maxDate="maxDate"/>
           <Message
             v-if="$form.dob?.invalid"
             severity="error"
@@ -127,6 +127,8 @@ const initialValues = ref({
   dob: null,
 })
 
+const maxDate = ref(new Date());
+
 const resolver = zodResolver(
   z.object({
     email: z
@@ -147,7 +149,11 @@ const resolver = zodResolver(
       }),
     name: z.string().min(2, { message: 'Prenumele este obligatoriu' }),
     surname: z.string().min(2, { message: 'Numele este obligatorie' }),
-    dob: z.date({ message: 'Data nasterii nu este valida' }),
+    dob: z
+    .date({ message: 'Data nasterii este obligatorie' })
+    .refine((value) => value < new Date(), {
+      message: 'Data nasterii nu poate fi in viitor',
+    }),
   }),
 )
 
@@ -175,6 +181,7 @@ const onFormSubmit = (e) => {
 
   if (e.valid) {
     register(e.values)
+    e.reset()
 
   } else if (e.errors) {
     console.log(e.errors)
