@@ -306,6 +306,18 @@ def update_allergy(allergy_id: uuid.UUID, allergy_new: AllergyUpdate, user_id: u
         "message": "Allergy updated successfully"
     }
     
+# Get all allergens
+@app.get("/allergens")
+def get_allergens(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    allergens = session.exec(select(Allergens)).all()
+    return allergens
+
+# Get all reactions
+@app.get("/reactions")
+def get_reactions(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    reactions = session.exec(select(Reactions)).all()
+    return reactions
+    
 ### Health Data endpoints
 # Get all health data
 @app.get("/me/healthdata", response_model=list[HealthDataResponse])
@@ -384,6 +396,12 @@ def update_healthdata(healthdata_id: uuid.UUID, healthdata_new: HealthDataUpdate
         "status": status.HTTP_200_OK,
         "message": "Health data updated successfully"
     }
+    
+# Get all health data types
+@app.get("/healthdata/types")
+def get_healthdata_types(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    healthdata_types = session.exec(select(HealthDataType)).all()
+    return healthdata_types
 
 ### Medication endpoints
 # Get all medications
@@ -465,3 +483,9 @@ def update_medication(medication_id: uuid.UUID, medication_new: MedicationUpdate
         "status": status.HTTP_200_OK,
         "message": "Medication updated successfully"
     }
+    
+# Get all medication forms
+@app.get("/medications/forms")
+def get_medication_forms(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    medication_forms = session.exec(select(MedicationForm)).all()
+    return medication_forms
