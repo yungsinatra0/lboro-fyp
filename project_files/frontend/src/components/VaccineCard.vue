@@ -1,21 +1,28 @@
 <template>
-  <Card style="overflow: hidden" class="w-full" :pt="{ body: { class: 'px-4 py-1' } }">
+  <Card style="overflow: hidden" class="w-full" :pt="cardStyles">
     <template #title>
       <span class="font-bold text-2xl">{{ name }}</span>
     </template>
     <template #subtitle>
       <div class="flex items-center justify-between">
         <div class="flex flex-col justify-start">
-            <span class="font-bold">{{ provider }}</span>
-            <span>{{ dateReceived }}</span>
+          <span class="font-bold">{{ provider }}</span>
+          <span>{{ dateReceived }}</span>
         </div>
         <div>
+          <ConfirmDialog></ConfirmDialog>
           <Button icon="pi pi-eye" class="p-button-rounded p-button-text p-button-plain" />
-          <Button icon="pi pi-ellipsis-h" class="p-button-rounded p-button-text p-button-plain" @click="toggle" aria-haspopup="true" aria-controls="overlay_menu" />
+          <Button
+            icon="pi pi-ellipsis-h"
+            class="p-button-rounded p-button-text p-button-plain"
+            @click="toggle"
+            aria-haspopup="true"
+            aria-controls="overlay_menu"
+          />
           <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
         </div>
       </div>
-    </template> 
+    </template>
   </Card>
 </template>
 
@@ -25,34 +32,85 @@ import Button from 'primevue/button'
 import Menu from 'primevue/menu'
 import { defineProps } from 'vue'
 import { ref } from 'vue'
+import { useConfirm } from 'primevue/useconfirm'
+import ConfirmDialog from 'primevue/confirmdialog'
+import api from '../services/api'
+import { Dialog } from 'primevue/dialog'
 
-defineProps({
+const emit = defineEmits(['delete', 'edit'])
+
+const props = defineProps({
+  id: String,
   name: String,
   provider: String,
-  dateReceived: Date,
+  dateReceived: String,
 })
 
-const menu = ref();
+const menu = ref()
 const items = ref([
-    {
-        label: 'Optiuni',
-        items: [
-            {
-                label: 'Editeaza',
-                icon: 'pi pi-pencil'
-            },
-            {
-                label: 'Sterge',
-                icon: 'pi pi-trash'
-            }
-        ]
-    }
-]);
+  {
+    label: 'Optiuni',
+    items: [
+      {
+        label: 'Editeaza',
+        icon: 'pi pi-pencil',
+        command: () => {
+          // open dialog and do the edit then pass the new vaccine object to the parent
+          // TODO: dialog goes here
+          emit('edit', props.id)
+        },
+      },
+      {
+        label: 'Sterge',
+        icon: 'pi pi-trash',
+        command: (event) => {
+          confirm1(event)
+        },
+      },
+    ],
+  },
+])
 
 const toggle = (event) => {
-    menu.value.toggle(event);
-};
+  menu.value.toggle(event)
+}
 
+const cardStyles = {
+  body: { class: 'px-4 py-1' },
+  root: {
+    class:
+      'bg-surface-0 dark:bg-surface-800 text-surface-700 dark:text-surface-0 dark:border dark:border-surface-700',
+  },
+}
+
+const confirm = useConfirm()
+
+const confirm1 = (event) => {
+  confirm.require({
+    target: event.currentTarget,
+    message: 'Esti sigur ca vrei sa stergi acest vaccin?',
+    header: 'Confirmare stergere',
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+      label: 'Cancel',
+      severity: 'secondary',
+      outlined: true,
+    },
+    acceptProps: {
+      label: 'Sterge',
+      severity: 'danger',
+    },
+    accept: async () => {
+      try {
+        await api.delete(`/me/vaccines/${props.id}`)
+        emit('delete', props.id)
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    reject: () => {},
+  })
+}
 </script>
 
 <style scoped></style>

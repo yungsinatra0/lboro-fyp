@@ -1,5 +1,6 @@
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
+import ConfirmationService from 'primevue/confirmationservice';
 import Primevue from 'primevue/config'
 import App from './App.vue'
 import router from './router'
@@ -14,4 +15,5 @@ app.use(Primevue, {
     theme: 'none',
     ripple: true,
 });
+app.use(ConfirmationService);
 app.mount('#app')

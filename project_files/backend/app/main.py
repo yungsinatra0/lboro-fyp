@@ -175,7 +175,8 @@ def add_vaccine(vaccine: VaccineCreate, user_id: uuid.UUID = Depends(validate_se
     session.refresh(new_vaccine)
     return {
         "status": status.HTTP_201_CREATED,
-        "message": "Vaccine added successfully"
+        "message": "Vaccine added successfully",
+        "vaccine": new_vaccine
     }
 
 # Delete a vaccine
@@ -228,7 +229,7 @@ def update_vaccine(vaccine_id: uuid.UUID, vaccine_new: VaccineUpdate, user_id: u
     session.refresh(vaccine_db)
     return {
         "status": status.HTTP_200_OK,
-        "message": "Vaccine updated successfully"
+        "message": "Vaccine updated successfully",
     }
     
 ### Allergy endpoints
