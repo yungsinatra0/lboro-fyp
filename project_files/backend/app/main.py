@@ -88,7 +88,10 @@ def register(*, session: Session = Depends(get_session), register_data: UserAuth
 @app.post("/logout")
 async def logout(response: Response, request: Request, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     
-    if request.user.id != user_id:
+    session_id = request.cookies.get("session_id")
+    cookie_user_id = session.get(AuthSession, uuid.UUID(session_id)).user_id
+    
+    if cookie_user_id != user_id:
         raise HTTPException(status_code=403, detail="You do not have permission to log out this user")
     
     # Will use the end_session function to end the session in the database

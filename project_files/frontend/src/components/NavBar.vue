@@ -33,8 +33,8 @@
           <span :class="[isDarkMode ? 'pi pi-moon' : 'pi pi-sun']" />
         </Button>
         <Button icon="pi pi-cog" class="p-button-rounded p-button-text p-button-plain" />
-        <Button icon="pi pi-sign-out" class="p-button-rounded p-button-text p-button-plain" />
-        <RouterLink to="/profile" class="flex items-center justify-center">
+        <Button icon="pi pi-sign-out" class="p-button-rounded p-button-text p-button-plain" @click="logout" />
+        <RouterLink to="/dashboard" class="flex items-center justify-center">
           <Avatar :label="C" shape="circle" />
         </RouterLink>
       </div>
@@ -48,6 +48,8 @@ import Menubar from 'primevue/menubar'
 import Button from 'primevue/button'
 import Avatar from 'primevue/avatar'
 import { useDarkMode } from '../composables/useDarkMode'
+import api from '../services/api'
+import router from '../router'
 
 const { isDarkMode, toggleDarkMode } = useDarkMode()
 
@@ -102,4 +104,13 @@ const items = ref([
     ],
   },
 ])
+
+async function logout() {
+  try {
+    await api.post('/logout')
+    router.push('/login')
+  } catch {
+    console.log('Logout failed')
+  }
+}
 </script>
