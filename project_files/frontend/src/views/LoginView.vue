@@ -109,7 +109,8 @@ const resolver = ({ values }) => {
   }
 
   return {
-    errors, values
+    errors,
+    values,
   }
 }
 
@@ -125,7 +126,7 @@ async function login(credentials) {
   }
 }
 
-const onFormSubmit = ( e ) => {
+const onFormSubmit = (e) => {
   // e.originalEvent: Represents the native form submit event.
   // e.valid: A boolean that indicates whether the form is valid or not.
   // e.states: Contains the current state of each form field, including validity status.
@@ -133,10 +134,11 @@ const onFormSubmit = ( e ) => {
   // e.values: An object containing the current values of all form fields.
   // e.reset: A function that resets the form to its initial state.
 
-  if (e.valid) {
-    login(e.values)
+  if (!e.valid) {
+    console.log('Error adding vaccine: ', e.errors)
+    return
   }
 
-    // login(values)
-  }
+  login(e.values)
+}
 </script>

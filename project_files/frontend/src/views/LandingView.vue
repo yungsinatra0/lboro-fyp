@@ -279,6 +279,7 @@
 <script setup>
 import Button from 'primevue/button'
 import Menubar from 'primevue/menubar'
+import Message from 'primevue/message'
 import { InputText, Textarea } from 'primevue'
 import { ref, useTemplateRef } from 'vue'
 import { useDarkMode } from '../composables/useDarkMode'
