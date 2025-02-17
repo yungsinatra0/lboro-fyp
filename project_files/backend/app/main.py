@@ -160,7 +160,7 @@ def get_vaccines(user_id: uuid.UUID = Depends(validate_session), session: Sessio
     return user.vaccines
 
 # Add a vaccine
-@app.post("/me/vaccines")
+@app.post("/me/vaccines", response_model=VaccineResponse)
 def add_vaccine(vaccine: VaccineCreate, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     user = session.get(User, user_id)
     

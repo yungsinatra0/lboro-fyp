@@ -10,7 +10,6 @@
           <span>{{ dateReceived }}</span>
         </div>
         <div>
-          <ConfirmDialog></ConfirmDialog>
           <Button icon="pi pi-eye" class="p-button-rounded p-button-text p-button-plain" />
           <Button
             icon="pi pi-ellipsis-h"
@@ -30,12 +29,9 @@
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import Menu from 'primevue/menu'
-import { defineProps } from 'vue'
 import { ref } from 'vue'
 import { useConfirm } from 'primevue/useconfirm'
-import ConfirmDialog from 'primevue/confirmdialog'
 import api from '../services/api'
-import { Dialog } from 'primevue/dialog'
 
 const emit = defineEmits(['delete', 'edit'])
 
