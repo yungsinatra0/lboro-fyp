@@ -31,32 +31,48 @@
         :provider="vaccine.provider"
         :date-received="vaccine.date_received"
         @delete="deleteVaccine"
-        @edit="updateVaccine"
+        @open-edit="updateVaccine"
       />
     </div>
-    
+
     <ConfirmDialog></ConfirmDialog>
 
-    <AddVaccine v-if="displayAddDialog" @close="displayAddDialog = false" @add="addVaccine" :display-dialog="displayAddDialog"/>
+    <AddVaccine
+      v-if="displayAddDialog"
+      @close="displayAddDialog = false"
+      @add="addVaccine"
+      :display-dialog="displayAddDialog"
+    />
 
+    <EditVaccine 
+    v-if="displayEditDialog"
+    @edit="refreshUpdatedVaccine"
+    @close="displayEditDialog = false"
+    :display-dialog="displayEditDialog"
+    :vaccine="editDialogData"
+    />
   </div>
 </template>
 
 <script setup>
 import NavBar from '@/components/NavBar.vue'
-import VaccineCard from '@/components/VaccineCard.vue'
 import Button from 'primevue/button'
 import { onMounted, ref } from 'vue'
-import AddVaccine from '@/components/AddVaccine.vue'
 import api from '@/services/api'
 import ProgressSpinner from 'primevue/progressspinner'
 import ConfirmDialog from 'primevue/confirmdialog'
 
+import AddVaccine from '@/components/vaccines/AddVaccine.vue'
+import VaccineCard from '@/components/vaccines/VaccineCard.vue'
+import EditVaccine from '@/components/vaccines/EditVaccine.vue'
+
 const vaccines = ref([])
 const loading = ref(true)
 const error = ref(null)
+
 const displayAddDialog = ref(false)
-const new_vaccine = ref(null)
+const displayEditDialog = ref(false)
+const editDialogData = ref(null)
 
 onMounted(async () => {
   try {
@@ -82,16 +98,14 @@ const deleteVaccine = (id) => {
   vaccines.value = vaccines.value.filter((vaccine) => vaccine.id !== id)
 }
 
-const updateVaccine = async (id) => {
-  try {
-    const response = await api.get(`me/vaccines/${id}`)
-    new_vaccine.value = response.data
-    const index = vaccines.value.findIndex((vaccine) => vaccine.id === id)
-    if (index !== -1) {
-      vaccines.value[index] = new_vaccine.value
-    }
-  } catch (error) {
-    console.error('Error updating vaccine:', error)
-  }
+const updateVaccine = (id) => {
+  displayEditDialog.value = true
+  const vaccine = vaccines.value.find((vaccine) => vaccine.id === id)
+  editDialogData.value = vaccine
+}
+
+const refreshUpdatedVaccine = (vaccine) => {
+  const index = vaccines.value.findIndex((v) => v.id === vaccine.id)
+  vaccines.value[index] = vaccine
 }
 </script>

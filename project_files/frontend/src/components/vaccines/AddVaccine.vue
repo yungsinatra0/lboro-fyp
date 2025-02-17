@@ -96,7 +96,7 @@ import Button from 'primevue/button'
 
 import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
-import api from '../services/api'
+import api from '@/services/api'
 import { ref } from 'vue'
 
 const props = defineProps({
@@ -131,7 +131,6 @@ const addVaccine = async (vaccineDetails) => {
       date_received: vaccineDetails.dateReceived,
       provider: vaccineDetails.provider,
     })
-    console.log('Vaccine added:', response.data.vaccine)
     emit('add', response.data.vaccine)
     emit('close')
   } catch (error) {

@@ -31,9 +31,9 @@ import Button from 'primevue/button'
 import Menu from 'primevue/menu'
 import { ref } from 'vue'
 import { useConfirm } from 'primevue/useconfirm'
-import api from '../services/api'
+import api from '@/services/api'
 
-const emit = defineEmits(['delete', 'edit'])
+const emit = defineEmits(['delete', 'openEdit'])
 
 const props = defineProps({
   id: String,
@@ -51,9 +51,7 @@ const items = ref([
         label: 'Editeaza',
         icon: 'pi pi-pencil',
         command: () => {
-          // open dialog and do the edit then pass the new vaccine object to the parent
-          // TODO: dialog goes here
-          emit('edit', props.id)
+          emit('openEdit', props.id)
         },
       },
       {

@@ -227,9 +227,18 @@ def update_vaccine(vaccine_id: uuid.UUID, vaccine_new: VaccineUpdate, user_id: u
     session.add(vaccine_db)
     session.commit()
     session.refresh(vaccine_db)
+    
+    vaccine_response = VaccineResponse(
+        id = vaccine_db.id,
+        name = vaccine_db.name,
+        provider = vaccine_db.provider,
+        date_received = vaccine_db.date_received,
+    )
+    
     return {
         "status": status.HTTP_200_OK,
         "message": "Vaccine updated successfully",
+        "vaccine": vaccine_response
     }
     
 ### Allergy endpoints
