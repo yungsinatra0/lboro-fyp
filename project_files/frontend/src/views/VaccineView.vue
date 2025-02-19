@@ -32,6 +32,7 @@
         :date-received="vaccine.date_received"
         @delete="deleteVaccine"
         @open-edit="updateVaccine"
+        @show-file="showCertificate"
       />
     </div>
 
@@ -44,12 +45,19 @@
       :display-dialog="displayAddDialog"
     />
 
-    <EditVaccine 
-    v-if="displayEditDialog"
-    @edit="refreshUpdatedVaccine"
-    @close="displayEditDialog = false"
-    :display-dialog="displayEditDialog"
-    :vaccine="editDialogData"
+    <EditVaccine
+      v-if="displayEditDialog"
+      @edit="refreshUpdatedVaccine"
+      @close="displayEditDialog = false"
+      :display-dialog="displayEditDialog"
+      :vaccine="editDialogData"
+    />
+
+    <ShowCertificate
+      v-if="displayCertificateDialog"
+      :display-dialog="displayCertificateDialog"
+      @close="displayCertificateDialog = false"
+      :vaccine-id="vaccineIdForCertificate"
     />
   </div>
 </template>
@@ -65,6 +73,7 @@ import ConfirmDialog from 'primevue/confirmdialog'
 import AddVaccine from '@/components/vaccines/AddVaccine.vue'
 import VaccineCard from '@/components/vaccines/VaccineCard.vue'
 import EditVaccine from '@/components/vaccines/EditVaccine.vue'
+import ShowCertificate from '@/components/vaccines/ShowCertificate.vue'
 
 const vaccines = ref([])
 const loading = ref(true)
@@ -72,6 +81,8 @@ const error = ref(null)
 
 const displayAddDialog = ref(false)
 const displayEditDialog = ref(false)
+const displayCertificateDialog = ref(false)
+const vaccineIdForCertificate = ref(null)
 const editDialogData = ref(null)
 
 onMounted(async () => {
@@ -90,7 +101,6 @@ const showAddDialog = () => {
 }
 
 const addVaccine = (vaccine) => {
-  console.log('Vaccine received by emit: ', vaccine)
   vaccines.value.push(vaccine)
 }
 
@@ -107,5 +117,10 @@ const updateVaccine = (id) => {
 const refreshUpdatedVaccine = (vaccine) => {
   const index = vaccines.value.findIndex((v) => v.id === vaccine.id)
   vaccines.value[index] = vaccine
+}
+
+const showCertificate = (id) => {
+  displayCertificateDialog.value = true
+  vaccineIdForCertificate.value = id
 }
 </script>

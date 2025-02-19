@@ -58,18 +58,20 @@
           >{{ $form.dateReceived.error.message }}</Message
         >
       </div>
-      <!-- <div class="flex items-center gap-5 mb-2">
-          <label for="file" class="font-semibold w-24">Certificat de vaccinare</label>
-          <FileUpload
-            name="file"
-            mode="basic"
-            accept="image/*"
-            maxFileSize="1000000"
-            chooseLabel="Incarca fisier"
-            uploadLabel="Incarca"
-            cancelLabel="Anuleaza"
-            @upload="onUpload" />
-        </div> -->
+      <FileUpload
+        name="certificate"
+        @select="onUpload"
+        :multiple="false"
+        :custom-upload="true"
+        :maxFileSize="1000000"
+        :choose-label="`Alege certificatul de vaccinare`"
+        :upload-label="`Incarca`"
+        :cancel-label="`Anuleaza`"
+      >
+        <template #empty>
+          <span>Adauga certificatul de vaccinare.</span>
+        </template>
+      </FileUpload>
       <div class="shrink-0 pt-3 px-5 pb-2 flex justify-end gap-2">
         <Button
           label="Anuleaza"
@@ -92,7 +94,7 @@ import { Form } from '@primevue/forms'
 import DatePicker from 'primevue/datepicker'
 import Message from 'primevue/message'
 import Button from 'primevue/button'
-// import FileUpload from 'primevue/fileupload'
+import FileUpload from 'primevue/fileupload'
 
 import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
@@ -105,6 +107,7 @@ const props = defineProps({
 const emit = defineEmits(['add', 'close'])
 const maxDate = ref(new Date())
 const displayAddDialog = ref(props.displayDialog)
+const uploadedFile = ref(null)
 
 const initialValues = ref({
   name: '',
@@ -131,11 +134,27 @@ const addVaccine = async (vaccineDetails) => {
       date_received: vaccineDetails.dateReceived,
       provider: vaccineDetails.provider,
     })
+
+    if (uploadedFile.value) {
+      const formData = new FormData()
+      formData.append('file', uploadedFile.value)
+      await api.post(`upload/vaccine/${response.data.vaccine.id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+    }
+
     emit('add', response.data.vaccine)
     emit('close')
   } catch (error) {
     console.error('Error adding vaccine:', error)
   }
+}
+
+const onUpload = (event) => {
+  uploadedFile.value = event.files[0] // doing only for one file for now
+  console.log(uploadedFile.value)
 }
 
 const onFormSubmit = (e) => {

@@ -148,7 +148,7 @@ const onFormSubmit = (e) => {
   // e.reset: A function that resets the form to its initial state.
 
   if (!e.valid) {
-    console.log('Error updating vaccine: ', e.errors)
+    console.error('Error updating vaccine: ', e.errors)
     return
   }
 

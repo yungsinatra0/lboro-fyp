@@ -855,5 +855,9 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# Uploaded files
+
+project_files/backend/app/uploads/
+
 # End of https://www.toptal.com/developers/gitignore/api/windows,macos,linux,tex,latex,node,vue,vuejs,python
 

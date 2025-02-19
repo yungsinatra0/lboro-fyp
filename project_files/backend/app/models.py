@@ -2,6 +2,7 @@ from sqlmodel import Field, SQLModel, Relationship
 from pydantic import EmailStr, field_serializer
 from datetime import date, datetime
 import uuid
+from typing import Optional
 
 # Base model that contains the field serializer for date formatting to dd-mm-yyyy and the date field itself
 class DateFormattingModel(SQLModel):
@@ -62,6 +63,8 @@ class Vaccine(SQLModel, table=True):
     
     user_id : uuid.UUID = Field(foreign_key="user.id")
     user: User = Relationship(back_populates="vaccines")
+    
+    certificate: Optional["FileUpload"] = Relationship(back_populates="vaccine", cascade_delete=True)
     
     @field_serializer('date_received')
     def serialize_date_received(self, value: date) -> str:
@@ -301,3 +304,19 @@ class HealthDataType(SQLModel, table=True):
     name: str
     
     healthdata: list[HealthData] = Relationship(back_populates="type")
+    
+# File Table models used for table creation
+class FileUpload(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    name: str
+    file_path: str
+    file_type: str
+    file_size: int
+    uploaded_at: datetime = Field(default_factory=datetime.now)
+    
+    vaccine_id : uuid.UUID | None = Field(default=None, foreign_key="vaccine.id")
+    vaccine: Optional["Vaccine"] = Relationship(back_populates="certificate")
+    
+    @field_serializer('uploaded_at')
+    def serialize_uploaded_at(self, value: datetime) -> str:
+        return value.strftime("%d-%m-%Y %H:%M:%S")

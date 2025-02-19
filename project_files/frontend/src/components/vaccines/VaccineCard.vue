@@ -10,7 +10,11 @@
           <span>{{ dateReceived }}</span>
         </div>
         <div>
-          <Button icon="pi pi-eye" class="p-button-rounded p-button-text p-button-plain" />
+          <Button
+            icon="pi pi-eye"
+            class="p-button-rounded p-button-text p-button-plain"
+            @click="emit('showFile', props.id)"
+          />
           <Button
             icon="pi pi-ellipsis-h"
             class="p-button-rounded p-button-text p-button-plain"
@@ -33,7 +37,7 @@ import { ref } from 'vue'
 import { useConfirm } from 'primevue/useconfirm'
 import api from '@/services/api'
 
-const emit = defineEmits(['delete', 'openEdit'])
+const emit = defineEmits(['delete', 'openEdit', 'showFile'])
 
 const props = defineProps({
   id: String,
@@ -99,7 +103,7 @@ const confirm1 = (event) => {
         await api.delete(`/me/vaccines/${props.id}`)
         emit('delete', props.id)
       } catch (error) {
-        console.log(error)
+        console.error(error)
       }
     },
     reject: () => {},
