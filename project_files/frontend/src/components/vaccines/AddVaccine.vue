@@ -60,6 +60,7 @@
       </div>
       <FileUpload
         name="certificate"
+        mode="basic"
         @select="onSelect"
         :multiple="false"
         :custom-upload="true"
@@ -136,16 +137,20 @@ const addVaccine = async (vaccineDetails) => {
     })
 
     if (uploadedFile.value) {
-      const formData = new FormData()
-      formData.append('file', uploadedFile.value)
-      await api.post(`upload/vaccine/${response.data.vaccine.id}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
+      try {
+        const formData = new FormData()
+        formData.append('file', uploadedFile.value)
+        await api.post(`upload/vaccine/${response.data.vaccine.id}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        })
+      } catch (error) {
+        console.error('Error uploading certificate:', error)
+      }
     }
-
-    emit('add', response.data.vaccine)
+    const vaccineWithCertificate = { ...response.data.vaccine, certificate: true } // that way I don't have to pass the whole certificate object
+    emit('add', vaccineWithCertificate)
     emit('close')
   } catch (error) {
     console.error('Error adding vaccine:', error)
