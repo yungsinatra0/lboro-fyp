@@ -30,6 +30,7 @@
         :name="vaccine.name"
         :provider="vaccine.provider"
         :date-received="vaccine.date_received"
+        :has-certificate="vaccine.certificate ? true : false"
         @delete="deleteVaccine"
         @open-edit="updateVaccine"
         @show-file="showCertificate"

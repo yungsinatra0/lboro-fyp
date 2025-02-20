@@ -14,6 +14,7 @@
             icon="pi pi-eye"
             class="p-button-rounded p-button-text p-button-plain"
             @click="emit('showFile', props.id)"
+            v-if = "hasCertificate"
           />
           <Button
             icon="pi pi-ellipsis-h"
@@ -44,6 +45,7 @@ const props = defineProps({
   name: String,
   provider: String,
   dateReceived: String,
+  hasCertificate: Boolean,
 })
 
 const menu = ref()

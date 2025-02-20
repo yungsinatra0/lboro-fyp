@@ -76,6 +76,7 @@ class VaccineResponse(SQLModel):
     name: str
     provider: str
     date_received: date
+    certificate: Optional["FileUpload"]
     
     @field_serializer('date_received')
     def serialize_date_received(self, value: date) -> str:

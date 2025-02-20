@@ -60,7 +60,7 @@
       </div>
       <FileUpload
         name="certificate"
-        @select="onUpload"
+        @select="onSelect"
         :multiple="false"
         :custom-upload="true"
         :maxFileSize="1000000"
@@ -152,7 +152,7 @@ const addVaccine = async (vaccineDetails) => {
   }
 }
 
-const onUpload = (event) => {
+const onSelect = (event) => {
   uploadedFile.value = event.files[0] // doing only for one file for now
   console.log(uploadedFile.value)
 }
