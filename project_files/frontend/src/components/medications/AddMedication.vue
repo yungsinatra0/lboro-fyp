@@ -283,7 +283,6 @@ const resolver = zodResolver(
 )
 
 const addMedication = async (medicationDetails) => {
-  console.log(medicationDetails)
   try {
     const response = await api.post('me/medications', {
       name: medicationDetails.name,
@@ -315,7 +314,6 @@ const onFormSubmit = (e) => {
     return
   }
   
-  console.log(e.values)
   addMedication(e.values)
 }
 </script>
