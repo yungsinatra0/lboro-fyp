@@ -59,7 +59,6 @@ class Vaccine(SQLModel, table=True):
     name: str
     provider: str
     date_received: date
-    # Later to add a file field for storing the vaccine certificate
     
     user_id : uuid.UUID = Field(foreign_key="user.id")
     user: User = Relationship(back_populates="vaccines")
@@ -224,7 +223,7 @@ class MedicationUpdate(SQLModel):
     dosage: str | None = None
     frequency: str | None = None
     date_prescribed: date | None = None
-    duration_days: int
+    duration_days: int | None = None
     form: str | None = None
     notes: str | None = None
     
