@@ -7,7 +7,7 @@
       <div class="flex items-center justify-between">
         <div class="flex flex-col justify-start">
           <span class="font-bold">{{ provider }}</span>
-          <span>{{ dateReceived }}</span>
+          <span>{{ date_received }}</span>
         </div>
         <div>
           <Button
@@ -44,7 +44,7 @@ const props = defineProps({
   id: String,
   name: String,
   provider: String,
-  dateReceived: String,
+  date_received: String,
   hasCertificate: Boolean,
 })
 

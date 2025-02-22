@@ -98,6 +98,7 @@ import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import api from '@/services/api'
 import { ref } from 'vue'
+import { parse } from 'date-fns'
 
 const props = defineProps({
   displayDialog: Boolean,
@@ -110,7 +111,7 @@ const displayEditDialog = ref(props.displayDialog)
 const initialValues = ref({
   name: props.vaccine.name,
   provider: props.vaccine.provider,
-  dateReceived: new Date(props.vaccine.date_received).toLocaleDateString('ro-RO'), // idk why I have to do this
+  dateReceived: parse(props.vaccine.date_received, 'dd-MM-yyyy', new Date()),
 })
 
 const resolver = zodResolver(
