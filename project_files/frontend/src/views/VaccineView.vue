@@ -26,13 +26,10 @@
         v-else
         v-for="vaccine in vaccines"
         :key="vaccine.id"
-        :id="vaccine.id"
-        :name="vaccine.name"
-        :provider="vaccine.provider"
-        :date-received="vaccine.date_received"
+        v-bind="vaccine"
         :has-certificate="vaccine.certificate ? true : false"
         @delete="deleteVaccine"
-        @open-edit="updateVaccine"
+        @open-edit="openEditDialog"
         @show-file="showCertificate"
       />
     </div>
@@ -91,7 +88,7 @@ onMounted(async () => {
     const response = await api.get('me/vaccines')
     vaccines.value = response.data
   } catch (error) {
-    error.value = 'O eroare a aparut la incarcarea vaccinurilor: ' + error.message
+    error.value = 'A aparut o eroare la incarcarea vaccinelor' + error
   } finally {
     loading.value = false
   }
@@ -109,7 +106,7 @@ const deleteVaccine = (id) => {
   vaccines.value = vaccines.value.filter((vaccine) => vaccine.id !== id)
 }
 
-const updateVaccine = (id) => {
+const openEditDialog = (id) => {
   displayEditDialog.value = true
   const vaccine = vaccines.value.find((vaccine) => vaccine.id === id)
   editDialogData.value = vaccine
