@@ -516,9 +516,22 @@ def update_medication(medication_id: uuid.UUID, medication_new: MedicationUpdate
     session.add(medication_db)
     session.commit()
     session.refresh(medication_db)
+    
+    medication_response = MedicationResponse(
+        id = medication_db.id,
+        name = medication_db.name,
+        dosage = medication_db.dosage,
+        frequency = medication_db.frequency,
+        date_prescribed = medication_db.date_prescribed,
+        duration_days = medication_db.duration_days,
+        form = medication_db.form.name if medication_db.form else None,
+        notes = medication_db.notes
+    )
+    
     return {
         "status": status.HTTP_200_OK,
-        "message": "Medication updated successfully"
+        "message": "Medication updated successfully",
+        "medication": medication_response
     }
     
 # Get all medication forms
