@@ -176,10 +176,18 @@ def add_vaccine(vaccine: VaccineCreate, user_id: uuid.UUID = Depends(validate_se
     session.add(new_vaccine)
     session.commit()
     session.refresh(new_vaccine)
+    
+    vaccine_response = VaccineResponse(
+        id = new_vaccine.id,
+        name = new_vaccine.name,
+        provider = new_vaccine.provider,
+        date_received = new_vaccine.date_received
+    )
+    
     return {
         "status": status.HTTP_201_CREATED,
         "message": "Vaccine added successfully",
-        "vaccine": new_vaccine
+        "vaccine": vaccine_response
     }
 
 # Delete a vaccine
