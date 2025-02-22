@@ -69,8 +69,6 @@
 
       <div class="flex flex-col items-center my-3">
         <div class="flex items-center">
-          <Checkbox id="rememberme1" v-model="checked" :binary="true" class="mr-2" />
-          <label for="rememberme1">Tine-ma minte</label>
         </div>
         <a class="font-medium no-underline ml-2 mt-3 mb-0 text-primary text-right cursor-pointer"
           >Ai uitat parola?</a
@@ -83,7 +81,6 @@
 <script setup>
 import { Form } from '@primevue/forms'
 import Button from 'primevue/button'
-import Checkbox from 'primevue/checkbox'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import api from '../services/api'
@@ -91,7 +88,6 @@ import { ref } from 'vue'
 import router from '@/router'
 import Message from 'primevue/message'
 
-const checked = ref(false)
 
 const initialValues = ref({
   email: '',
