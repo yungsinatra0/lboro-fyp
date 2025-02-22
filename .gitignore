@@ -859,5 +859,9 @@ $RECYCLE.BIN/
 
 project_files/backend/app/uploads/
 
+# Generators
+
+project_files/backend/app/generators/
+
 # End of https://www.toptal.com/developers/gitignore/api/windows,macos,linux,tex,latex,node,vue,vuejs,python
 

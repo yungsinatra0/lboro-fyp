@@ -5,6 +5,7 @@ import RegisterView from '@/views/RegisterView.vue'
 import LandingView from '@/views/LandingView.vue'
 import { useAuthStore } from '../stores/auth'
 import VaccineView from '@/views/VaccineView.vue'
+import MedicationView from '@/views/MedicationView.vue'
 
 const router = createRouter({
   history: createWebHistory(), // Will need to change base URL if not using root
@@ -37,6 +38,12 @@ const router = createRouter({
       path: '/vaccine',
       name: 'Vaccine',
       component: VaccineView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/medicamente',
+      name: 'Medicamente',
+      component: MedicationView,
       meta: { requiresAuth: true },
     }
   ],

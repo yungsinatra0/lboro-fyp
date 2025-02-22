@@ -424,20 +424,40 @@ def get_healthdata_types(user_id: uuid.UUID = Depends(validate_session), session
 @app.get("/me/medications", response_model=list[MedicationResponse])
 def get_medications(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     user = session.get(User, user_id)
-    return user.medications
+    
+    # Need to do this because each user has multiple medications, and each medication has a form 
+    result = []
+    for medication in user.medications:
+        med = {
+            "id": medication.id,
+            "name": medication.name,
+            "dosage": medication.dosage,
+            "frequency": medication.frequency,
+            "date_prescribed": medication.date_prescribed,
+            "duration_days": medication.duration_days,
+            "form": medication.form.name if medication.form else None,
+            "notes": medication.notes      
+        }
+        result.append(med)
+    
+    return result
 
 # Add medication
 @app.post("/me/medications")
 def add_medication(medication: MedicationCreate, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     user = session.get(User, user_id)
     
+    # Find the medication form using the form name
+    medication_form = session.exec(select(MedicationForm).where(MedicationForm.name == medication.form)).first()
+    
     new_medication = Medication(
         name = medication.name,
         dosage = medication.dosage,
         frequency = medication.frequency,
         date_prescribed = medication.date_prescribed,
-        date_ending = medication.date_ending,
-        form = medication.form,
+        duration_days = medication.duration_days,
+        form = medication_form,
+        notes = medication.notes,
         user = user)
           
     session.add(new_medication)
@@ -445,7 +465,8 @@ def add_medication(medication: MedicationCreate, user_id: uuid.UUID = Depends(va
     session.refresh(new_medication)
     return {
         "status": status.HTTP_201_CREATED,
-        "message": "Medication added successfully"
+        "message": "Medication added successfully",
+        "medication": new_medication
     }
     
 # Delete medication
@@ -501,7 +522,7 @@ def update_medication(medication_id: uuid.UUID, medication_new: MedicationUpdate
     }
     
 # Get all medication forms
-@app.get("/medications/forms")
+@app.get("/medications/forms", response_model=list[MedicationFormResponse])
 def get_medication_forms(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     medication_forms = session.exec(select(MedicationForm)).all()
     return medication_forms

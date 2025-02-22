@@ -175,7 +175,8 @@ class Medication(SQLModel, table=True):
     dosage: str
     frequency: str
     date_prescribed: date
-    date_ending: date | None = None
+    duration_days: int | None = None
+    notes: str | None = None
     
     user_id : uuid.UUID = Field(foreign_key="user.id")
     user: User = Relationship(back_populates="medications")
@@ -186,11 +187,7 @@ class Medication(SQLModel, table=True):
     @field_serializer('date_prescribed')
     def serialize_date_prescribed(self, value: date) -> str:
         return value.strftime("%d-%m-%Y")
-    
-    @field_serializer('date_ending')
-    def serialize_date_ending(self, value: date) -> str:
-        return value.strftime("%d-%m-%Y")
-    
+
 # Medication response model
 class MedicationResponse(SQLModel):
     id: uuid.UUID
@@ -198,16 +195,14 @@ class MedicationResponse(SQLModel):
     dosage: str
     frequency: str
     date_prescribed: date
-    date_ending: date | None = None
+    duration_days: int | None = None 
     form: str
+    notes: str | None = None
     
     @field_serializer('date_prescribed')
     def serialize_date_prescribed(self, value: date) -> str:
         return value.strftime("%d-%m-%Y")
-    
-    @field_serializer('date_ending')
-    def serialize_date_ending(self, value: date) -> str:
-        return value.strftime("%d-%m-%Y")
+
     
 # Medication create model
 class MedicationCreate(SQLModel):
@@ -215,15 +210,12 @@ class MedicationCreate(SQLModel):
     dosage: str
     frequency: str
     date_prescribed: date
-    date_ending: date | None = None
+    duration_days: int | None = None
     form: str
+    notes: str | None = None
     
     @field_serializer('date_prescribed')
     def serialize_date_prescribed(self, value: date) -> str:
-        return value.strftime("%d-%m-%Y")
-    
-    @field_serializer('date_ending')
-    def serialize_date_ending(self, value: date) -> str:
         return value.strftime("%d-%m-%Y")
     
 # Medication update model
@@ -232,22 +224,24 @@ class MedicationUpdate(SQLModel):
     dosage: str | None = None
     frequency: str | None = None
     date_prescribed: date | None = None
-    date_ending: date | None = None
+    duration_days: int
     form: str | None = None
+    notes: str | None = None
     
     @field_serializer('date_prescribed')
     def serialize_date_prescribed(self, value: date) -> str:
         return value.strftime("%d-%m-%Y")
     
-    @field_serializer('date_ending')
-    def serialize_date_ending(self, value: date) -> str:
-        return value.strftime("%d-%m-%Y")
-    
+
 class MedicationForm(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
     
     medications: list[Medication] = Relationship(back_populates="form")
+    
+class MedicationFormResponse(SQLModel):
+    id: uuid.UUID
+    name: str
     
 # Health data Table models used for table creation    
 class HealthData(SQLModel, table=True):

@@ -89,7 +89,7 @@ const items = ref([
       {
         label: 'Medicamente',
         // icon: 'pi pi-tablet',
-        route: '/dashboard',
+        route: '/medicamente',
       },
       {
         label: 'Alergii',
@@ -110,7 +110,7 @@ async function logout() {
     await api.post('/logout')
     router.push('/login')
   } catch {
-    console.log('Logout failed')
+    console.error('Logout failed')
   }
 }
 </script>
