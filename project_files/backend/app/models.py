@@ -167,6 +167,14 @@ class Reactions(SQLModel, table=True):
     
     allergies: list[Allergy] = Relationship(back_populates="reactions", link_model=AllergyReactionsLink)
     
+class AllergensResponse(SQLModel):
+    id: uuid.UUID
+    name: str
+    
+class ReactionsResponse(SQLModel):
+    id: uuid.UUID
+    name: str
+    
 # Medication Table models used for table creation
 class Medication(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
