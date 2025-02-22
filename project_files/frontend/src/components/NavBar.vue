@@ -94,7 +94,7 @@ const items = ref([
       {
         label: 'Alergii',
         // icon: 'pi pi-ban',
-        route: '/dashboard',
+        route: '/alergii',
       },
       {
         label: 'Semne vitale',
