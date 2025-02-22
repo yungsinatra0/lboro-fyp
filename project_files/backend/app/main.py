@@ -249,7 +249,17 @@ def update_vaccine(vaccine_id: uuid.UUID, vaccine_new: VaccineUpdate, user_id: u
 @app.get("/me/allergies", response_model=list[AllergyResponse])
 def get_allergies(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     user = session.get(User, user_id)
-    return user.allergies
+    
+    result = []
+    for allergy in user.allergies:
+        result.append({
+            "id": allergy.id,
+            "date_diagnosed": allergy.date_diagnosed,
+            "allergens": [allergen.name for allergen in allergy.allergens],
+            "reactions": [reaction.name for reaction in allergy.reactions]
+        })
+    
+    return result
 
 # Add an allergy
 @app.post("/me/allergies")
@@ -265,9 +275,18 @@ def add_allergy(allergy: AllergyCreate, user_id: uuid.UUID = Depends(validate_se
     session.add(new_allergy)
     session.commit()
     session.refresh(new_allergy)
+    
+    allergy_response = AllergyResponse(
+        id = new_allergy.id,
+        date_diagnosed = new_allergy.date_diagnosed,
+        allergens = [allergen.name for allergen in new_allergy.allergens],
+        reactions = [reaction.name for reaction in new_allergy.reactions]
+    )
+    
     return {
         "status": status.HTTP_201_CREATED,
-        "message": "Allergy added successfully"
+        "message": "Allergy added successfully",
+        "allergy": allergy_response
     }
     
 # Delete an allergy
@@ -317,19 +336,27 @@ def update_allergy(allergy_id: uuid.UUID, allergy_new: AllergyUpdate, user_id: u
     session.add(allergy_db)
     session.commit()
     session.refresh(allergy_db)
+    
+    allergy_response = AllergyResponse(
+        id = allergy_db.id,
+        date_diagnosed = allergy_db.date_diagnosed,
+        allergens = [allergen.name for allergen in allergy_db.allergens],
+        reactions = [reaction.name for reaction in allergy_db.reactions]
+    )
     return {
         "status": status.HTTP_200_OK,
-        "message": "Allergy updated successfully"
+        "message": "Allergy updated successfully",
+        'allergy': allergy_response
     }
     
 # Get all allergens
-@app.get("/allergens")
+@app.get("/allergens", response_model=list[AllergensResponse])
 def get_allergens(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     allergens = session.exec(select(Allergens)).all()
     return allergens
 
 # Get all reactions
-@app.get("/reactions")
+@app.get("/reactions", response_class=list[ReactionsResponse])
 def get_reactions(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     reactions = session.exec(select(Reactions)).all()
     return reactions
