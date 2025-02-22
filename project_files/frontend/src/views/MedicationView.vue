@@ -44,6 +44,15 @@
       :display-dialog="displayAddDialog"
       :forms="medforms"
     />
+
+    <EditMedication
+      v-if="displayEditDialog"
+      @edit="refreshUpdatedMedication"
+      @close="displayEditDialog = false"
+      :display-dialog="displayEditDialog"
+      :medication="editDialogData"
+      :forms="medforms"
+    />
   </div>
 </template>
 
@@ -51,6 +60,7 @@
 import NavBar from '@/components/NavBar.vue'
 import Button from 'primevue/button'
 import MedicationCard from '@/components/medications/MedicationCard.vue'
+import EditMedication from '@/components/medications/EditMedication.vue'
 import AddMedication from '@/components/medications/AddMedication.vue'
 import ProgressSpinner from 'primevue/progressspinner'
 import api from '../services/api'
@@ -94,5 +104,10 @@ const openEditDialog = (id) => {
   displayEditDialog.value = true
   const medication = medications.value.find((medication) => medication.id === id)
   editDialogData.value = medication
+}
+
+const refreshUpdatedMedication = (updatedMedication) => {
+  const index = medications.value.findIndex((medication) => medication.id === updatedMedication.id)
+  medications.value[index] = updatedMedication
 }
 </script>

@@ -309,7 +309,8 @@ const resolver = zodResolver(
     duration: z
       .number('Durata tratamentului trebuie sa fie un numar.')
       .int()
-      .positive('Durata tratamentului trebuie sa fie un numar pozitiv.'),
+      .positive('Durata tratamentului trebuie sa fie un numar pozitiv.')
+      .optional(),
     notes: z.string().optional(),
     form: z.string().nonempty('Forma medicamentului este obligatorie.'),
     dosageUnits: z.string().nonempty('Unitatea de masura a dozei este obligatorie.'),
