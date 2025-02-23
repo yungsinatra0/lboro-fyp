@@ -265,7 +265,8 @@ def get_allergies(user_id: uuid.UUID = Depends(validate_session), session: Sessi
             "date_diagnosed": allergy.date_diagnosed,
             "allergens": [allergen.name for allergen in allergy.allergens],
             "reactions": [reaction.name for reaction in allergy.reactions],
-            "severity": allergy.severity.name
+            "severity": allergy.severity.name,
+            "notes": allergy.notes
         })
     
     return result
@@ -292,7 +293,8 @@ def add_allergy(allergy: AllergyCreate, user_id: uuid.UUID = Depends(validate_se
         user = user,
         allergens = allergens,
         reactions = reactions,
-        severity = severity)
+        severity = severity,
+        notes = allergy.notes)
           
     session.add(new_allergy)
     session.commit()
@@ -302,7 +304,9 @@ def add_allergy(allergy: AllergyCreate, user_id: uuid.UUID = Depends(validate_se
         id = new_allergy.id,
         date_diagnosed = new_allergy.date_diagnosed,
         allergens = [allergen.name for allergen in new_allergy.allergens],
-        reactions = [reaction.name for reaction in new_allergy.reactions]
+        reactions = [reaction.name for reaction in new_allergy.reactions],
+        severity = new_allergy.severity.name,
+        notes = new_allergy.notes
     )
     
     return {
@@ -383,7 +387,8 @@ def update_allergy(allergy_id: uuid.UUID, allergy_new: AllergyUpdate, user_id: u
         date_diagnosed = allergy_db.date_diagnosed,
         allergens = [allergen.name for allergen in allergy_db.allergens],
         reactions = [reaction.name for reaction in allergy_db.reactions],
-        severity = allergy_db.severity.name
+        severity = allergy_db.severity.name,
+        notes = allergy_db.notes
     )
     return {
         "status": status.HTTP_200_OK,

@@ -113,6 +113,7 @@ class AllergyReactionsLink(SQLModel, table=True):
 class Allergy(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     date_diagnosed: date
+    notes: str | None = None
         
     user_id : uuid.UUID = Field(foreign_key="user.id")
     user: User = Relationship(back_populates="allergies")
@@ -134,6 +135,7 @@ class AllergyResponse(SQLModel):
     severity: str
     allergens: list[str]
     reactions: list[str]
+    notes: str | None = None
     
     @field_serializer('date_diagnosed')
     def serialize_date_diagnosed(self, value: date) -> str:
@@ -145,6 +147,7 @@ class AllergyCreate(SQLModel):
     severity: str
     allergens: list[str]
     reactions: list[str]
+    notes: str | None = None
     
     @field_serializer('date_diagnosed')
     def serialize_date_diagnosed(self, value: date) -> str:
@@ -156,6 +159,7 @@ class AllergyUpdate(SQLModel):
     severity: str | None = None
     allergens: list[str] | None = None
     reactions: list[str] | None = None
+    notes: str | None = None
     
     @field_serializer('date_diagnosed')
     def serialize_date_diagnosed(self, value: date) -> str:
