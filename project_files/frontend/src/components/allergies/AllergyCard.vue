@@ -1,63 +1,67 @@
 <template>
-  <Card class="w-full md:w-1/3 mb-4 shadow-3" :pt="cardStyles">
+  <Card class="w-full mb-4 shadow-3" :pt="cardStyles">
     <template #header>
-      <div class="flex flex-col gap-2">
-        <div class="bg-primary h-1 w-full"></div>
-        <div class="px-3">
-          <h3 class="text-xl font-bold text-surface-900 dark:text-surface-0 mt-1">Alergie</h3>
-        </div>
-      </div>
+      <div class="h-2 w-full rounded-t-lg bg-primary"></div>
     </template>
 
     <template #content>
-      <div class="flex flex-col gap-2 px-3">
-        <div>
-          <span class="text-sm text-surface-600 dark:text-surface-400">Alergie la</span>
-          <p
-            class="text-lg font-semibold text-surface-900 dark:text-surface-0 mt-1"
-            v-for="allergen in allergens"
-            :key="allergen.id"
-          >
-            {{ allergen }}
-          </p>
-        </div>
-
-        <div>
-          <span class="text-sm text-surface-600 dark:text-surface-400">Severitate</span>
-          <div class="mt-1">
-            <Tag :value="severity" :severity="getSeverityType(severity)" rounded />
+      <div class="flex flex-col h-full px-3 pt-3">
+        <div class="grid grid-cols-2 gap-x-4 gap-y-3">
+          <div class="col-span-2">
+            <span class="text-sm text-surface-600 dark:text-surface-400">Alergie la</span>
+            <div class="grid grid-flow-col grid-rows-2 auto-cols-fr gap-1">
+              <p
+                class="text-base font-semibold text-surface-900 dark:text-surface-0 mt-0.5"
+                v-for="allergen in allergens"
+                :key="allergen.id"
+              >
+                {{ allergen }}
+              </p>
+            </div>
           </div>
-        </div>
 
-        <div>
-          <span class="text-sm text-surface-600 dark:text-surface-400">Simptome</span>
-          <div class="flex flex-wrap gap-1 mt-1">
-            <Tag
-              v-for="reaction in reactions"
-              :key="reaction"
-              :value="reaction"
-              severity="info"
-              rounded
-            />
-          </div>
-        </div>
-
-        <div>
-          <span class="text-sm text-surface-600 dark:text-surface-400">Data diagnosticării</span>
-          <p class="text-base text-surface-900 dark:text-surface-0 mt-1">{{ date_diagnosed }}</p>
-        </div>
-
-        <div class="flex flex-col" v-if="notes">
           <div>
-            <span class="text-sm text-surface-600 dark:text-surface-400">Notițe:</span>
-            <p class="text-base text-surface-900 dark:text-surface-0 mt-1">{{ notes }}</p>
+            <span class="text-sm text-surface-600 dark:text-surface-400">Severitate</span>
+            <div class="mt-0.5">
+              <Tag :value="severity" :severity="getSeverityType(severity)" rounded />
+            </div>
+          </div>
+
+          <div>
+            <span class="text-sm text-surface-600 dark:text-surface-400">Data diagnosticării</span>
+            <p class="text-base text-surface-900 dark:text-surface-0 mt-0.5">
+              {{ date_diagnosed }}
+            </p>
+          </div>
+
+          <div class="col-span-2">
+            <span class="text-sm text-surface-600 dark:text-surface-400">Simptome</span>
+            <div class="flex flex-wrap gap-1 mt-0.5">
+              <Tag
+                v-for="reaction in reactions"
+                :key="reaction"
+                :value="reaction"
+                severity="info"
+                rounded
+              />
+            </div>
+          </div>
+
+          <div class="col-span-2">
+            <span class="text-sm text-surface-600 dark:text-surface-400">Notițe</span>
+            <div class="mt-0.5 max-h-16 overflow-y-auto">
+              <p v-if="notes" class="text-base text-surface-900 dark:text-surface-0">
+                {{ notes }}
+              </p>
+                <p v-else class="text-base text-surface-400 dark:text-surface-400">Fără notițe</p>
+            </div>
           </div>
         </div>
       </div>
     </template>
 
     <template #footer>
-      <div class="flex justify-end px-3">
+      <div class="flex justify-end px-3 py-2">
         <Button
           icon="pi pi-ellipsis-h"
           class="p-button-rounded p-button-text p-button-plain"
@@ -83,7 +87,7 @@ import api from '../../services/api'
 const emit = defineEmits(['delete', 'openEdit'])
 
 const props = defineProps({
-  id: Number,
+  id: String,
   reactions: Array,
   allergens: Array,
   severity: String,

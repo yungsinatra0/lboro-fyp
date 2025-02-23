@@ -23,14 +23,15 @@
 
       <div v-else-if="allergies.length === 0" class="p-4">Nu a fost gasita nici o alergie.</div>
 
-      <AllergyCard
-        v-else
-        v-for="allergy in allergies"
-        :key="allergy.id"
-        v-bind="allergy"
-        @delete="deleteAllergy"
-        @open-edit="openEditDialog"
-      />
+      <div v-else class="md:grid md:grid-cols-3 md:gap-6 md:w-full ">
+        <AllergyCard
+          v-for="allergy in allergies"
+          :key="allergy.id"
+          v-bind="allergy"
+          @delete="deleteAllergy"
+          @open-edit="openEditDialog"
+        />
+      </div>
     </div>
 
     <ConfirmDialog></ConfirmDialog>
