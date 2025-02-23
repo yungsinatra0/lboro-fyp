@@ -113,7 +113,8 @@ class AllergyReactionsLink(SQLModel, table=True):
 class Allergy(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     date_diagnosed: date
-    
+    severity: str 
+        
     user_id : uuid.UUID = Field(foreign_key="user.id")
     user: User = Relationship(back_populates="allergies")
     
@@ -128,6 +129,7 @@ class Allergy(SQLModel, table=True):
 class AllergyResponse(SQLModel):
     id: uuid.UUID
     date_diagnosed: date
+    severity: str
     allergens: list[str]
     reactions: list[str]
     
@@ -138,6 +140,7 @@ class AllergyResponse(SQLModel):
 # Allergy create model
 class AllergyCreate(SQLModel):
     date_diagnosed: date
+    severity: str
     allergens: list[str]
     reactions: list[str]
     
@@ -148,6 +151,7 @@ class AllergyCreate(SQLModel):
 # Allergy update model
 class AllergyUpdate(SQLModel):
     date_diagnosed: date | None = None
+    severity: str | None = None
     allergens: list[str] | None = None
     reactions: list[str] | None = None
     
