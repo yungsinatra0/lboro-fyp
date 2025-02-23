@@ -113,13 +113,15 @@ class AllergyReactionsLink(SQLModel, table=True):
 class Allergy(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     date_diagnosed: date
-    severity: str 
         
     user_id : uuid.UUID = Field(foreign_key="user.id")
     user: User = Relationship(back_populates="allergies")
     
     allergens: list["Allergens"] = Relationship(back_populates="allergies", link_model=AllergyAllergensLink)
     reactions: list["Reactions"] = Relationship(back_populates="allergies", link_model=AllergyReactionsLink)
+   
+    severity_id : uuid.UUID = Field(foreign_key="severity.id")
+    severity: "Severity" = Relationship(back_populates="allergies")
     
     @field_serializer('date_diagnosed')
     def serialize_date_diagnosed(self, value: date) -> str:
@@ -171,6 +173,12 @@ class Reactions(SQLModel, table=True):
     
     allergies: list[Allergy] = Relationship(back_populates="reactions", link_model=AllergyReactionsLink)
     
+class Severity(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    name: str
+    
+    allergies: list[Allergy] = Relationship(back_populates="severity")
+    
 class AllergensResponse(SQLModel):
     id: uuid.UUID
     name: str
@@ -179,6 +187,11 @@ class ReactionsResponse(SQLModel):
     id: uuid.UUID
     name: str
     
+    
+class SeverityResponse(SQLModel):
+    id: uuid.UUID
+    name: str
+        
 # Medication Table models used for table creation
 class Medication(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)

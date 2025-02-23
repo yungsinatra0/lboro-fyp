@@ -264,7 +264,8 @@ def get_allergies(user_id: uuid.UUID = Depends(validate_session), session: Sessi
             "id": allergy.id,
             "date_diagnosed": allergy.date_diagnosed,
             "allergens": [allergen.name for allergen in allergy.allergens],
-            "reactions": [reaction.name for reaction in allergy.reactions]
+            "reactions": [reaction.name for reaction in allergy.reactions],
+            "severity": allergy.severity.name
         })
     
     return result
@@ -274,11 +275,24 @@ def get_allergies(user_id: uuid.UUID = Depends(validate_session), session: Sessi
 def add_allergy(allergy: AllergyCreate, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     user = session.get(User, user_id)
     
+    severity = session.exec(select(Severity).where(Severity.name == allergy.severity)).first()
+    
+    allergens = []
+    for allergen_name in allergy.allergens:
+        allergen_db = session.exec(select(Allergens).where(Allergens.name == allergen_name)).first()
+        allergens.append(allergen_db)
+    
+    reactions = []
+    for reaction_name in allergy.reactions:
+        reaction_db = session.exec(select(Reactions).where(Reactions.name == reaction_name)).first()
+        reactions.append(reaction_db)    
+    
     new_allergy = Allergy(
         date_diagnosed = allergy.date_diagnosed,
         user = user,
-        allergens = allergy.allergens,
-        reactions = allergy.reactions)
+        allergens = allergens,
+        reactions = reactions,
+        severity = severity)
           
     session.add(new_allergy)
     session.commit()
@@ -340,6 +354,25 @@ def update_allergy(allergy_id: uuid.UUID, allergy_new: AllergyUpdate, user_id: u
         raise HTTPException(status_code=403, detail="You do not have permission to update this allergy")
     
     allergy_data = allergy_new.model_dump(exclude_unset=True)
+    
+    if "severity" in allergy_data:
+        severity = session.exec(select(Severity).where(Severity.name == allergy_data["severity"])).first()
+        allergy_data["severity"] = severity
+        
+    if "allergens" in allergy_data:
+        allergens = []
+        for allergen_name in allergy_data["allergens"]:
+            allergen_db = session.exec(select(Allergens).where(Allergens.name == allergen_name)).first()
+            allergens.append(allergen_db)
+        allergy_data["allergens"] = allergens
+        
+    if "reactions" in allergy_data:
+        reactions = []
+        for reaction_name in allergy_data["reactions"]:
+            reaction_db = session.exec(select(Reactions).where(Reactions.name == reaction_name)).first()
+            reactions.append(reaction_db)
+        allergy_data["reactions"] = reactions        
+    
     allergy_db.sqlmodel_update(allergy_data)
     session.add(allergy_db)
     session.commit()
@@ -349,7 +382,8 @@ def update_allergy(allergy_id: uuid.UUID, allergy_new: AllergyUpdate, user_id: u
         id = allergy_db.id,
         date_diagnosed = allergy_db.date_diagnosed,
         allergens = [allergen.name for allergen in allergy_db.allergens],
-        reactions = [reaction.name for reaction in allergy_db.reactions]
+        reactions = [reaction.name for reaction in allergy_db.reactions],
+        severity = allergy_db.severity.name
     )
     return {
         "status": status.HTTP_200_OK,
