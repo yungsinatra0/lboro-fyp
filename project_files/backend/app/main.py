@@ -581,6 +581,11 @@ def update_medication(medication_id: uuid.UUID, medication_new: MedicationUpdate
         raise HTTPException(status_code=403, detail="You do not have permission to update this medication")
     
     medication_data = medication_new.model_dump(exclude_unset=True)
+    
+    if "form" in medication_data:
+        form = session.exec(select(MedicationForm).where(MedicationForm.name == medication_data["form"])).first()
+        medication_data["form"] = form
+    
     medication_db.sqlmodel_update(medication_data)
     session.add(medication_db)
     session.commit()
@@ -593,7 +598,7 @@ def update_medication(medication_id: uuid.UUID, medication_new: MedicationUpdate
         frequency = medication_db.frequency,
         date_prescribed = medication_db.date_prescribed,
         duration_days = medication_db.duration_days,
-        form = medication_db.form.name if medication_db.form else None,
+        form = medication_db.form.name,
         notes = medication_db.notes
     )
     
