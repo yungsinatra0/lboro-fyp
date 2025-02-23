@@ -81,8 +81,8 @@ onMounted(async () => {
     medications.value = response.data
     const response2 = await api.get('/medications/forms')
     medforms.value = response2.data.map((form) => form.name) // get only the name of the form
-  } catch (error) {
-    error.value = 'A aparut o eroare la incarcarea medicamentelor: ' + error.message
+  } catch (err) {
+    error.value = 'A aparut o eroare la incarcarea medicamentelor: ' + err.message
   } finally {
     loading.value = false
   }

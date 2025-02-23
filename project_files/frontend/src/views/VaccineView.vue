@@ -87,8 +87,8 @@ onMounted(async () => {
   try {
     const response = await api.get('me/vaccines')
     vaccines.value = response.data
-  } catch (error) {
-    error.value = 'A aparut o eroare la incarcarea vaccinelor' + error
+  } catch (err) {
+    error.value = 'A aparut o eroare la incarcarea vaccinelor' + err
   } finally {
     loading.value = false
   }
