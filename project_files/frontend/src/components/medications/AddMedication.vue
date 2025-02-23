@@ -310,7 +310,7 @@ const onFormSubmit = (e) => {
   // e.reset: A function that resets the form to its initial state.
 
   if (!e.valid) {
-    console.error('Error adding vaccine: ', e.errors)
+    console.error('Error adding medication: ', e.errors)
     return
   }
   
