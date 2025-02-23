@@ -2,7 +2,7 @@
   <NavBar />
 
   <div class="min-h-screen bg-surface-0 dark:bg-surface-900">
-    <div class="flex flex-col items-center md:flex-row md:justify-between p-3 md:p-5">
+    <div class="flex flex-col items-center md:flex-row md:justify-between p-3">
       <h1 class="text-2xl font-bold p-3 md:text-4xl md:p-5 text-surface-900 dark:text-surface-0">
         Alergiile mele
       </h1>
@@ -14,7 +14,7 @@
       />
     </div>
 
-    <div class="flex flex-col md:flex-row items-center md:items-start gap-4 p-3 md:p-5">
+    <div class="flex flex-col md:flex-row items-center md:items-start gap-2 p-3">
       <ProgressSpinner v-if="loading" />
 
       <div v-else-if="error" class="p-4 text-red-500">
