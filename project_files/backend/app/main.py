@@ -398,10 +398,16 @@ def get_allergens(user_id: uuid.UUID = Depends(validate_session), session: Sessi
     return allergens
 
 # Get all reactions
-@app.get("/reactions", response_class=list[ReactionsResponse])
+@app.get("/reactions", response_model=list[ReactionsResponse])
 def get_reactions(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     reactions = session.exec(select(Reactions)).all()
     return reactions
+
+# Get all severities
+@app.get("/severities", response_model=list[SeverityResponse])
+def get_severities(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    severities = session.exec(select(Severity)).all()
+    return severities
     
 ### Health Data endpoints
 # Get all health data

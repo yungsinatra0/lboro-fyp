@@ -187,7 +187,6 @@ class ReactionsResponse(SQLModel):
     id: uuid.UUID
     name: str
     
-    
 class SeverityResponse(SQLModel):
     id: uuid.UUID
     name: str
