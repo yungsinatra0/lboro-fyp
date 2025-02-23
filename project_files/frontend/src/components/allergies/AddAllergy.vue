@@ -202,7 +202,6 @@ const resolver = zodResolver(
 
 const addAllergy = async (allergyDetails) => {
   try {
-    console.log(allergyDetails)
     const response = await api.post('/me/allergies', {
       date_diagnosed: allergyDetails.dateDiagnosed,
       reactions: allergyDetails.reactions,

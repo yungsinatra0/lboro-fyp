@@ -23,7 +23,7 @@
 
       <div v-else-if="allergies.length === 0" class="p-4">Nu a fost gasita nici o alergie.</div>
 
-      <div v-else class="md:grid md:grid-cols-3 md:gap-6 md:w-full ">
+      <div v-else class="md:grid md:grid-cols-3 md:gap-6 md:w-full">
         <AllergyCard
           v-for="allergy in allergies"
           :key="allergy.id"
@@ -45,6 +45,17 @@
       :allergens="allergyAllergens"
       :severities="allergySeverities"
     />
+
+    <EditAllergy
+      v-if="displayEditDialog"
+      @edit="refreshUpdatedAllergy"
+      @close="displayEditDialog = false"
+      :display-dialog="displayEditDialog"
+      :allergy="editDialogData"
+      :reactions="allergyReactions"
+      :allergens="allergyAllergens"
+      :severities="allergySeverities"
+    />
   </div>
 </template>
 
@@ -54,6 +65,7 @@ import Button from 'primevue/button'
 import ProgressSpinner from 'primevue/progressspinner'
 import AllergyCard from '@/components/allergies/AllergyCard.vue'
 import AddAllergy from '@/components/allergies/AddAllergy.vue'
+import EditAllergy from '@/components/allergies/EditAllergy.vue'
 import { onMounted, ref } from 'vue'
 import api from '../services/api'
 import ConfirmDialog from 'primevue/confirmdialog'
@@ -102,5 +114,10 @@ const openEditDialog = (id) => {
 
 const addAllergy = (allergy) => {
   allergies.value.push(allergy)
+}
+
+const refreshUpdatedAllergy = (updatedAllergy) => {
+  const index = allergies.value.findIndex((allergy) => allergy.id === updatedAllergy.id)
+  allergies.value[index] = updatedAllergy
 }
 </script>
