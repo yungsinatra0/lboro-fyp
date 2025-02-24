@@ -19,7 +19,6 @@ class AuthSession(SQLModel, table=True):
     expires_at: datetime
     created_at: datetime = Field(default_factory=datetime.now)    
     
-
 # User Table model used for table creation, also contains sensitive info like email, password hash and MFA secret
 class User(DateFormattingModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
