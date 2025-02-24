@@ -2,14 +2,491 @@
 
 This chapter will discuss the development of the project. Rather than going into detail how each sprint has been done, it will focus on the main features implemented, how this was achieved and will talk about successes or challenged that were encountered in the development process.
 
-\section{Feature \#1}
+\section{Sprint \#1}
 
-\section{Feature \#2}
+The first sprint of this project was focused in laying the groundwork for the project, which mainly involved setting up the schemas for the ORM that would create the tables for the database, the initial setup of the API endpoints, such as the login and register endpoints, authentication and other security measures, but also setting up the frontend of the project.
 
-\section{Feature \#3}
+\subsection{SQLModel Schemas \& Database creation}
 
-\section{Feature \#4}
+SQLModel played a pivotal role in helping quickly build the database tables. As previously mentioned in \ref{sec:techstack}, SQLModel is built on top of SQLAlchemy and Pydantic, both being very powerful Python libraries. Pydantic was used to create the schemas that were used both within the backend but also by SQLAlchemy to create the tables in the database. 
 
-\section{Feature \#5}
+Below is an example of a schema that was used to create the User table in the database.
 
-\section{Feature \#6}
+\begin{lstlisting}[language=Python, caption=SQLModel User Schema]
+# Base model that contains the field serializer for date formatting to dd-mm-yyyy and the date field itself
+    class DateFormattingModel(SQLModel):
+        dob: date | None = None
+    
+        @field_serializer('dob')
+        def serialize_dob(self, value: date) -> str:
+            return value.strftime("%d-%m-%Y")
+    
+    class User(DateFormattingModel, table=True):
+        id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+        name: str
+        email: EmailStr = Field(index=True, unique=True)
+        hashed_password: str
+\end{lstlisting}
+
+Similarly, SQLModel (and more specifically Pydantic schemas) could be used to create response/request models that would be used by the endpoints to validate the data that was being sent to or by the API. These schemas did not create tables in the database, but were used to control or validate the data being sent to or from the API.
+
+Below is an example of a SQLModel/Pydantic schema that was used to validate the data that was being sent to the register endpoint.
+
+\begin{lstlisting}[language=Python, caption=SQLModel Auth Schema]
+    # User Data model used for login and registration
+    class UserAuth(SQLModel):
+        email: EmailStr
+        password: str
+        name: str | None = None # Will only be used for registration
+
+    # User Data model used for most API responses
+    class UserPublic(SQLModel):
+        id: uuid.UUID
+\end{lstlisting}
+
+\subsection{Authentication \& APIs}
+
+As the project was centered around building a PHR system that would deal with sensitive health data, one of the main concerns was the security of the system and its users. 
+
+One of the important choices to make was how to handle the authentication. The student has identified 4 different ways to handle authentication in the project:
+
+\begin{itemize}
+    \item JWT Tokens
+    \item OAuth2
+    \item Session-based authentication
+    \item Using 3rd party authentication services, like Auth0
+\end{itemize}
+
+% TODO: Insert research here comparing JWT vs Session based vs OAuth2
+
+In the end, the student decided to go with a session-based authentication system. One of the main reasons was its ease of implementation that still provided a good level of security. The ability to control the session on the server side was an additional, important factor that contributed to this decision. This allows the system to safely log out users, invalidate sessions due to inactivity or suspicious activity, and also to control the session's lifetime, all without relying on storing tokens on the client side.
+
+Sessions were created in the backend by storing them in a Session table in the database. The table contained a Session ID, which was passed to the user as a cookie. Upon a succesful login, the backend would set the cookie in the user's browser, which would then be sent with every request to the server. 
+
+To ensure that the cookies were safe from common attacks like Cross-Site Scripting (XSS) and Cross-Site Request Forgery (CSRF), the student used guidance from \cite{owasp,mozilla} to set the following flags on the cookies:
+
+\begin{lstlisting}
+    # Set the session cookie in the response and send it to the client
+    response.set_cookie(
+        "session_id",
+        str(session_id), # Using str() to convert the UUID to a string
+        httponly=True,
+        max_age=3600, # 1 hour
+        samesite="strict",
+        secure=True
+    )
+\end{lstlisting}
+
+To further secure the system, some of the endpoints that were created in this sprint were protected by using session validation checks to ensure that the user was authenticated before accessing the endpoint. This was achieved thanks to FastAPI's dependency injection system, which allowed the student to create a dependency that would check if the user was authenticated before allowing the request to continue. An example of this can be seen below:
+
+\begin{lstlisting}[language=Python, caption=FastAPI Dependency for Session Validation]
+    # Logout endpoint that uses the validate_session dependency to check if the user is authenticated
+    @app.post("/logout")
+    async def logout(response: Response, request: Request, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+        
+        session_id = request.cookies.get("session_id")
+        cookie_user_id = session.get(AuthSession, uuid.UUID(session_id)).user_id
+        
+        if cookie_user_id != user_id:
+            raise HTTPException(status_code=403, detail="You do not have permission to log out this user")
+        
+        # Will use the end_session function to end the session in the database
+        end_session(request, session) # Need to pass the request and session to the function, otherwise it will not work
+        
+        # Still need to delete the session cookie from the client
+        response.delete_cookie(
+            "session_id",
+            samesite="strict",
+            secure=True,
+            httponly=True
+            )
+        
+        return {
+            "status": status.HTTP_200_OK,
+            "message": "Logout successful"
+        }
+
+    # Util function to validate the session and return the user_id - also used as a dependency for protected routes
+    async def validate_session(request: Request, session: Session = Depends(get_session)):
+        session_id = request.cookies.get("session_id")
+        if not session_id:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session cookie not found")
+            
+        existingAuthSession = session.exec(select(AuthSession)
+                                .where(AuthSession.id == uuid.UUID(session_id))
+                                .where(AuthSession.expires_at > datetime.now())
+        ).first()
+            
+        if not existingAuthSession:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session not found")
+            
+        return existingAuthSession.user_id
+\end{lstlisting}
+
+Finally, to ensure that the system was secure, the system also used a hashing algorithm to hash the passwords before storing them in the database. The student identified multiple hashing algorithms that could be used, with the main contenders being bcrypt, scrypt and Argon2. % Talk about differences between them
+
+In the end, the decision was made to use bcrypt as the hashing algorithm. The main reasons for the use of this algorithm was its simplicity of use, wide adoption and its balance between security and perfomance. The passlib library was used to hash the passwords before storing them in the database. The library allowed for automatic salt generation and storage within the hash and by default, it used a work factor of 12, which is considered to be a good balance between security and performance. An example of this can be seen below:
+
+\begin{lstlisting}[language=Python, caption=Hashing passwords with bcrypt]
+    # Util function to verify the password hash against the plaintext password
+    def verify_hash(plaintext_password: str, hashed_password: str) -> bool:
+        return bcrypt.verify(plaintext_password, hashed_password)
+    
+    # Util function to create a password hash from the plaintext password
+    def create_hash(plaintext_password: str) -> str:
+        return bcrypt.hash(plaintext_password)
+\end{lstlisting}
+
+A final security measure that could've been implemented was a rate limiter to all of the created endpoints. Similarly, Starlette, the framework FastAPI was built on top of, also offered other middleware such as HTTPSRedirectMiddleware, TrustedHostMiddleware, and others that could be used to further secure the system. However, in the interest of time, it was decided to leave these for a future sprint.
+
+\subsection{Frontend Setup}
+
+While most of the work done in this sprint was done in the backend, some work was also done in the frontend, mainly focusing on the login and register pages. Here, the student used the PrimeVue component library to quickly and easily create the forms that would be used to log in and register users.
+
+An example of PrimeVue components being used can be seen below in the Register page. Some of the components taken from PrimeVue include InputText, DatePicker, Password, Button and Message. 
+
+% Remove and keep only datepicker and show a screenshot of how it looks instead
+
+\begin{lstlisting}[language=HTML, caption=PrimeVue components in the Register page]
+    <Form
+        v-slot="$form"
+        :initialValues
+        :resolver
+        @submit="onFormSubmit"
+        class="flex flex-col gap-4 w-full sm:w-60"
+      >
+        <div class="flex flex-col gap-1">
+          <InputText name="name" type="text" placeholder="Nume" fluid />
+          <Message
+            v-if="$form.name?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            class="text-rose-600 text-sm"
+            >{{ $form.name.error.message }}</Message
+          >
+        </div>
+        <div class="flex flex-col gap-1">
+          <InputText name="surname" type="text" placeholder="Prenume" fluid />
+          <Message
+            v-if="$form.surname?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            class="text-rose-600 text-sm"
+            >{{ $form.surname.error.message }}</Message
+          >
+        </div>
+        <div class="flex flex-col gap-1">
+          <DatePicker
+            name="dob"
+            dateFormat="dd/mm/yy"
+            placeholder="Data nasterii"
+            showIcon
+            fluid
+            :maxDate="maxDate"
+          />
+          <Message
+            v-if="$form.dob?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            class="text-rose-600 text-sm"
+            >{{ $form.dob.error.message }}</Message
+          >
+        </div>
+        <div class="flex flex-col gap-1">
+          <InputText name="email" type="text" placeholder="Adresa email" fluid />
+          <Message
+            v-if="$form.email?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            class="text-rose-600 text-sm"
+            >{{ $form.email.error.message }}</Message
+          >
+        </div>
+        <div class="flex flex-col gap-1">
+          <Password name="password" placeholder="Parola" :feedback="false" toggleMask fluid />
+          <Message
+            v-if="$form.password?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            class="text-rose-600 text-sm"
+          >
+            <ul class="my-0 flex flex-col gap-1">
+              <li v-for="(error, index) of $form.password.errors" :key="index">
+                {{ error.message }}
+              </li>
+            </ul>
+          </Message>
+        </div>
+        <Button type="submit" severity="secondary" label="Inregistrare" />
+      </Form>
+\end{lstlisting}
+
+% Insert a screenshot of the register endpoint here
+
+As previously mentioned in \ref{sec:techstack}, Vue also comes with other in-built tools that help create a well-working frontend. One of these tools is Vue Router, which was used to create the routes for the frontend. The student created a simple router that would allow the user to navigate between different pages. A navigation guard was used to protect the routes that required the user to be authenticated. An example of this can be seen below:
+
+\begin{lstlisting}[caption=Vue Router Navigation Guard]
+    // Navigation guard
+router.beforeEach(async (to) => {
+  const authStore = useAuthStore()
+
+  if (to.meta.requiresAuth) {
+    await authStore.checkAuth() // Check if user is authenticated for protected routes
+    if (!authStore.isAuthenticated) {
+      return { name: 'Login' } // Redirect to login if not authenticated
+    }
+  } else if (to.path === '/login' || to.path === '/register') {
+    await authStore.checkAuth()
+    if (authStore.isAuthenticated) {
+      return { name: 'Dashboard' } // Redirect to dashboard if authenticated and going to login or register
+    }
+  }
+
+  return true // Continue to requested route if no conditions are met
+})
+
+export default router
+\end{lstlisting}
+
+Similarly, Pinia store was used to manage the authentication state of the user in the frontend. The store was then used by elements like the Navigation Guard to check if the user was authenticated before allowing them to access certain routes. An example of the store can be seen below:
+
+\begin{lstlisting}[caption=Pinia Store for Authentication]
+export const useAuthStore = defineStore('auth', () => {
+  const isAuthenticated = ref(false)
+  const user = ref(null)
+
+  async function checkAuth() { // Function checks if user is authenticated
+    try {
+      const response = await api.get('/me') // This will return the user object if the user is authenticated
+      isAuthenticated.value = true // if you get response, then user is authenticated
+      user.value = response.data.user
+    }
+    catch {
+      isAuthenticated.value = false // if you don't get response, then user is not authenticated
+      user.value = null
+    }
+  }
+  return { isAuthenticated, user, checkAuth }
+})
+\end{lstlisting}
+
+\section{Sprint \#2}
+
+The second sprint of this project was focused on building some of the smaller elements of the system, such as the ability to add vaccines, allergies and medications. The decision to start with the smaller elements was made to allow the student to get a better understanding of how the frameworks used in the project worked and to get a better understanding of how to structure the project.
+
+\subsection{Adding Vaccines, Allergies and Medications functionality}
+
+The student started by creating the schemas for the Vaccines, Allergies and Medications tables in the database. These tables were created in a similar way to the User table, using SQLModel schemas. Afterwards, the student created the endpoints that would allow the user to add, update, delete and view the data in these tables. An example of the schema for the Vaccines table and the endpoint to add a vaccine can be seen below:
+
+\begin{lstlisting}[language=Python, caption=SQLModel Vaccine Schema]
+    # Vaccine Table model used for table creation
+    class Vaccine(SQLModel, table=True):
+        id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+        name: str
+        provider: str
+        date_received: date
+        
+        user_id : uuid.UUID = Field(foreign_key="user.id")
+        user: User = Relationship(back_populates="vaccines")
+        
+        certificate: Optional["FileUpload"] = Relationship(back_populates="vaccine", cascade_delete=True)
+        
+        @field_serializer('date_received')
+        def serialize_date_received(self, value: date) -> str:
+            return value.strftime("%d-%m-%Y")
+
+
+    # Add a vaccine endpoint
+    @app.post("/me/vaccines")
+    def add_vaccine(vaccine: VaccineCreate, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+        user = session.get(User, user_id)
+        
+        # Create vaccine using Vaccine main schema
+        new_vaccine = Vaccine(
+            name = vaccine.name,
+            provider = vaccine.provider,
+            date_received = vaccine.date_received,
+            user = user)
+                
+        session.add(new_vaccine)
+        session.commit()
+        session.refresh(new_vaccine)
+        
+        # Create a response object to return to the user using the VaccineResponse schema
+        vaccine_response = VaccineResponse(
+            id = new_vaccine.id,
+            name = new_vaccine.name,
+            provider = new_vaccine.provider,
+            date_received = new_vaccine.date_received
+        )
+                
+        return {
+            "status": status.HTTP_201_CREATED,
+            "message": "Vaccine added successfully",
+            "vaccine": vaccine_response
+        }
+\end{lstlisting}
+
+On the frontend side, the system used Vue's main strengths to enable a smooth developer and future user experience. Some of the strengths used were using Vue components to create reusable elemenets, such as a Vaccine Card that would be used to display the vaccines that the user had added. The card also used other Vue elements such as props and emits to pass data between parent and child elements and pass events, respectively. An example of the Vaccine Card can be seen below:
+
+\begin{lstlisting}[language=HTML, caption=Vue Vaccine Card]
+    <template>
+  <Card style="overflow: hidden" class="w-full" :pt="cardStyles">
+    <template #title>
+      <span class="font-bold text-2xl">{{ name }}</span> <!-- Name of the vaccine passed as a prop by the parent element -->
+    </template>
+    <template #subtitle>
+      <div class="flex items-center justify-between">
+        <div class="flex flex-col justify-start">
+          <span class="font-bold">{{ provider }}</span>
+          <span>{{ date_received }}</span> 
+        </div>
+        <div>
+          <Button
+            icon="pi pi-eye"
+            class="p-button-rounded p-button-text p-button-plain"
+            @click="emit('showFile', props.id)" <!-- Emit an event to show the certificate -->
+            v-if = "hasCertificate"
+          />
+          <Button
+            icon="pi pi-ellipsis-h"
+            class="p-button-rounded p-button-text p-button-plain"
+            @click="toggle"
+            aria-haspopup="true"
+            aria-controls="overlay_menu"
+          />
+          <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
+        </div>
+      </div>
+    </template>
+  </Card>
+</template>    
+\end{lstlisting}
+
+Subsequently, using this VaccineCard element is very easy in the main vaccine view page: 
+
+\begin{lstlisting}[language=HTML, caption=Vue Vaccine View Page]
+    <div class="flex flex-col items-center gap-4 p-3 md:p-5">
+      <ProgressSpinner v-if="loading" />
+
+      <div v-else-if="error" class="p-4 text-red-500">
+        {{ error }}
+      </div>
+
+      <div v-else-if="vaccines.length === 0" class="p-4">Nu a fost gasit nici un vaccin.</div>
+
+      <VaccineCard
+        v-else
+        v-for="vaccine in vaccines"
+        :key="vaccine.id"
+        v-bind="vaccine"
+        :has-certificate="vaccine.certificate ? true : false"
+        @delete="deleteVaccine"
+        @open-edit="openEditDialog"
+        @show-file="showCertificate"
+      />
+    </div>
+\end{lstlisting}
+
+This format was used across the system to easily create reusable components that could be used in multiple places, making the system more modular and easier to maintain.
+
+To make sure the data displayed in the frontend was always up to date, the frontend used Vue's reactivity system. This allowed the data to be automatically updated whenever any change was made to the data in the backend or frontend. Examples of the reactivity system in use can be seen below, with functions that add and delete vaccines from the frontend when called:
+
+\begin{lstlisting}[language=HTML, caption=Vue Reactivity System]
+    <script setup>
+    import { onMounted, ref } from 'vue'
+
+    const vaccines = ref([])
+    onMounted(async () => {
+  try {
+    const response = await api.get('me/vaccines')
+    vaccines.value = response.data
+  } catch (err) {
+    error.value = 'A aparut o eroare la incarcarea vaccinelor' + err
+  } finally {
+    loading.value = false
+  }
+
+  const addVaccine = (vaccine) => {
+  vaccines.value.push(vaccine)
+}
+
+const deleteVaccine = (id) => {
+  vaccines.value = vaccines.value.filter((vaccine) => vaccine.id !== id)
+}
+})
+\end{lstlisting}
+
+\subsection{File Uploads}
+
+Another major feature that was implemented in the 2nd sprint was the ability to upload files. At the time of implementation, the feature was only to be used for uploading vaccine certificates, however it could be easily extended to other parts of the system, such as uploading health records or lab results.
+
+% Add new ERD diagram here
+
+To allow a proper upload of files, a new table was created in the database, called FileUpload. This table contained the file metadata, such as its name, size, type, path and others. 
+
+To add more security to the system, the files were further encrypted before being stored in the database. The encryption was done using the Fernet symmetric encryption algorithm from the cryptography library. Fernet uses AES-128 to encrypt the files. % Citation needed? 
+The key used to encrypt the files was stored in the environment variables and was generated when the system was started. In the interest of time, no rotation system for the key was implemented, however this would be a good feature to add in the future. 
+
+The file upload process can be seen in the diagram below:
+
+% Add file upload process diagram
+
+The file upload process was done in two steps. The first step was to upload the file to the server by using multipart form data. The next step would have the file be validated by checking its file type and size, then encrypted and stored in the file system and database. 
+
+To access the files, the system used a new endpoint that would allow the user to download the file. The endpoint would take the file ID as a parameter and would stream the file to the user. The endpoint can be seen below:
+
+\begin{lstlisting}[language=Python, caption=File Download Endpoint]
+    # Get a file by ID
+@app.get("/files/{record_type}/{record_id}")
+async def get_file(
+    record_type: str,
+    record_id: uuid.UUID,
+    user_id: User = Depends(validate_session),
+    session: Session = Depends(get_session)    
+):
+    
+    print(f"GET request received for vaccine file: {record_id}")
+    
+    record = await get_connected_record(record_type, record_id, user_id, session)
+    
+    file_record = None
+    
+    if record_type == "vaccine":
+        file_record = record.certificate
+    
+    
+    if not file_record:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File not found")
+    
+    async def get_data_from_file():
+        with open(file_record.file_path, "rb") as f:
+            encrypted_content = f.read()
+            
+        decrypted_content = decrypt_file(encrypted_content)
+
+        yield decrypted_content
+        
+    return StreamingResponse(
+        content=get_data_from_file(),
+        media_type=file_record.file_type,
+        status_code=status.HTTP_200_OK,
+        headers={"Content-Disposition": f"inline; filename={file_record.name}"}
+    )
+\end{lstlisting}
+
+% Show example of how the file is streamed in the frontend
+
+
+\section{Sprint \#3}
+
+\section{Sprint \#4}
+
+\section{Sprint \#5}
+
+\section{Sprint \#6}
