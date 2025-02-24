@@ -38,13 +38,13 @@ class UserResponse(DateFormattingModel):
     email: EmailStr
 
 # User Data model used for login    
-class UserAuth(DateFormattingModel):
+class UserAuth(SQLModel):
     email: EmailStr
     password: str
     name: str | None = None # Will only be used for registration
 
 # User Data model used for most API responses
-class UserPublic(DateFormattingModel):
+class UserPublic(SQLModel):
     id: uuid.UUID
     
 # User Data model used for updating user info
