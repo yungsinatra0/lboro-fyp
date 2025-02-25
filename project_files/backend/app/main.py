@@ -181,7 +181,8 @@ def add_vaccine(vaccine: VaccineCreate, user_id: uuid.UUID = Depends(validate_se
         id = new_vaccine.id,
         name = new_vaccine.name,
         provider = new_vaccine.provider,
-        date_received = new_vaccine.date_received
+        date_received = new_vaccine.date_received,
+        certificate = new_vaccine.certificate
     )
     
     return {
