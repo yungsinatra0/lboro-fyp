@@ -204,14 +204,14 @@ const resolver = zodResolver(
 
 const updateAllergy = async (allergyDetails) => {
   try {
-    const response = await api.patch(`/me/allergies/${props.id}`, {
+    const response = await api.patch(`/me/allergies/${props.allergy.id}`, {
       date_diagnosed: allergyDetails.dateDiagnosed,
       reactions: allergyDetails.reactions,
       allergens: allergyDetails.allergens,
       severity: allergyDetails.severity,
       notes: allergyDetails.notes,
     })
-    emit('add', response.data.allergy)
+    emit('edit', response.data.allergy)
     emit('close')
   } catch (error) {
     console.error('Error adding allergy: ', error)
