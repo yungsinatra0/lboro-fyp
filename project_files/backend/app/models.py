@@ -6,7 +6,7 @@ from typing import Optional
 
 # Base model that contains the field serializer for date formatting to dd-mm-yyyy and the date field itself
 class DateFormattingModel(SQLModel):
-    dob: date | None = None
+    dob: date | None
     
     @field_serializer('dob')
     def serialize_dob(self, value: date) -> str | None:
@@ -47,8 +47,8 @@ class UserDashboard(SQLModel):
     medications: list["MedicationResponse"]
     healthdata: list["HealthDataResponse"]
 
-# User Data model used for login    
-class UserAuth(SQLModel):
+# User Data model used for login and registration  
+class UserAuth(DateFormattingModel):
     email: EmailStr
     password: str
     name: str | None = None # Will only be used for registration
@@ -250,7 +250,9 @@ class MedicationUpdate(SQLModel):
     notes: str | None = None
     
     @field_serializer('date_prescribed')
-    def serialize_date_prescribed(self, value: date) -> str:
+    def serialize_date_prescribed(self, value: date) -> str | None:
+        if value is None:
+            return None
         return value.strftime("%d-%m-%Y")
     
 
@@ -305,7 +307,9 @@ class HealthDataUpdate(SQLModel):
     type: str | None = None
     
     @field_serializer('date_recorded')
-    def serialize_date_recorded(self, value: date) -> str:
+    def serialize_date_recorded(self, value: date) -> str | None:
+        if value is None:
+            return None
         return value.strftime("%d-%m-%Y")
 
 class HealthDataType(SQLModel, table=True):

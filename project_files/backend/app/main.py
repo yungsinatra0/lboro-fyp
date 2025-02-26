@@ -147,13 +147,11 @@ def update_user(*, session: Session = Depends(get_session), user_update: UserUpd
         session.rollback()
         raise HTTPException(status_code=500, detail=f"An error occurred when updating: {e}")        
 
-# Homepage/dashboard endpoint TODO: Change this to a more useful endpoint
-@app.get("/")
+# Homepage/dashboard endpoint, returns the user object with related data to display in the dashboard
+@app.get("/dashboard", response_model=UserDashboard)
 async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
-    user = session.get(User, user_id)
-    return {
-        "message": f"Welcome {user.name}!"
-        }
+    user = session.get(User, user_id)   
+    return user
 
 ### Vaccine endpoints
 # Get all vaccines
@@ -182,7 +180,8 @@ def add_vaccine(vaccine: VaccineCreate, user_id: uuid.UUID = Depends(validate_se
         name = new_vaccine.name,
         provider = new_vaccine.provider,
         date_received = new_vaccine.date_received,
-        certificate = new_vaccine.certificate
+        certificate = new_vaccine.certificate,
+        date_added = new_vaccine.date_added
     )
     
     return {
@@ -245,6 +244,8 @@ def update_vaccine(vaccine_id: uuid.UUID, vaccine_new: VaccineUpdate, user_id: u
         name = vaccine_db.name,
         provider = vaccine_db.provider,
         date_received = vaccine_db.date_received,
+        # certificate = vaccine_db.certificate,
+        date_added = vaccine_db.date_added
     )
     
     return {
@@ -267,7 +268,8 @@ def get_allergies(user_id: uuid.UUID = Depends(validate_session), session: Sessi
             "allergens": [allergen.name for allergen in allergy.allergens],
             "reactions": [reaction.name for reaction in allergy.reactions],
             "severity": allergy.severity.name,
-            "notes": allergy.notes
+            "notes": allergy.notes,
+            "date_added": allergy.date_added
         })
     
     return result
@@ -295,7 +297,9 @@ def add_allergy(allergy: AllergyCreate, user_id: uuid.UUID = Depends(validate_se
         allergens = allergens,
         reactions = reactions,
         severity = severity,
-        notes = allergy.notes)
+        notes = allergy.notes,
+        date_added = allergy.date_added
+        )
           
     session.add(new_allergy)
     session.commit()
@@ -307,7 +311,8 @@ def add_allergy(allergy: AllergyCreate, user_id: uuid.UUID = Depends(validate_se
         allergens = [allergen.name for allergen in new_allergy.allergens],
         reactions = [reaction.name for reaction in new_allergy.reactions],
         severity = new_allergy.severity.name,
-        notes = new_allergy.notes
+        notes = new_allergy.notes,
+        date_added = new_allergy.date_added
     )
     
     return {
@@ -389,7 +394,8 @@ def update_allergy(allergy_id: uuid.UUID, allergy_new: AllergyUpdate, user_id: u
         allergens = [allergen.name for allergen in allergy_db.allergens],
         reactions = [reaction.name for reaction in allergy_db.reactions],
         severity = allergy_db.severity.name,
-        notes = allergy_db.notes
+        notes = allergy_db.notes,
+        date_added = allergy_db.date_added
     )
     return {
         "status": status.HTTP_200_OK,
@@ -432,7 +438,9 @@ def add_healthdata(healthdata: HealthDataCreate, user_id: uuid.UUID = Depends(va
         value = healthdata.value,
         date_recorded = healthdata.date_recorded,
         user = user,
-        type=healthdata.type)
+        type=healthdata.type,
+        date_added=healthdata.date_added
+        )
           
     session.add(new_healthdata)
     session.commit()
@@ -517,7 +525,8 @@ def get_medications(user_id: uuid.UUID = Depends(validate_session), session: Ses
             "date_prescribed": medication.date_prescribed,
             "duration_days": medication.duration_days,
             "form": medication.form.name if medication.form else None,
-            "notes": medication.notes      
+            "notes": medication.notes,
+            "date_added": medication.date_added    
         }
         result.append(med)
     
@@ -539,7 +548,9 @@ def add_medication(medication: MedicationCreate, user_id: uuid.UUID = Depends(va
         duration_days = medication.duration_days,
         form = medication_form,
         notes = medication.notes,
-        user = user)
+        user = user,
+        date_added = medication.date_added
+        )
           
     session.add(new_medication)
     session.commit()
@@ -611,7 +622,8 @@ def update_medication(medication_id: uuid.UUID, medication_new: MedicationUpdate
         date_prescribed = medication_db.date_prescribed,
         duration_days = medication_db.duration_days,
         form = medication_db.form.name,
-        notes = medication_db.notes
+        notes = medication_db.notes,
+        date_added = medication_db.date_added
     )
     
     return {
