@@ -6,7 +6,7 @@ from typing import Optional
 
 # Base model that contains the field serializer for date formatting to dd-mm-yyyy and the date field itself
 class DateFormattingModel(SQLModel):
-    dob: date | None
+    dob: date | None = None
     
     @field_serializer('dob')
     def serialize_dob(self, value: date) -> str | None:

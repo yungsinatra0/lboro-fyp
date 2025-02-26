@@ -136,24 +136,23 @@ const addVaccine = async (vaccineDetails) => {
       provider: vaccineDetails.provider,
     })
 
+    let hasCertificate = false
+
     if (uploadedFile.value) {
-      try {
-        const formData = new FormData()
-        formData.append('file', uploadedFile.value)
-        await api.post(`upload/vaccine/${response.data.vaccine.id}`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        })
-      } catch (error) {
-        console.error('Error uploading certificate:', error)
-      }
+      const formData = new FormData()
+      formData.append('file', uploadedFile.value)
+      await api.post(`upload/vaccine/${response.data.vaccine.id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+      hasCertificate = true
     }
-    const vaccineWithCertificate = { ...response.data.vaccine, certificate: true } // that way I don't have to pass the whole certificate object
-    emit('add', vaccineWithCertificate)
+
+    emit('add', { ...response.data.vaccine, certificate: hasCertificate })
     emit('close')
   } catch (error) {
-    console.error('Error adding vaccine:', error)
+    console.error('Error in vaccine operation:', error)
   }
 }
 
