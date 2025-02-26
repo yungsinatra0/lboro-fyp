@@ -201,6 +201,17 @@ def delete_vaccine(vaccine_id: uuid.UUID, user_id: uuid.UUID = Depends(validate_
     if vaccine.user_id != user_id:
         raise HTTPException(status_code=403, detail="You do not have permission to delete this vaccine")
     
+    # Delete the file associated with the vaccine
+    file_record = vaccine.certificate
+    if file_record:
+        # Delete file from the file system
+        file_path = file_record.file_path
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            folder_path = os.path.dirname(file_path)
+            os.rmdir(folder_path)           
+        session.delete(file_record)
+    
     session.delete(vaccine)
     session.commit()
     return {
