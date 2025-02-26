@@ -130,9 +130,19 @@ const resolver = zodResolver(
 
 const addVaccine = async (vaccineDetails) => {
   try {
+    let formattedDate = vaccineDetails.dateReceived
+
+    // Need to format the date as yyyy-mm-dd
+    if (vaccineDetails.dateReceived instanceof Date) {
+      const [day, month, year] = vaccineDetails.dateReceived
+        .toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit', year: 'numeric' })
+        .split('.')
+      formattedDate = `${year}-${month}-${day}`
+    }
+
     const response = await api.post('me/vaccines', {
       name: vaccineDetails.name,
-      date_received: vaccineDetails.dateReceived,
+      date_received: formattedDate,
       provider: vaccineDetails.provider,
     })
 

@@ -202,8 +202,18 @@ const resolver = zodResolver(
 
 const addAllergy = async (allergyDetails) => {
   try {
+    let formattedDate = allergyDetails.dateDiagnosed
+
+    // Need to format the date as yyyy-mm-dd
+    if (allergyDetails.dateDiagnosed instanceof Date) {
+      const [day, month, year] = allergyDetails.dateDiagnosed
+        .toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit', year: 'numeric' })
+        .split('.')
+      formattedDate = `${year}-${month}-${day}`
+    }
+
     const response = await api.post('/me/allergies', {
-      date_diagnosed: allergyDetails.dateDiagnosed,
+      date_diagnosed: formattedDate,
       reactions: allergyDetails.reactions,
       allergens: allergyDetails.allergens,
       severity: allergyDetails.severity,

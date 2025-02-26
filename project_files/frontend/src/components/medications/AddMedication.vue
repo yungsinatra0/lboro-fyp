@@ -284,11 +284,21 @@ const resolver = zodResolver(
 
 const addMedication = async (medicationDetails) => {
   try {
+    let formattedDate = medicationDetails.datePrescribed
+
+    // Need to format the date as yyyy-mm-dd
+    if (medicationDetails.datePrescribed instanceof Date) {
+      const [day, month, year] = medicationDetails.datePrescribed
+        .toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit', year: 'numeric' })
+        .split('.')
+      formattedDate = `${year}-${month}-${day}`
+    }
+
     const response = await api.post('me/medications', {
       name: medicationDetails.name,
       dosage: medicationDetails.dosage + medicationDetails.dosageUnits,
       frequency: medicationDetails.frequency + ' ' + medicationDetails.frequencyUnits,
-      date_prescribed: medicationDetails.datePrescribed,
+      date_prescribed: formattedDate,
       duration_days: medicationDetails.duration,
       notes: medicationDetails.notes,
       form: medicationDetails.form,
@@ -313,7 +323,7 @@ const onFormSubmit = (e) => {
     console.error('Error adding medication: ', e.errors)
     return
   }
-  
+
   addMedication(e.values)
 }
 </script>
