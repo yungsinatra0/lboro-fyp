@@ -8,7 +8,7 @@ The first sprint of this project was focused in laying the groundwork for the pr
 
 \subsection{SQLModel Schemas \& Database creation}
 
-SQLModel played a pivotal role in helping quickly build the database tables. As previously mentioned in \ref{sec:techstack}, SQLModel is built on top of SQLAlchemy and Pydantic, both being very powerful Python libraries. Pydantic was used to create the schemas that were used both within the backend but also by SQLAlchemy to create the tables in the database. 
+SQLModel played a pivotal role in helping quickly build the database tables. As previously mentioned in~\ref{sec:techstack}, SQLModel is built on top of SQLAlchemy and Pydantic, both being very powerful Python libraries. Pydantic was used to create the schemas that were used both within the backend but also by SQLAlchemy to create the tables in the database. 
 
 Below is an example of a schema that was used to create the User table in the database.
 
@@ -64,7 +64,7 @@ Session-based authentication stores session information server-side, using cooki
 
 Third-party authentication options include OAuth2 through providers like Google \parencite{auth2, auth3} or services like Auth0 \parencite{auth0}. While these offer quick implementation, they may introduce dependencies or security concerns due to third-party data storage. 
 
-Moldova's electronic government iniatives have created MPass, which is a national Single Sign On (SSO) authentication system that offers a secure and easy way to access electronic government services \parencite{mpass}. While it may not be possible to currently integrate MPass into the system, it will be considered as a possible future integration, given the system's Moldovan user focus, which will be discussed in the \ref{sec:future_work} section.
+Moldova's electronic government iniatives have created MPass, which is a national Single Sign On (SSO) authentication system that offers a secure and easy way to access electronic government services \parencite{mpass}. While it may not be possible to currently integrate MPass into the system, it will be considered as a possible future integration, given the system's Moldovan user focus, which will be discussed in the~\ref{sec:future_work} section.
 
 In the end, the student decided to go with a session-based authentication system. One of the main reasons was its ease of implementation that still provided a good level of security. The ability to control the session on the server side was an additional, important factor that contributed to this decision. This allows the system to safely log out users, invalidate sessions due to inactivity or suspicious activity, and also to control the session's lifetime, all without relying on storing tokens on the client side.
 
@@ -165,13 +165,12 @@ An example of PrimeVue components being used can be seen below in the Register p
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{DatePicker.png}
-  \caption{PrimeVue DatePicker component}
-  \label{fig:datepicker}
+  \caption{PrimeVue DatePicker component}\label{fig:datepicker}
 \end{figure}
 
 \FloatBarrier
 
-As previously mentioned in \ref{sec:techstack}, Vue also comes with other in-built tools that help create a well-working frontend. One of these tools is Vue Router, which was used to create the routes for the frontend. The student created a simple router that would allow the user to navigate between different pages. A navigation guard was used to protect the routes that required the user to be authenticated. An example of this can be seen below:
+As previously mentioned in~\ref{sec:techstack}, Vue also comes with other in-built tools that help create a well-working frontend. One of these tools is Vue Router, which was used to create the routes for the frontend. The student created a simple router that would allow the user to navigate between different pages. A navigation guard was used to protect the routes that required the user to be authenticated. An example of this can be seen below:
 
 \begin{lstlisting}[caption=Vue Router Navigation Guard]
 router.beforeEach(async (to) => {
@@ -264,8 +263,7 @@ The VaccineCard component can then be easily used in the main view:
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{VaccineCard.png}
-  \caption{Vue Vaccine Card component}
-  \label{fig:vaccinecard}
+  \caption{Vue Vaccine Card component}\label{fig:vaccinecard}
 \end{figure}
 
 \FloatBarrier
@@ -295,15 +293,14 @@ Another major feature that was implemented in the 2nd sprint was the ability to 
 
 To allow a proper upload of files, a new table was created in the database, called FileUpload. This table contained the file metadata, such as its name, size, type, path and others. Similarly, a new table for Allergy Severity was created to ensure consistency in the user uploads and to allow for easy filtering and searching of the data.
 
-The updated ERD diagram with the new tables can be seen below in figure \ref{fig:erd_s2}:
+The updated ERD diagram with the new tables can be seen below in figure~\ref{fig:erd_s2}:
 
 \noindent\begin{minipage}{\textwidth}
   \begin{center}
       \rotatebox[origin=c]{270}{
           \includegraphics[width=0.95\textheight,keepaspectratio]{ERD_updatedS2.png}
       }
-      \captionof{figure}{Updated Entity Relationship Diagram}
-      \label{fig:erd_s2}
+      \captionof{figure}{Updated Entity Relationship Diagram}\label{fig:erd_s2}
   \end{center}
 \end{minipage}
 
@@ -311,13 +308,12 @@ To add more security to the system, the files were further encrypted before bein
 
 The encryption was done using the Fernet symmetric encryption algorithm from the cryptography library. Fernet uses AES-128 to encrypt the files. The key used to encrypt the files was stored in the environment variables and was generated when the system was started. In the interest of time, no rotation system for the key was implemented, however this would be a good feature to add in the future. 
 
-The file upload process can be seen in figure \ref{fig:fileuploadview} below. The file upload process was done in two steps. The first step was to upload the file to the server by using multipart form data. The next step would have the file be validated by checking its file type and size, then encrypted and stored in the file system and database. To access the files, the system used a new endpoint that would allow the user to download the file. The endpoint would take the file ID as a parameter and would stream the file to the user.
+The file upload process can be seen in figure~\ref{fig:fileuploadview} below. The file upload process was done in two steps. The first step was to upload the file to the server by using multipart form data. The next step would have the file be validated by checking its file type and size, then encrypted and stored in the file system and database. To access the files, the system used a new endpoint that would allow the user to download the file. The endpoint would take the file ID as a parameter and would stream the file to the user.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]{VaccineCertificate.png}
-  \caption{Uploaded Vaccine Certificate}
-  \label{fig:vaccinecertificate}
+  \caption{Uploaded Vaccine Certificate}\label{fig:vaccinecertificate}
 \end{figure}
 
 \FloatBarrier
@@ -327,8 +323,7 @@ The file upload process can be seen in figure \ref{fig:fileuploadview} below. Th
   \subfloat[File Upload Sequence Diagram]{\includegraphics[width=\textwidth]{Sequence_FileUpload.png}\label{fig:seqfileupload}} 
   \\
   \subfloat[File View Sequence Diagram]{\includegraphics[width=\textwidth]{Sequence_FileView.png}\label{fig:seqfileview}} 
-  \caption{Sequence Diagrams for File Upload and File View}
-  \label{fig:fileuploadview}
+  \caption{Sequence Diagrams for File Upload and File View}\label{fig:fileuploadview}
 \end{figure}
 
 \FloatBarrier
@@ -373,8 +368,7 @@ Finally, the frontend was made with both mobile and desktop browsers in mind. Th
   \subfloat[Mobile version]{%
       \includegraphics[width=0.4\textwidth]{Mobile_AllergyView.png}%
   }
-  \caption{Desktop and Mobile version of the Allergies page}
-  \label{fig:allergiespage}
+  \caption{Desktop and Mobile version of the Allergies page}\label{fig:allergiespage}
 \end{figure}
 
 \FloatBarrier

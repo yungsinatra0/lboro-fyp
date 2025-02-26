@@ -6,47 +6,44 @@ This chapter will provide a review of the existing literature, which will be use
 \begin{itemize}
     \item Software development methodologies
     \item Requirement and stakeholder management
-    \item Tech stack (backend and frotnend
-    )
+    \item Tech stack (backend and frontend)
     \item Large Language Models (LLMs)
     \item PHR Systems
 \end{itemize}
 
-\section{Software development methodologies}
-\label{sec:methodologies}
+\section{Software development methodologies}\label{sec:methodologies}
 
 \subsection{Software Development Life Cycle}
 
-The Software Development Life Cycle (SDLC) is a process used to guide the development of software applications or systems \parencite{sdlc1}. The SDLC consists of multiple phases, each with its own set of activities and deliverables. \textcite{sdlc2} outline the phases of the SDLC as following:
+The Software Development Life Cycle (SDLC) is a process used to guide the development of software applications or systems \parencite{sdlc1}. The SDLC consists of multiple phases, each with its own set of activities and deliverables.`\ '\textcite{sdlc2} outline the phases of the SDLC as following:
 \begin{enumerate}
-    \item \textbf{Requirement gathering and analysis phase} - the requirements are gathered saved in a document. Based on the requirements gathered, a development plan is created.
-    \item \textbf{Design phase} - requirements are written in a more technical manner and system desings are created. 
-    \item \textbf{Implementation phase} - Actual development of the software occurs in this phase. Additionally, some smaller unit tests may be done during this phase.
-    \item \textbf{Testing phase} - may involve multiple types of testing, such as unit testing, integration testing, and system testing. \textcite{testing} describes the different types of tests:
+    \item \textbf{Requirement gathering and analysis phase} --- the requirements are gathered saved in a document. Based on the requirements gathered, a development plan is created.
+    \item \textbf{Design phase} --- requirements are written in a more technical manner and system desings are created. 
+    \item \textbf{Implementation phase} --- Actual development of the software occurs in this phase. Additionally, some smaller unit tests may be done during this phase.
+    \item \textbf{Testing phase} --- may involve multiple types of testing, such as unit testing, integration testing, and system testing.`\ '\textcite{testing} describes the different types of tests:
     \begin{itemize}
-    \item Unit testing - testing individual units or components of the software.
-    \item Integration testing - performed on two or more units combined together, focusing on the interfaces between these components.
-    \item System testing - focuses on the `end-to-end quality of the entire system', testing it as a whole.
+    \item Unit testing --- testing individual units or components of the software.
+    \item Integration testing --- performed on two or more units combined together, focusing on the interfaces between these components.
+    \item System testing --- focuses on the `end-to-end quality of the entire system', testing it as a whole.
     \end{itemize}
-    \item \textbf{Maintenance phase} - involves the deployment and maintenance of the software. Additionally, this phase may include end-user acceptance testing, to ensure that it meets their needs \parencite{testing}. 
+    \item \textbf{Maintenance phase} --- involves the deployment and maintenance of the software. Additionally, this phase may include end-user acceptance testing, to ensure that it meets their needs \parencite{testing}. 
 \end{enumerate}
 
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=0.7]{SDLC.png}
-    \caption{Software Development Life Cycle}
-    \label{fig:sdlc}
+    \caption{Software Development Life Cycle}\label{fig:sdlc}
 \end{figure}
 
 \newpage
 
 \subsection{SDLC Models}
 
-The literature describes several SDLC models that have been used in the development of software applications. \textcite{sdlc1, sdlc2} highlight the most common ones: Waterfall model, V model, Spiral model, Interative model, and Agile model.
+The literature describes several SDLC models that have been used in the development of software applications.`\ '\textcite{sdlc1, sdlc2} highlight the most common ones: Waterfall model, V model, Spiral model, Interative model, and Agile model.
 
 \subsubsection{Waterfall Model}
 
-The Waterfall Model is probably the most well-known SDLC model. It is a linear model, where the development process is divided into distinct, sequential phases (which can be seen in figure \ref{fig:waterfall}).
+The Waterfall Model is probably the most well-known SDLC model. It is a linear model, where the development process is divided into distinct, sequential phases (which can be seen in figure~\ref{fig:waterfall}).
 
 The Waterfall Model's strengths lie in its simplicty of use, ease of understanding and a clear, structured approach \parencite{waterfall}. An additional stregth that the authors note is its extensive documentation and planning, emphasizing quality and adherence to regulations. 
 
@@ -55,23 +52,21 @@ On the other hand, one of Waterfall's main weaknesses is its lack of flexibility
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=0.6]{Waterfall.png}
-    \caption{Waterfall model}
-    \label{fig:waterfall}
+    \caption{Waterfall model}\label{fig:waterfall}
 \end{figure}
 
 \subsubsection{Agile Model}
 
-Another well-known model is Agile. It has multiple frameworks, with Scrum and Kanban being the most popular ones. Scrum is a framework where the project is divided into sprints, each lasting between 2-4 weeks, that aim on delivering value to the customer through incremental software features \parencite{scrumban, agile}. Kanban focuses on visualizing the project workflow by using a visual board with columns, cards and swimlanes. It uses column limits and a pull system to make the flow of work through the system more efficient \parencite{agile}.
+Another well-known model is Agile. It has multiple frameworks, with Scrum and Kanban being the most popular ones. Scrum is a framework where the project is divided into sprints, each lasting between 2--4 weeks, that aim on delivering value to the customer through incremental software features \parencite{scrumban, agile}. Kanban focuses on visualizing the project workflow by using a visual board with columns, cards and swimlanes. It uses column limits and a pull system to make the flow of work through the system more efficient \parencite{agile}.
 
-Agile has some drawbacks - its lack of documentation and formal planning, especially in the early stages of the project, may not be suitable for large scale projects \parencite{agile, sdlc2}. Similarly, lack of knowledge on how to use the frameworks may be a barrier for some teams \parencite{waterfallno, sdlc2}.
+Agile has some drawbacks --- its lack of documentation and formal planning, especially in the early stages of the project, may not be suitable for large scale projects \parencite{agile, sdlc2}. Similarly, lack of knowledge on how to use the frameworks may be a barrier for some teams \parencite{waterfallno, sdlc2}.
 
 Nowadays, the combined use of Scrum and Kanban is becoming quite popular, with many teams employing both frameworks in their projects, allowing them to adopt the appropriate practices and adapt them accordingly based on their needs \parencite{scrumban}.
 
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=0.5]{Scrum.png}
-    \caption{Scrum framework}
-    \label{fig:scrum}
+    \caption{Scrum framework}\label{fig:scrum}
 \end{figure}
 
 \subsection{A hybrid approach}
@@ -86,7 +81,7 @@ Requirements gathering is the first step in any software development process. As
 
 \subsection{Requirement types}
 
-Requirements can be classified into 2 categories: functional and non-functional. Functional requirements describe the system's behavior, while non-functional requirements describe the system's quality attributes, such as performance, security, reliability, etc. \parencite[6]{requirements}.
+Requirements can be classified into 2 categories: functional and non-functional. Functional requirements describe the system's behavior, while non-functional requirements describe the system's quality attributes, such as performance, security, reliability, etc.`\ '\parencite[6]{requirements}.
 
 When writing the requirements in a document, it is important to ensure clarity and conciseness to avoid ambiguity. Based on the recommendations of \textcite[112]{requirements} and \textcite{requirements2}, the following principles and practices can be followed:  
 \begin{itemize}
@@ -98,35 +93,33 @@ When writing the requirements in a document, it is important to ensure clarity a
 
 Prioritizing requirements is another crucial task, especially in projects with numerous requirements. Some methods mentioned by \textcite{moscow} include using a low to high priority, assigning a numerical value within a specific range or MoSCoW, which classifies requirements into four categories: 
 \begin{itemize}
-    \item Must have - must be implemented in the software before being released
-    \item Should have - important but not necessary for the software to be released
-    \item Could have - desirable but not necessary for the software to be released
-    \item Won't have - requirements that are not included in the current release
+    \item Must have --- must be implemented in the software before being released
+    \item Should have --- important but not necessary for the software to be released
+    \item Could have --- desirable but not necessary for the software to be released
+    \item Won't have --- requirements that are not included in the current release
 \end{itemize}
 
 \subsubsection{Requirements in Agile}
 
 In Agile projects, requirements are written in the form of User Stories, which are simple descriptions of a feature desired by the customer, using a specific format: `As a [user], I want to [action] so that [benefit]' \parencite[191]{requirements}. Components of a User Story include a title, acceptance criteria, priority, story points and description. Epics are requirements that cannot be completed in a single sprint and can be broken down into user stories. Epics and User Stories are part of the Product and Sprint backlogs, which contain the requirements for the whole project and the current sprint, respectively.
 
-\subsection{Stakeholders}
-\label{sec:stakeholders}
+\subsection{Stakeholders}\label{sec:stakeholders}
 
 Stakeholders are the individuals who have some interest in the success of the system or project, thus it is important to identify all possible stakeholders in the early stages of the project to avoid missing important requirements or constraints \parencite[34]{requirements}. 
 
-Stakeholder analysis can help understand their position within the project. One way of doing it is by using a stakeholder matrix, such as the Influence/Interest grid (see figure \ref{fig:stakeholder_matrix}), which classifies stakeholders based on their influence and interest in the project \parencite{stakeholders,stakeholders2}.
+Stakeholder analysis can help understand their position within the project. One way of doing it is by using a stakeholder matrix, such as the Influence/Interest grid (see figure~\ref{fig:stakeholder_matrix}), which classifies stakeholders based on their influence and interest in the project \parencite{stakeholders,stakeholders2}.
 
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=0.5]{Stakeholder.png}
-    \caption{Stakeholder Influence/Interest matrix}
-    \label{fig:stakeholder_matrix}
+    \caption{Stakeholder Influence/Interest matrix}\label{fig:stakeholder_matrix}
 \end{figure}
 
 \subsection{Requirement gathering techniques}
 
 Multiple studies mention the most popular requirement gathering techniques are interviews, workshops, prototyping, modelling, brainstorming, storyboards and observing users \parencite{reqanalysis1,reqanalysis2, reqanalysis3, reqanalysis4}. In one of them, individuals with multiple years of experience in requirement gathering were interviewed, and the authors found that the most used techniques were collaborative meetings, interviews, ethnography and modelling \parencite{reqanalysis1}.
 
-Multiple research papers recognise interviews as the most common technique for requirement gathering \parencite{interviews5,interviews1,interviews2}. Some studies have looked at best practices and common mistakes when conducting requirement gathering interviews. The recommended practices, based on \textcite{interviews4, interviews3}, and the common mistakes, from \textcite{interviews1, interviews2}, are summarized in Table \ref{tab:comparison_mistakes_practices} below.
+Multiple research papers recognise interviews as the most common technique for requirement gathering \parencite{interviews5,interviews1,interviews2}. Some studies have looked at best practices and common mistakes when conducting requirement gathering interviews. The recommended practices, based on \textcite{interviews4, interviews3}, and the common mistakes, from \textcite{interviews1, interviews2}, are summarized in Table~\ref{tab:comparison_mistakes_practices} below.
 
 \begin{table}[h!]
     \centering
@@ -135,24 +128,22 @@ Multiple research papers recognise interviews as the most common technique for r
     \begin{tabular}{|>{\arraybackslash}m{0.45\textwidth}|>{\arraybackslash}m{0.45\textwidth}|}
     \hline
     \textbf{Common Mistakes} & \textbf{Recommended Practices} \\ \hline
-    Wrong opening: failing to understand the context before discussing the problem. & State goals at the beginning and allow customer input at the end. \\ \hline
-    Not leveraging ambiguity to reveal knowledge gaps. & Avoid ambiguity by asking clarifying questions. \\ \hline
-    Lack of planning: unstructured sequence of questions. & Plan interviews with a structured sequence of questions. \\ \hline
-    Failing to build rapport with the customer. & Building rapport through small talk or personal questions in the beginning. \\ \hline
-    Implicit goals: failing to ask or clarify stakeholder goals. & Verify alignment and current interpretation with the customer's vision. \\ \hline
-    Question omission: not asking about business processes or doing follow-up questions. & Be flexible by probing into relevant topics. \\ \hline
-    Weak communication: too much technical jargon usage or not listening to the customer. & Use projective techniques like scenarios to encourage deep thinking. \\ \hline
-    Poor question formulation: vague, technical, irrelevant, or too long. & Break down questions or responses into smaller parts and use story telling.  \\ \hline
-    Wrong closing sequence: skipping interview summaries or feedback. & Leaving time at the end for the stakeholder to offer any feedback or thoughts. \\ \hline
+    Wrong opening: failing to understand the context before discussing the problem. & State goals at the beginning and allow customer input at the end.`\ '\\ \hline
+    Not leveraging ambiguity to reveal knowledge gaps. & Avoid ambiguity by asking clarifying questions.`\ '\\ \hline
+    Lack of planning: unstructured sequence of questions. & Plan interviews with a structured sequence of questions.`\ '\\ \hline
+    Failing to build rapport with the customer. & Building rapport through small talk or personal questions in the beginning.`\ '\\ \hline
+    Implicit goals: failing to ask or clarify stakeholder goals. & Verify alignment and current interpretation with the customer's vision.`\ '\\ \hline
+    Question omission: not asking about business processes or doing follow-up questions. & Be flexible by probing into relevant topics.`\ '\\ \hline
+    Weak communication: too much technical jargon usage or not listening to the customer. & Use projective techniques like scenarios to encourage deep thinking.`\ '\\ \hline
+    Poor question formulation: vague, technical, irrelevant, or too long. & Break down questions or responses into smaller parts and use story telling.`\ '\\ \hline
+    Wrong closing sequence: skipping interview summaries or feedback. & Leaving time at the end for the stakeholder to offer any feedback or thoughts.`\ '\\ \hline
     \end{tabular}
-    \caption{Comparison of Common Mistakes and Recommended Practices}
-    \label{tab:comparison_mistakes_practices}
+    \caption{Comparison of Common Mistakes and Recommended Practices}\label{tab:comparison_mistakes_practices}
 \end{table}
 
 \section{Tech stack}
 
-\subsection{Database}
-\label{sec:database}
+\subsection{Database}\label{sec:database}
 
 There are several types of databases, such as: relational (SQL), NoSQL databases, graph databases or object-oriented databases \parencite{databases2}. The choice of database depends on the project or organisation requirements, such as the amount of data, the complexity of the data, the need for scalability, etc. 
 
@@ -164,14 +155,13 @@ Relational databases store structured data in tables, linked through keys to cre
 
 NoSQL databases manage unstructured or semi-structured data without rigid schemas or relationships \parencite{databases}. As the authors describe, NoSQL databases, such as key-value, document, column-family, and graph databases, excel in flexibility and scalability. NoSQL databases often prioritize performance over strict consistency, making them suitable for large datasets of unstructured data but less ideal for complex transactions. NoSQL systems lack SQL’s mature standardization and support. Examples include MongoDB, Cassandra, Couchbase, and Redis.
 
-\subsection{Backend framework}
-\label{sec:backend}
+\subsection{Backend framework}\label{sec:backend}
 
-Choosing the right backend framework is crucial - it is responsible for handling the business logic of the application, such as processing requests, interacting with the database, and returning responses to the client. A good framework also comes with the added benefit of included features such as security and authentication, database support, a big community and documentation. 
+Choosing the right backend framework is crucial --- it is responsible for handling the business logic of the application, such as processing requests, interacting with the database, and returning responses to the client. A good framework also comes with the added benefit of included features such as security and authentication, database support, a big community and documentation. 
 
 Based on recent a recent survey by \textcite{statista-webframeworks}, the most popular backend frameworks are Express, Flask, Spring Boot, Django and Laravel. This data is also supported by the Stack Overflow Developer Survey 2024, which lists the most popular programming languages as JavaScript (Express), Python (Flask, Django), Java (Spring Boot) and PHP (Laravel) \parencite{stackoverflow}. 
 
-Due to their high popularity among developers, the above frameworks will be compared. Using the information from \textcite{spring,express,django,fastapi}, table \ref{tab:backend} will compare the frameworks based on the following criteria: programming language used, learning curve, community support, security features, database features, and project size suitability.
+Due to their high popularity among developers, the above frameworks will be compared. Using the information from \textcite{spring,express,django,fastapi}, table~\ref{tab:backend} will compare the frameworks based on the following criteria: programming language used, learning curve, community support, security features, database features, and project size suitability.
 
 \begin{table}[h]
     \centering
@@ -194,14 +184,12 @@ Due to their high popularity among developers, the above frameworks will be comp
     \hline
     \end{tabular}%
     }
-    \caption{Comparison of backend frameworks}
-    \label{tab:backend}
+    \caption{Comparison of backend frameworks}\label{tab:backend}
 \end{table}
 
-\subsection{Frontend framework}
-\label{sec:frontend}
+\subsection{Frontend framework}\label{sec:frontend}
 
-Similar to the backend frameworks, choosing a suitable frontend framework is equally important - it is responsible for the user interface of the application, such as displaying data, handling user interactions, and making requests to the backend. 
+Similar to the backend frameworks, choosing a suitable frontend framework is equally important --- it is responsible for the user interface of the application, such as displaying data, handling user interactions, and making requests to the backend. 
 
 Based on the same survey by \textcite{statista-webframeworks}, the most popular frontend frameworks are React, Angular, Vue.js, and Svelte. This data is also supported by the Stack Overflow Developer Survey 2024, where those frameworks rank among the highest for desirability and admirability among developers \parencite{stackoverflow}.
 
@@ -228,8 +216,7 @@ Table \ref{tab:frontend} will use the information from \textcite{react,angular,v
     \hline
     \end{tabular}%
     }
-    \caption{Comparison of frontend frameworks}
-    \label{tab:frontend}
+    \caption{Comparison of frontend frameworks}\label{tab:frontend}
 \end{table}
 
 \section{Large Language Models (LLMs)}
@@ -277,11 +264,10 @@ Running and hosting LLMs locally can be a challenge, considering their big model
         glhf.chat & Any model on Hugging Face that fits on an A100 node (~640GB VRAM)& 480 requests/8 hours \\
         \bottomrule
     \end{tabular}
-    \caption{API providers for LLMs}
-    \label{tab:llm_apis}
+    \caption{API providers for LLMs}\label{tab:llm_apis}
 \end{table}
 
-\FloatBarrier
+\FloatBarrier{}
 \clearpage
 
 \subsection{LLMs in healthcare}
@@ -297,7 +283,7 @@ One application of MLLMs is in healthcare, where the growing volume and complexi
 
 \subsection{Prompt Engineering}
 
-The success of LLMs depends not only on the model itself - but also on how it's effectively used by the users, using techniques like prompt engineering, which involves the constant designing and refining of prompts to guide the output of LLMs \parencite{promptmed,prompt2}. Prompts represent instructions given to the model to guide its output, such as providing context, examples, or constraints to the model \parencite{prompt,prompt1,prompt2}. 
+The success of LLMs depends not only on the model itself --- but also on how it's effectively used by the users, using techniques like prompt engineering, which involves the constant designing and refining of prompts to guide the output of LLMs \parencite{promptmed,prompt2}. Prompts represent instructions given to the model to guide its output, such as providing context, examples, or constraints to the model \parencite{prompt,prompt1,prompt2}. 
 
 There are multiple techniques for prompt engineering, ranging from simple to more advanced. The tables and subsections below outlines some of the most common techniques.
 
@@ -327,11 +313,10 @@ Zero-shot prompting are techniques where the LLM is given a prompt without any e
         Self-Ask & Prompting the LLM to decide if it needs to ask any follow-up questions for a given prompt. &  \textcite{selfask} \\
         \bottomrule
     \end{tabular}
-    \caption{Zero-Shot Prompt Techniques}
-    \label{tab:zero_shot}
+    \caption{Zero-Shot Prompt Techniques}\label{tab:zero_shot}
 \end{table}
 
-\FloatBarrier
+\FloatBarrier{}
 
 \subsubsection{Few-Shot Prompting}
 
@@ -350,11 +335,10 @@ Few-shot prompting are techniques where the LLM learns how to complete a task ba
         Prompt Mining & Scanning the training data to discover common formats that can be used as prompt templates. & \textcite{mining} \\
         \bottomrule
     \end{tabular}
-    \caption{Few-Shot Prompt Techniques}
-    \label{tab:few_shot}
+    \caption{Few-Shot Prompt Techniques}\label{tab:few_shot}
 \end{table}
 
-\FloatBarrier
+\FloatBarrier{}
 
 \subsubsection{Thought Generation Prompting}
 
@@ -382,11 +366,10 @@ Thought generation are techniques where the prompt encourages the LLM to explain
         Tree-of-Thought (ToT) & Starts with an initial problem and then generates multiple possible steps by using CoT. Then, it evaluates each step, decides which one to take and creates more thoughts until it reaches an answer. & \textcite{treeofthought} \\
         \bottomrule
     \end{tabular}
-    \caption{Thought Generation Prompt Techniques}
-    \label{tab:thought_gen}
+    \caption{Thought Generation Prompt Techniques}\label{tab:thought_gen}
 \end{table}
 
-\FloatBarrier
+\FloatBarrier{}
 
 \subsubsection{Multimodal and Multilingual Prompting}
 
@@ -417,11 +400,10 @@ Multimodal and multilingual prompting are techniques which aim to improve an LLM
         Chain-of-Images (CoI) & Using the CoT process to generate images as part of its thought process to reason visually. & \textcite{coi} \\
         \bottomrule
     \end{tabular}
-    \caption{Multimodal and Multilingual Techniques}
-    \label{tab:multi_prompt}
+    \caption{Multimodal and Multilingual Techniques}\label{tab:multi_prompt}
 \end{table}
 
-\FloatBarrier
+\FloatBarrier{}
 
 \subsubsection{Agents}
 
@@ -443,11 +425,10 @@ Agents are techniques which encourage LLMs to use external tools or resources to
         Retrieval Augmented Generation (RAG) & This technique involves retrieval of information from an external source and inserting it into the prompt. & \textcite{rag} \\
         \bottomrule
     \end{tabular}
-    \caption{LLM Agent Techniques}
-    \label{tab:agents}
+    \caption{LLM Agent Techniques}\label{tab:agents}
 \end{table}
 
-\FloatBarrier
+\FloatBarrier{}
 
 \subsection{Challenges and concerns of using LLMs}
 
@@ -455,7 +436,7 @@ While LLMs bring many benefits when applied to the healthcare domain, it is impo
 
 \begin{itemize}
     \item \textbf{Data Privacy and Compliance:} Patient data is highly sensitive, thus ensuring compliance with standards is essential, requiring data anonymization and secure handling practices to ensure patient data safety.\parencite{llm_healthcare,llm_healthcare2,llm_healthcare4}.
-    \item \textbf{Transparency and Explainability:} LLMs are often described as `black boxes', making it difficult to explain their decision-making processes. In healthcare, transparency is crucial - lack of it poses risks and raises ethical concerns about relying on such systems in high-stakes scenarios \parencite{llm_healthcare,llm_healthcare2,llm_healthcare4}..
+    \item \textbf{Transparency and Explainability:} LLMs are often described as `black boxes', making it difficult to explain their decision-making processes. In healthcare, transparency is crucial --- lack of it poses risks and raises ethical concerns about relying on such systems in high-stakes scenarios \parencite{llm_healthcare,llm_healthcare2,llm_healthcare4}..
     \item \textbf{Bias and Fairness:} LLMs trained on vast datasets can inherit biases in the data, leading to skewed or unfair outcomes \parencite{llm_healthcare2}.
     \item \textbf{Hallucinations:} LLMs sometimes generate false or fabricated outputs, also known as `hallucinations'. In healthcare, this poses significant risks, as incorrect or misleading information could jeopardize patient safety and trust in the technology \parencite{llm_healthcare4,llm_healthcare}.
     \item \textbf{Accountability:} Responsibility must be clearly communicated and understood by all parties involved in the development and use of the model \parencite{llm_healthcare2}. The author recommends the usage of clear guidelines, policies and code of conducts to ensure that all parties are aware of their obligations.
@@ -494,8 +475,7 @@ A mobile app developed in Romania that allows patients to upload their medical h
     \centering
     \subfloat[My doctors screen]{\includegraphics[width=0.35\textwidth]{Medvalet_1.png}} \quad
     \subfloat[Uploaded documents screen]{\includegraphics[width=0.35\textwidth]{Medvalet_2.png}}
-    \caption{Medvalet screenshots}
-    \label{fig:medvalet}
+    \caption{Medvalet screenshots}\label{fig:medvalet}
 \end{figure}
 
 \begin{table}[h!]
@@ -518,22 +498,20 @@ A mobile app developed in Romania that allows patients to upload their medical h
         \item Only available as a mobile app, limiting accessibility for desktop-only users.
     \end{itemize} \\ \hline
     \end{tabular}
-\caption{Medvalet Features and Limitations}
-\label{tab:medvalet}
+\caption{Medvalet Features and Limitations}\label{tab:medvalet}
 \end{table}
 
-\FloatBarrier
+\FloatBarrier{}
 
 \subsubsection{Andaman7}
 
-A mobile app developed by a Belgian-American eHealth company with the goal to improve doctor-patient communication, compliant with GDPR and HIPAA \parencite{andaman}. See Table \ref{tab:andaman7} for a summary of its features and limitations and figure \ref{fig:andaman7} for a screenshot of the app.
+A mobile app developed by a Belgian-American eHealth company with the goal to improve doctor-patient communication, compliant with GDPR and HIPAA \parencite{andaman}. See Table~\ref{tab:andaman7} for a summary of its features and limitations and figure~\ref{fig:andaman7} for a screenshot of the app.
 
 \begin{figure}[ht]
     \centering
     \subfloat[PHR Sections screen]{\includegraphics[width=0.45\textwidth]{Andaman_1.png}} \quad
     \subfloat[Documents section screen]{\includegraphics[width=0.45\textwidth]{Andaman_2.png}}
-    \caption{Andaman7 screenshots}
-    \label{fig:andaman7}
+    \caption{Andaman7 screenshots}\label{fig:andaman7}
 \end{figure}
 
 \begin{table}[htbp]
@@ -555,23 +533,21 @@ A mobile app developed by a Belgian-American eHealth company with the goal to im
         \item Limited to mobile platforms, which may limit usability for desktop-only users.
     \end{itemize} \\ \hline
     \end{tabular}
-\caption{Andaman7 Features and Limitations}
-\label{tab:andaman7}
+\caption{Andaman7 Features and Limitations}\label{tab:andaman7}
 \end{table}
 
-\FloatBarrier
+\FloatBarrier{}
 
 \subsubsection{Fasten Health}
 
-An open-source, self-hosted electronic medical record aggregator with optional paid desktop versions for Windows and Mac \parencite{fasten}. See Table \ref{tab:fasten_health} for a summary of its features and limitations and figure \ref{fig:fasten} for a screenshot of the app.
+An open-source, self-hosted electronic medical record aggregator with optional paid desktop versions for Windows and Mac \parencite{fasten}. See Table~\ref{tab:fasten_health} for a summary of its features and limitations and figure~\ref{fig:fasten} for a screenshot of the app.
 
 \begin{figure}[ht]
     \centering
     \subfloat[Dashboard screen]{\includegraphics[width=0.75\textwidth]{fasten_1.png}\label{fig:fasten1}} 
     \hspace{0.05\textwidth} 
     \subfloat[Visit history screen]{\includegraphics[scale=0.3]{fasten_2.png}\label{fig:fasten2}} 
-    \caption{Fasten Health screenshots}
-    \label{fig:fasten}
+    \caption{Fasten Health screenshots}\label{fig:fasten}
 \end{figure}
 
 \begin{table}[h!]
@@ -596,6 +572,5 @@ An open-source, self-hosted electronic medical record aggregator with optional p
         \item Restricted to healthcare providers in the United States.
     \end{itemize} \\ \hline
     \end{tabular}
-\caption{Fasten Health Features and Limitations}
-\label{tab:fasten_health}
+\caption{Fasten Health Features and Limitations}\label{tab:fasten_health}
 \end{table}
