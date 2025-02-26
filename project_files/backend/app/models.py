@@ -9,7 +9,9 @@ class DateFormattingModel(SQLModel):
     dob: date | None = None
     
     @field_serializer('dob')
-    def serialize_dob(self, value: date) -> str:
+    def serialize_dob(self, value: date) -> str | None:
+        if value is None:
+            return None
         return value.strftime("%d-%m-%Y")
 
 # Session table model used for storing sessions in the database.
@@ -35,6 +37,15 @@ class UserResponse(DateFormattingModel):
     id: uuid.UUID
     name: str
     email: EmailStr
+    
+# User object response for dashboard
+class UserDashboard(SQLModel):
+    id: uuid.UUID
+    name: str
+    vaccines: list["VaccineResponse"]
+    allergies: list["AllergyResponse"]
+    medications: list["MedicationResponse"]
+    healthdata: list["HealthDataResponse"]
 
 # User Data model used for login    
 class UserAuth(SQLModel):
@@ -52,43 +63,37 @@ class UserUpdate(DateFormattingModel):
     email: EmailStr | None = None
     password: str | None = None
     
+# Vaccine model containing dates and serializers
+class VaccineDates(SQLModel):
+    date_received: date
+    date_added: datetime = Field(default_factory=datetime.now)
+    
+    @field_serializer('date_received')
+    def serialize_date_received(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")
+    
 # Vaccine Table model used for table creation
-class Vaccine(SQLModel, table=True):
+class Vaccine(VaccineDates, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
     provider: str
-    date_received: date
     
     user_id : uuid.UUID = Field(foreign_key="user.id")
     user: User = Relationship(back_populates="vaccines")
     
     certificate: Optional["FileUpload"] = Relationship(back_populates="vaccine", cascade_delete=True)
-    
-    @field_serializer('date_received')
-    def serialize_date_received(self, value: date) -> str:
-        return value.strftime("%d-%m-%Y")
 
 # Vaccine response model
-class VaccineResponse(SQLModel):
+class VaccineResponse(VaccineDates):
     id: uuid.UUID
     name: str
     provider: str
-    date_received: date
     certificate: Optional["FileUpload"]
-    
-    @field_serializer('date_received')
-    def serialize_date_received(self, value: date) -> str:
-        return value.strftime("%d-%m-%Y")
 
 # Vaccine create model
-class VaccineCreate(SQLModel):
+class VaccineCreate(VaccineDates):
     name: str
     provider: str
-    date_received: date
-    
-    @field_serializer('date_received')
-    def serialize_date_received(self, value: date) -> str:
-        return value.strftime("%d-%m-%Y")
 
 # Vaccine update model
 class VaccineUpdate(SQLModel):
@@ -97,8 +102,10 @@ class VaccineUpdate(SQLModel):
     date_received: date | None = None
     
     @field_serializer('date_received')
-    def serialize_date_received(self, value: date) -> str:
-        return value.strftime("%d-%m-%Y")   
+    def serialize_date_received(self, value: date) -> str | None:
+        if value is None:
+            return None
+        return value.strftime("%d-%m-%Y")
 
 # Allergy Table models used for table creation
 class AllergyAllergensLink(SQLModel, table=True):
@@ -109,9 +116,17 @@ class AllergyReactionsLink(SQLModel, table=True):
     allergy_id: uuid.UUID = Field(foreign_key="allergy.id", primary_key=True)
     reaction_id: uuid.UUID = Field(foreign_key="reactions.id", primary_key=True)
 
-class Allergy(SQLModel, table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+# Allergy model for date and serializers
+class AllergyDates(SQLModel):
     date_diagnosed: date
+    date_added: datetime = Field(default_factory=datetime.now)
+    
+    @field_serializer('date_diagnosed')
+    def serialize_date_diagnosed(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")
+
+class Allergy(AllergyDates, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     notes: str | None = None
         
     user_id : uuid.UUID = Field(foreign_key="user.id")
@@ -122,46 +137,34 @@ class Allergy(SQLModel, table=True):
    
     severity_id : uuid.UUID = Field(foreign_key="severity.id")
     severity: "Severity" = Relationship(back_populates="allergies")
-    
-    @field_serializer('date_diagnosed')
-    def serialize_date_diagnosed(self, value: date) -> str:
-        return value.strftime("%d-%m-%Y")
 
 # Allergy response model
-class AllergyResponse(SQLModel):
+class AllergyResponse(AllergyDates):
     id: uuid.UUID
-    date_diagnosed: date
     severity: str
     allergens: list[str]
     reactions: list[str]
     notes: str | None = None
-    
-    @field_serializer('date_diagnosed')
-    def serialize_date_diagnosed(self, value: date) -> str:
-        return value.strftime("%d-%m-%Y")
     
 # Allergy create model
-class AllergyCreate(SQLModel):
-    date_diagnosed: date
+class AllergyCreate(AllergyDates):
     severity: str
     allergens: list[str]
     reactions: list[str]
     notes: str | None = None
-    
-    @field_serializer('date_diagnosed')
-    def serialize_date_diagnosed(self, value: date) -> str:
-        return value.strftime("%d-%m-%Y")  
     
 # Allergy update model
 class AllergyUpdate(SQLModel):
-    date_diagnosed: date | None = None
     severity: str | None = None
     allergens: list[str] | None = None
     reactions: list[str] | None = None
     notes: str | None = None
+    date_diagnosed: date | None = None
     
     @field_serializer('date_diagnosed')
-    def serialize_date_diagnosed(self, value: date) -> str:
+    def serialize_date_diagnosed(self, value: date) -> str | None:
+        if value is None:
+            return None
         return value.strftime("%d-%m-%Y")
 
 class Allergens(SQLModel, table=True):
@@ -195,12 +198,19 @@ class SeverityResponse(SQLModel):
     name: str
         
 # Medication Table models used for table creation
-class Medication(SQLModel, table=True):
+class MedicationDates(SQLModel):
+    date_prescribed: date
+    date_added: datetime = Field(default_factory=datetime.now)
+    
+    @field_serializer('date_prescribed')
+    def serialize_date_prescribed(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")
+
+class Medication(MedicationDates, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
     dosage: str
     frequency: str
-    date_prescribed: date
     duration_days: int | None = None
     notes: str | None = None
     
@@ -209,40 +219,25 @@ class Medication(SQLModel, table=True):
     
     form_id : uuid.UUID = Field(foreign_key="medicationform.id")
     form: "MedicationForm" = Relationship(back_populates="medications")
-    
-    @field_serializer('date_prescribed')
-    def serialize_date_prescribed(self, value: date) -> str:
-        return value.strftime("%d-%m-%Y")
 
 # Medication response model
-class MedicationResponse(SQLModel):
+class MedicationResponse(MedicationDates):
     id: uuid.UUID
     name: str
     dosage: str
     frequency: str
-    date_prescribed: date
     duration_days: int | None = None 
     form: str
     notes: str | None = None
-    
-    @field_serializer('date_prescribed')
-    def serialize_date_prescribed(self, value: date) -> str:
-        return value.strftime("%d-%m-%Y")
 
-    
 # Medication create model
-class MedicationCreate(SQLModel):
+class MedicationCreate(MedicationDates):
     name: str
     dosage: str
     frequency: str
-    date_prescribed: date
     duration_days: int | None = None
     form: str
     notes: str | None = None
-    
-    @field_serializer('date_prescribed')
-    def serialize_date_prescribed(self, value: date) -> str:
-        return value.strftime("%d-%m-%Y")
     
 # Medication update model
 class MedicationUpdate(SQLModel):
@@ -269,12 +264,19 @@ class MedicationFormResponse(SQLModel):
     id: uuid.UUID
     name: str
     
-# Health data Table models used for table creation    
-class HealthData(SQLModel, table=True):
+# Health data Table models used for table creation
+class HealthDataDates(SQLModel):
+    date_recorded: date
+    date_added: datetime = Field(default_factory=datetime.now)
+    
+    @field_serializer('date_recorded')
+    def serialize_date_recorded(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")
+    
+class HealthData(HealthDataDates, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
     value: float
-    date_recorded: date
     
     user_id : uuid.UUID = Field(foreign_key="user.id")
     user: User = Relationship(back_populates="healthdata")
@@ -282,32 +284,18 @@ class HealthData(SQLModel, table=True):
     type_id : uuid.UUID = Field(foreign_key="healthdatatype.id")
     type: "HealthDataType" = Relationship(back_populates="healthdata") 
     
-    @field_serializer('date_recorded')
-    def serialize_date_recorded(self, value: date) -> str:
-        return value.strftime("%d-%m-%Y")
-    
 # Health data response model
-class HealthDataResponse(SQLModel):
+class HealthDataResponse(HealthDataDates):
     id: uuid.UUID
     name: str
     value: float
-    date_recorded: date
     type: str
-    
-    @field_serializer('date_recorded')
-    def serialize_date_recorded(self, value: date) -> str:
-        return value.strftime("%d-%m-%Y")
     
 # Health data create model
-class HealthDataCreate(SQLModel):
+class HealthDataCreate(HealthDataDates):
     name: str
     value: float
-    date_recorded: date
     type: str
-    
-    @field_serializer('date_recorded')
-    def serialize_date_recorded(self, value: date) -> str:
-        return value.strftime("%d-%m-%Y")
     
 # Health data update model
 class HealthDataUpdate(SQLModel):
