@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, status, Response, Request, File, UploadFile
 from fastapi.responses import StreamingResponse
-from sqlmodel import Session, select
+from sqlmodel import Session, select, col
 from contextlib import asynccontextmanager
 import uuid
 
@@ -113,18 +113,90 @@ async def logout(response: Response, request: Request, user_id: uuid.UUID = Depe
         "message": "Logout successful"
     }
 
+# Homepage/dashboard endpoint, returns the user object with related data to display in the dashboard
+@app.get("/dashboard", response_model=UserDashboard)
+async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    user = session.get(User, user_id)
+    
+    if user_id != user.id:
+        raise HTTPException(status_code=403, detail="You do not have permission to access this endpoint!")   
+    
+    newest_vaccines = session.exec(select(Vaccine).where(Vaccine.user_id == user_id).order_by(col(Vaccine.date_added).desc()).limit(5)).all()
+    newest_allergies = session.exec(select(Allergy).where(Allergy.user_id == user_id).order_by(col(Allergy.date_added).desc()).limit(5)).all()
+    # newest_healthdata = session.exec(select(HealthData).where(HealthData.user_id == user_id).order_by(col(HealthData.date_added).desc()).limit(5)).all()
+    newest_medications = session.exec(select(Medication).where(Medication.user_id == user_id).order_by(col(Medication.date_added).desc()).limit(5)).all()
+    
+    vaccines_response = []
+    for vaccine in newest_vaccines:
+        vaccines_response.append(
+            VaccineResponse(
+                id = vaccine.id,
+                name = vaccine.name,
+                provider = vaccine.provider,
+                date_received = vaccine.date_received,
+                certificate = vaccine.certificate,
+                date_added = vaccine.date_added 
+            ))
+    
+    # Iterate through allergies to get only allergen names and reactions - this is because AllergyResponse expects a list of str for allergens and reactions
+    allergies_response = []
+    for allergy in newest_allergies:
+        allergens = [allergen.name for allergen in allergy.allergens]
+        reactions = [reaction.name for reaction in allergy.reactions]
+        allergies_response.append(
+            AllergyResponse(
+                id = allergy.id,
+                date_diagnosed = allergy.date_diagnosed,
+                allergens = allergens,
+                reactions = reactions,
+                severity = allergy.severity.name,
+                notes = allergy.notes,
+                date_added = allergy.date_added
+        ))
+    
+    # Iterate through medications to get only form names - same as above, expects str for medication form
+    medications_response = []
+    for medication in newest_medications:
+        form = medication.form.name if medication.form else None
+        medications_response.append(
+            MedicationResponse(
+                id = medication.id,
+                name = medication.name,
+                dosage=medication.dosage,
+                frequency=medication.frequency,
+                date_prescribed=medication.date_prescribed,
+                duration_days=medication.duration_days,
+                form=form,
+                notes=medication.notes,
+                date_added=medication.date_added               
+        ))
+    
+    user_dashboard = UserDashboard(
+        id = user.id,
+        name = user.name,
+        vaccines = vaccines_response,
+        allergies = allergies_response,
+        # healthdata = newest_healthdata,
+        medications = medications_response
+    )
+    
+    return user_dashboard
+
 # Get current user info endpoint
 @app.get("/me", response_model=UserPublic)
 async def read_users_me(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     return session.get(User, user_id)
 
-# Update user endpoint - TODO: Add authentication to this endpoint   
+# Update user endpoint  
 @app.patch("/update", response_model=UserResponse)
 def update_user(*, session: Session = Depends(get_session), user_update: UserUpdate, user_id: uuid.UUID = Depends(validate_session)):
     # Find the user to be updated, if not found, raise an exception
     user_db = session.get(User, user_id)
     if not user_db:
         raise HTTPException(status_code=404, detail="User not found")
+    
+    if user_id != user_db.id:
+        raise HTTPException(status_code=403, detail="You do not have permission to update this user")
     
     # Get the user data to be updated
     user_data = user_update.model_dump(exclude_unset=True)
@@ -146,12 +218,6 @@ def update_user(*, session: Session = Depends(get_session), user_update: UserUpd
     except Exception as e:
         session.rollback()
         raise HTTPException(status_code=500, detail=f"An error occurred when updating: {e}")        
-
-# Homepage/dashboard endpoint, returns the user object with related data to display in the dashboard
-@app.get("/dashboard", response_model=UserDashboard)
-async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
-    user = session.get(User, user_id)   
-    return user
 
 ### Vaccine endpoints
 # Get all vaccines

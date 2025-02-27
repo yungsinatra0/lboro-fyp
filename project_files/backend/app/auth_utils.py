@@ -40,7 +40,7 @@ async def validate_session(request: Request, session: Session = Depends(get_sess
     ).first()
     
     if not existingAuthSession:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session not found")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session not found")  
     
     return existingAuthSession.user_id
 
