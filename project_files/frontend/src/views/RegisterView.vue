@@ -71,6 +71,7 @@
             showIcon
             fluid
             :maxDate="maxDate"
+            @date-select="console.log($form.dob.value)"
           />
           <Message
             v-if="$form.dob?.invalid"
@@ -148,11 +149,11 @@ const resolver = zodResolver(
       .refine((value) => /[A-Z]/.test(value), {
         message: 'Parola trebuie sa contina cel putin o litera mare',
       })
-      .refine((value) => /d/.test(value), {
-        message: 'Parola trebuie sa contina cel putin o cifra',
-      })
       .refine((value) => /[!@#$%^&*(),.?":{}|<>]/.test(value), {
         message: 'Parola trebuie sa contina cel putin un simbol special',
+      })
+      .refine((value) => /\d/.test(value), {
+        message: 'Parola trebuie sa contina cel putin o cifra',
       }),
     name: z.string().min(2, { message: 'Prenumele este obligatoriu' }),
     surname: z.string().min(2, { message: 'Numele este obligatorie' }),

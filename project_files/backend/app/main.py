@@ -23,6 +23,8 @@ async def lifespan(app: FastAPI):
         
 app = FastAPI(lifespan=lifespan)
 
+# TODO: Create generic response model for every endpoint and update it for each accordingly (use builder - google it)
+
 # PUBLIC ROUTES
 # Login endpoint
 @app.post("/login")
@@ -97,8 +99,10 @@ async def logout(response: Response, request: Request, user_id: uuid.UUID = Depe
     if cookie_user_id != user_id:
         raise HTTPException(status_code=403, detail="You do not have permission to log out this user")
     
+    print("\n Deleting sessiong from database \n")
+    
     # Will use the end_session function to end the session in the database
-    end_session(request, session) # Need to pass the request and session to the function, otherwise it will not work
+    await end_session(request, session) # Need to pass the request and session to the function, otherwise it will not work
     
     # Still need to delete the session cookie from the client
     response.delete_cookie(
@@ -185,7 +189,7 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
     return user_dashboard
 
 # Get current user info endpoint
-@app.get("/me", response_model=UserPublic)
+@app.get("/me", response_model=UserResponse)
 async def read_users_me(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     return session.get(User, user_id)
 
@@ -206,7 +210,7 @@ def update_user(*, session: Session = Depends(get_session), user_update: UserUpd
     
     # If password is being updated, hash it before updating
     if "password" in user_data:
-        extra_data["hashed_password"] = create_hash(user_data["password"]) # Do I need to pop this from user_data?
+        raise HTTPException(status_code=400, detail="Password cannot be updated using this endpoint")
     
     # Update the user data
     try:
@@ -219,8 +223,35 @@ def update_user(*, session: Session = Depends(get_session), user_update: UserUpd
     
     except Exception as e:
         session.rollback()
-        raise HTTPException(status_code=500, detail=f"An error occurred when updating: {e}")        
+        raise HTTPException(status_code=500, detail=f"An error occurred when updating: {e}")    
+    
+# Update user password endpoint
+@app.patch("/update/password")
+def update_password(*, request: Request, session: Session = Depends(get_session), password_update: UserPasswordChange, response: Response, user_id: uuid.UUID = Depends(validate_session)):
+    user_db = session.get(User, user_id)
+    
+    if not user_db:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user_id != user_db.id:
+        raise HTTPException(status_code=403, detail="You do not have permission to update this user")
+    
+    user_data = password_update.model_dump(exclude_unset=True)
 
+    if not verify_hash(user_data["current_password"], user_db.hashed_password):
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Incorrect current password")
+    
+    user_db.hashed_password = create_hash(user_data["new_password"])
+    
+    session.add(user_db)
+    session.commit()
+    session.refresh(user_db)
+    
+    return {
+        "status": status.HTTP_200_OK,
+        "message": "Password updated successfully"
+    }  
+    
 ### Vaccine endpoints
 # Get all vaccines
 @app.get("/me/vaccines", response_model=list[VaccineResponse])

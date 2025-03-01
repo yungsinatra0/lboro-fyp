@@ -52,6 +52,11 @@ class UserAuth(DateFormattingModel):
     email: EmailStr
     password: str
     name: str | None = None # Will only be used for registration
+    
+# User data model used for password change
+class UserPasswordChange(SQLModel):
+    current_password: str
+    new_password: str
 
 # User Data model used for most API responses
 class UserPublic(SQLModel):

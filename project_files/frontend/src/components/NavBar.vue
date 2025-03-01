@@ -34,7 +34,7 @@
         </Button>
         <Button icon="pi pi-cog" class="p-button-rounded p-button-text p-button-plain" />
         <Button icon="pi pi-sign-out" class="p-button-rounded p-button-text p-button-plain" @click="logout" />
-        <RouterLink to="/dashboard" class="flex items-center justify-center">
+        <RouterLink to="/profil" class="flex items-center justify-center">
           <Avatar :label="C" shape="circle" />
         </RouterLink>
       </div>
