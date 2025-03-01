@@ -1,56 +1,60 @@
 <template>
   <Card class="w-full mb-4 shadow-3" :pt="cardStyles">
     <template #header>
-      <div class="bg-primary h-1 w-full"></div>
-    </template>
-
-    <template #title>
-      <div class="flex flex-col md:flex-row md:justify-between md:items-center py-2 gap-2">
-        <span class="font-bold text-xl text-primary">{{ name }}</span>
-        <Tag :value="form" rounded severity="success" class="text-sm self-start md:self-auto"></Tag>
-      </div>
+      <div class="h-2 w-full rounded-t-lg bg-primary"></div>
     </template>
 
     <template #content>
-      <div class="flex flex-col">
-        <div class="flex flex-col gap-1">
-          <div class="flex items-center gap-2">
-            <i class="pi pi-clock text-primary"></i>
-            <span class="font-bold"
-              >Frecvență: <span class="font-medium"> {{ frequency }}</span>
-            </span>
+      <div class="flex flex-col h-full px-3 pt-3">
+        <div class="grid grid-cols-2 gap-x-4 gap-y-3">
+          <div class="col-span-2">
+            <span class="text-sm text-surface-600 dark:text-surface-400">Medicament</span>
+            <div class="flex gap-2 mt-0.5 justify-between">
+              <p class="text-base font-semibold text-surface-900 dark:text-surface-0">{{ name }}</p>
+              <div class="flex flex-row gap-1">
+                <Tag :value="form" rounded severity="info" class="text-sm"></Tag>
+                <Tag :value="route" rounded severity="info" class="text-sm"></Tag>
+              </div>
+            </div>
           </div>
 
-          <div class="flex items-center gap-2">
-            <i class="pi pi-box text-primary"></i>
-            <span class="font-bold"
-              >Doză: <span class="font-medium"> {{ dosage }}</span>
-            </span>
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-1">
-          <div class="flex items-center gap-2">
-            <i class="pi pi-calendar text-primary"></i>
-            <span class="font-bold"
-              >Prescris la data: <span class="font-medium">{{ date_prescribed }}</span></span
-            >
+          <div>
+            <span class="text-sm text-surface-600 dark:text-surface-400">Doză</span>
+            <p class="text-base text-surface-900 dark:text-surface-0 mt-0.5">{{ dosage }}</p>
           </div>
 
-          <div class="flex items-center gap-2">
-            <i class="pi pi-hourglass text-primary"></i>
-            <span class="font-bold"
-              >Durata tratamentului: <span class="font-medium">{{ duration_days }} zile</span></span
-            >
+          <div>
+            <span class="text-sm text-surface-600 dark:text-surface-400">Frecvență</span>
+            <p class="text-base text-surface-900 dark:text-surface-0 mt-0.5">
+              {{ frequency }}
+              <span v-if="time_of_day" class="text-sm">({{ time_of_day }})</span>
+            </p>
           </div>
-        </div>
 
-        <div v-if="notes && notes.length > 0" class="flex flex-col gap-1 mt-1">
-          <div class="flex items-start gap-2">
-            <i class="pi pi-info-circle text-primary mt-1"></i>
-            <div>
-              <span class="font-bold">Notițe:</span>
-              <p class="m-0 mt-1 text-sm">{{ notes }}</p>
+          <div>
+            <span class="text-sm text-surface-600 dark:text-surface-400">Data prescrierii</span>
+            <p class="text-base text-surface-900 dark:text-surface-0 mt-0.5">
+              {{ date_prescribed }}
+            </p>
+          </div>
+
+          <div>
+            <span class="text-sm text-surface-600 dark:text-surface-400">Durata tratamentului</span>
+            <p class="text-base text-surface-900 dark:text-surface-0 mt-0.5">
+              {{ duration_days }} zile
+            </p>
+          </div>
+
+          <div class="col-span-2">
+            <span class="text-sm text-surface-600 dark:text-surface-400">Notițe</span>
+            <div class="mt-0.5 max-h-16 overflow-y-auto">
+              <p
+                v-if="notes && notes.length > 0"
+                class="text-base text-surface-900 dark:text-surface-0"
+              >
+                {{ notes }}
+              </p>
+              <p v-else class="text-base text-surface-400 dark:text-surface-400">Fără notițe</p>
             </div>
           </div>
         </div>
@@ -58,7 +62,7 @@
     </template>
 
     <template #footer>
-      <div class="flex justify-end">
+      <div class="flex justify-end px-3 py-2">
         <Button
           icon="pi pi-ellipsis-h"
           class="p-button-rounded p-button-text p-button-plain"
@@ -88,9 +92,11 @@ const props = defineProps({
   name: String,
   dosage: String,
   frequency: String,
+  time_of_day: String,
   date_prescribed: String,
   duration_days: Number,
   form: String,
+  route: String,
   notes: String || null,
 })
 

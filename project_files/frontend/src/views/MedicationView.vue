@@ -14,7 +14,7 @@
       />
     </div>
 
-    <div class="flex flex-col items-center gap-4 p-3 md:p-5">
+    <div class="flex flex-col md:flex-row items-center md:items-start gap-2 p-3">
       <ProgressSpinner v-if="loading" />
 
       <div v-else-if="error" class="p-4 text-red-500">
@@ -24,15 +24,16 @@
       <div v-else-if="medications.length === 0" class="p-4">
         Nu a fost gasit nici un medicament.
       </div>
-<!-- TODO: Change medication cards to an accordion-style view  -->
-      <MedicationCard
-        v-else
-        v-for="medication in medications"
-        :key="medication.id"
-        v-bind="medication"
-        @delete="deleteMedication"
-        @open-edit="openEditDialog"
-      />
+      
+      <div v-else class="md:grid md:grid-cols-3 md:gap-6 md:w-full">
+        <MedicationCard
+          v-for="medication in medications"
+          :key="medication.id"
+          v-bind="medication"
+          @delete="deleteMedication"
+          @open-edit="openEditDialog"
+        />
+      </div>
     </div>
 
     <ConfirmDialog></ConfirmDialog>

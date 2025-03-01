@@ -132,7 +132,15 @@
               :options="frequency"
               placeholder="Unitate"
               fluid
-              class="w-1/2 md:w-1/3"
+              class="w-1/2"
+            />
+            <Select
+              v-if="$form.frequencyValue?.value === 1 && $form.frequencyUnits?.value === 'pe zi'"
+              name="timeOfDay"
+              :options="['dimineata', 'pranz', 'seara']"
+              placeholder="Momentul zilei"
+              fluid
+              class="w-1/2"
             />
           </div>
           <div class="flex flex-col mt-1">
@@ -338,7 +346,8 @@ const initialValues = ref({
   duration: 0,
   notes: '',
   form: props.forms[0],
-  routes: props.routes[0],
+  route: props.routes[0],
+  timeOfDay: '',
 })
 
 const resolver = zodResolver(
@@ -359,6 +368,7 @@ const resolver = zodResolver(
       .int()
       .positive('Durata tratamentului trebuie sa fie un numar pozitiv.'),
     notes: z.string().optional(),
+    timeOfDay: z.string().optional(),
     form: z.string().nonempty('Forma medicamentului este obligatorie.'),
     route: z.string().nonempty('Calea de administrare a medicamentului este obligatorie.'),
     dosageUnits: z.string().nonempty('Unitatea de masura a dozei este obligatorie.'),
@@ -386,9 +396,8 @@ const addMedication = async (medicationDetails) => {
         case 'alternativ':
           return (
             medicationDetails.frequencyValue +
-            'la fiecare 2' +
-            ' ' +
-            medicationDetails.frequencyUnits.split()[1]
+            ' la fiecare 2 ' +
+            medicationDetails.frequencyUnits.split(' ')[1]
           )
         case 'asNeeded':
           return 'la nevoie'
@@ -405,6 +414,8 @@ const addMedication = async (medicationDetails) => {
       duration_days: medicationDetails.duration,
       notes: medicationDetails.notes,
       form: medicationDetails.form,
+      route: medicationDetails.route,
+      time_of_day: medicationDetails.timeOfDay,
     })
 
     emit('add', response.data.medication)

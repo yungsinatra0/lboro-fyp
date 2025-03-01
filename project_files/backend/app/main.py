@@ -683,7 +683,8 @@ def get_medications(user_id: uuid.UUID = Depends(validate_session), session: Ses
             "route": medication.route.name if medication.route else None,
             "form": medication.form.name if medication.form else None,
             "notes": medication.notes,
-            "date_added": medication.date_added    
+            "date_added": medication.date_added,
+            "time_of_day": medication.time_of_day
         }
         result.append(med)
     
@@ -710,15 +711,31 @@ def add_medication(medication: MedicationCreate, user_id: uuid.UUID = Depends(va
         form = medication_form,
         notes = medication.notes,
         user = user,
+        time_of_day=medication.time_of_day
         )
           
     session.add(new_medication)
     session.commit()
     session.refresh(new_medication)
+    
+    medication_response = MedicationResponse(
+        id = new_medication.id,
+        name = new_medication.name,
+        dosage = new_medication.dosage,
+        frequency = new_medication.frequency,
+        date_prescribed = new_medication.date_prescribed,
+        duration_days = new_medication.duration_days,
+        route = new_medication.route.name,
+        form = new_medication.form.name,
+        notes = new_medication.notes,
+        date_added = new_medication.date_added,
+        time_of_day = new_medication.time_of_day
+    )
+    
     return {
         "status": status.HTTP_201_CREATED,
         "message": "Medication added successfully",
-        "medication": new_medication
+        "medication": medication_response
     }
     
 # Delete medication
@@ -788,7 +805,8 @@ def update_medication(medication_id: uuid.UUID, medication_new: MedicationUpdate
         route = medication_db.route.name,
         form = medication_db.form.name,
         notes = medication_db.notes,
-        date_added = medication_db.date_added
+        date_added = medication_db.date_added,
+        time_of_day = medication_db.time_of_day
     )
     
     return {

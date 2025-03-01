@@ -206,8 +206,6 @@ class MedicationDates(SQLModel):
     def serialize_date_prescribed(self, value: date) -> str:
         return value.strftime("%d-%m-%Y")
 
-# TODO: Add nr of pills per taking (optional)
-# TODO: Add route of administration (optional)
 class Medication(MedicationDates, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
