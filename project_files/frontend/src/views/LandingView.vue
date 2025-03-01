@@ -31,12 +31,12 @@
         <h1
           class="text-3xl lg:text-5xl font-bold text-surface-900 dark:text-surface-0 mb-4 lg:leading-normal text-center lg:text-left"
         >
-          Cu MedArhiv <br /><span class="text-primary"> ai un istoric definitiv!</span>
+          Cu MoldHealth <br /><span class="text-primary"> ai un istoric definitiv!</span>
         </h1>
         <p
           class="text-surface-700 dark:text-surface-200 leading-normal mb-8 text-center lg:text-left"
         >
-          MedArhiv iti ofera posibilitatea de a-ti pastra istoricul medical intr-un singur loc,
+          MoldHealth iti ofera posibilitatea de a-ti pastra istoricul medical intr-un singur loc,
           sigur si usor de accesat.
         </p>
         <div class="flex flex-col items-center justify-center gap-6">
@@ -80,7 +80,7 @@
         <span class="text-primary-600 dark:text-primary-400">Toate nevoile asigurate</span>
       </div>
       <div class="text-surface-700 dark:text-surface-0/70 mb-[3rem]">
-        MedArhiv iti ofera un sistem complex si sigur de gestionare a datelor medicale, punand
+        MoldHealth iti ofera un sistem complex si sigur de gestionare a datelor medicale, punand
         accentul pe confidentialitate si accesibilitate. Descopera functionalitati adaptate pentru
         toti utilizatorii.
       </div>
@@ -97,7 +97,7 @@
           <p
             class="text-surface-700 dark:text-surface-0/70 leading-normal max-w-sm mx-auto text-center"
           >
-            Aplicatia MedArhiv iti ofera un sistem de securitate complex, care iti protejeaza datele
+            Aplicatia MoldHealth iti ofera un sistem de securitate complex, care iti protejeaza datele
             personale.
           </p>
         </div>
@@ -131,7 +131,7 @@
           <p
             class="text-surface-700 dark:text-surface-0/70 leading-normal max-w-sm mx-auto text-center"
           >
-            MedArhiv a fost creat pentru a fi usor de folosit, indiferent de varsta sau experienta
+            MoldHealth a fost creat pentru a fi usor de folosit, indiferent de varsta sau experienta
             in utilizarea aplicatiilor web.
           </p>
         </div>
@@ -163,7 +163,7 @@
           <p
             class="text-surface-700 dark:text-surface-0/70 leading-normal max-w-sm mx-auto text-center"
           >
-            Codul MedArhiv este open source, astfel incat oricine poate contribui la imbunatatirea
+            Codul MoldHealth este open source, astfel incat oricine poate contribui la imbunatatirea
             aplicatiei. Accesati codul sursa
             <Button as="router-link" label="aici." variant="text" to="/" class="p-0 border-0" />
           </p>
@@ -180,7 +180,7 @@
           <p
             class="text-surface-700 dark:text-surface-0/70 leading-normal max-w-sm mx-auto text-center"
           >
-            9 din 10 medici recomanda MedArhiv pentru a elimina durerea de cap lucrand cu arhiva
+            9 din 10 medici recomanda MoldHealth pentru a elimina durerea de cap lucrand cu arhiva
             medicala
           </p>
         </div>
@@ -204,12 +204,12 @@
           <h1
             class="text-3xl lg:text-5xl font-bold text-surface-900 dark:text-surface-0 mb-4 lg:leading-normal text-center lg:text-left"
           >
-            Echipa MedArhiv
+            Echipa MoldHealth
           </h1>
           <p
             class="text-surface-700 dark:text-surface-200 leading-normal mb-8 text-center lg:text-left"
           >
-            MedArhiv este dezvoltat de un student,
+            MoldHealth este dezvoltat de un student,
             <span class="text-primary font-bold"> Calin Corcimaru</span>, in cadrul proiectului de
             licenta la universitatea Loughborough din Marea Britanie.
           </p>
@@ -271,7 +271,7 @@
     <div
       class="bg-surface-0 dark:bg-surface-900 text-surface-700 dark:text-surface-200 text-center py-4"
     >
-      <span>© 2025 MedArhiv. All rights reserved.</span>
+      <span>© 2025 MoldHealth. All rights reserved.</span>
     </div>
   </footer>
 </template>
@@ -330,7 +330,7 @@ const items = ref([
     route: '/',
   },
   {
-    label: 'Despre MedArhiv',
+    label: 'Despre MoldHealth',
     command: () => {
       setTimeout(() => {
         featuresSection.value.scrollIntoView({ behavior: 'smooth' }) // This is a horrible hack, but it works (for now)
