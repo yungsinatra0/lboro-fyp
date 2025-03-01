@@ -503,21 +503,76 @@ def get_severities(user_id: uuid.UUID = Depends(validate_session), session: Sess
 @app.get("/me/healthdata", response_model=list[HealthDataResponse])
 def get_healthdata(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     user = session.get(User, user_id)
-    return user.healthdata
+    
+    result = []
+    
+    for healthdata in user.healthdata:
+        if healthdata.type.name == "Blood Pressure":
+            result.append({
+                "id": healthdata.id,
+                "name": healthdata.type.name,
+                "unit": healthdata.type.unit,
+                "value_systolic": healthdata.value_systolic,
+                "value_diastolic": healthdata.value_diastolic,
+                "date_recorded": healthdata.date_recorded,
+                "notes": healthdata.notes,
+                "date_added": healthdata.date_added
+            })
+        else:
+            result.append({
+                "id": healthdata.id,
+                "name": healthdata.type.name,
+                "unit": healthdata.type.unit,
+                "value": healthdata.value,
+                "date_recorded": healthdata.date_recorded,
+                "notes": healthdata.notes,
+                "date_added": healthdata.date_added
+            })
+    
+    return result
 
-# Add health data
+# Add health data - simple
 @app.post("/me/healthdata")
-def add_healthdata(healthdata: HealthDataCreate, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+def add_healthdata(healthdata: SimpleHealthDataCreate, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     user = session.get(User, user_id)
     
+    data_type = session.exec(select(HealthDataType).where(HealthDataType.name == healthdata.name)).first()
+      
     new_healthdata = HealthData(
-        name = healthdata.name,
         value = healthdata.value,
         date_recorded = healthdata.date_recorded,
         user = user,
-        type=healthdata.type,
-        date_added=healthdata.date_added
+        type = data_type,
         )
+    
+    if healthdata.notes:
+        new_healthdata.notes = healthdata.notes
+          
+    session.add(new_healthdata)
+    session.commit()
+    session.refresh(new_healthdata)
+    return {
+        "status": status.HTTP_201_CREATED,
+        "message": "Health data added successfully"
+    }
+    
+# Add health data - blood pressure
+@app.post("/me/healthdata/bp")
+def add_complex_healthdata(healthdata: BloodPressureCreate, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    user = session.get(User, user_id)
+    
+    data_type = session.exec(select(HealthDataType).where(HealthDataType.name == healthdata.name)).first()
+    
+    new_healthdata = HealthData(
+        systolic = healthdata.value_systolic,
+        diastolic = healthdata.value_diastolic,
+        date_recorded = healthdata.date_recorded,
+        user = user,
+        type = data_type,
+        )
+    
+    if healthdata.notes:
+        new_healthdata.notes = healthdata.notes
           
     session.add(new_healthdata)
     session.commit()
@@ -570,17 +625,41 @@ def update_healthdata(healthdata_id: uuid.UUID, healthdata_new: HealthDataUpdate
         raise HTTPException(status_code=403, detail="You do not have permission to update this health data")
     
     healthdata_data = healthdata_new.model_dump(exclude_unset=True)
+    
+    if "name" in healthdata_data:
+        data_type = session.exec(select(HealthDataType).where(HealthDataType.name == healthdata_data["name"])).first()
+        healthdata_data["type"] = data_type      
+    
     healthdata_db.sqlmodel_update(healthdata_data)
     session.add(healthdata_db)
     session.commit()
     session.refresh(healthdata_db)
+    
+    updated_healthdata = HealthDataResponse(
+        id = healthdata_db.id,
+        name = healthdata_db.type.name,
+        unit = healthdata_db.type.unit,
+        date_recorded = healthdata_db.date_recorded,
+        notes = healthdata_db.notes,
+        date_added = healthdata_db.date_added
+    )    
+    
+    if healthdata_db.value:
+        updated_healthdata.value = healthdata_db.value
+    elif healthdata_db.value_diastolic and healthdata_db.value_systolic:
+        updated_healthdata.value_systolic = healthdata_db.value_systolic
+        updated_healthdata.value_diastolic = healthdata_db.value_diastolic
+    else: 
+        raise HTTPException(status_code=500, detail="An error occurred when updating health data")
+    
     return {
         "status": status.HTTP_200_OK,
-        "message": "Health data updated successfully"
+        "message": "Health data updated successfully",
+        "healthdata": updated_healthdata
     }
     
 # Get all health data types
-@app.get("/healthdata/types")
+@app.get("/healthdata/types", response_model=list[HealthDataTypeResponse])
 def get_healthdata_types(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     healthdata_types = session.exec(select(HealthDataType)).all()
     return healthdata_types

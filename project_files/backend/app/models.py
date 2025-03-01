@@ -206,6 +206,8 @@ class MedicationDates(SQLModel):
     def serialize_date_prescribed(self, value: date) -> str:
         return value.strftime("%d-%m-%Y")
 
+# TODO: Add nr of pills per taking (optional)
+# TODO: Add time of day for taking (optional)
 class Medication(MedicationDates, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
@@ -277,8 +279,10 @@ class HealthDataDates(SQLModel):
     
 class HealthData(HealthDataDates, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    name: str
-    value: float
+    value: float | None = None
+    value_systolic: float | None = None
+    value_diastolic: float | None = None
+    notes: str | None = None
     
     user_id : uuid.UUID = Field(foreign_key="user.id")
     user: User = Relationship(back_populates="healthdata")
@@ -290,21 +294,35 @@ class HealthData(HealthDataDates, table=True):
 class HealthDataResponse(HealthDataDates):
     id: uuid.UUID
     name: str
-    value: float
-    type: str
+    unit: str
+    value: float | None = None
+    value_systolic: float | None = None
+    value_diastolic: float | None = None
+    notes: str | None = None     
     
 # Health data create model
-class HealthDataCreate(HealthDataDates):
+class SimpleHealthDataCreate(HealthDataDates):
     name: str
+    unit: str
     value: float
-    type: str
+    notes: str | None = None
+    
+class BloodPressureCreate(HealthDataDates):
+    name: str
+    unit: str
+    value_systolic: float
+    value_diastolic: float
+    notes: str | None = None
     
 # Health data update model
 class HealthDataUpdate(SQLModel):
     name: str | None = None
     value: float | None = None
+    value_systolic: float | None = None
+    value_diastolic: float | None = None
     date_recorded: date | None = None
-    type: str | None = None
+    unit: str | None = None
+    notes: str | None = None
     
     @field_serializer('date_recorded')
     def serialize_date_recorded(self, value: date) -> str | None:
@@ -315,8 +333,16 @@ class HealthDataUpdate(SQLModel):
 class HealthDataType(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
+    unit: str
+    is_compound: bool = False
     
     healthdata: list[HealthData] = Relationship(back_populates="type")
+    
+class HealthDataTypeResponse(SQLModel):
+    id: uuid.UUID
+    name: str
+    unit: str
+    is_compound: bool
     
 # File Table models used for table creation
 class FileUpload(SQLModel, table=True):
