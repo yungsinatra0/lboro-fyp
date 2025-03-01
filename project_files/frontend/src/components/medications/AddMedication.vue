@@ -69,14 +69,57 @@
         </div>
       </div>
 
-      <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 mb-6">
-        <label for="frequency" class="font-semibold text-sm md:text-base w-full md:w-1/4"
-          >Frecventa luarii medicamentului</label
+      <div class="flex flex-col gap-4 md:gap-6 mb-6">
+          <div class="flex flex-row gap-4 items-center">
+            <label class="font-semibold text-sm md:text-base"> Tipul frecventei </label>
+            <RadioButtonGroup name="frequencyChoice" class="flex flex-row">
+
+              <div class="flex items-center gap-2 ml-2">
+                <RadioButton value="standard" inputId="standard" />
+                <label for="standard" class="text-sm md:text-base cursor-pointer">Standard</label>
+              </div>
+
+              <div class="flex items-center gap-2 ml-2">
+                <RadioButton value="alternativ" inputId="alternativ" />
+                <label for="alternativ" class="text-sm md:text-base cursor-pointer"
+                  >Alternativ</label
+                >
+              </div>
+
+              <div class="flex items-center gap-2 ml-2">
+                <RadioButton value="asNeeded" inputId="asNeeded" />
+                <label for="asNeeded" class="text-sm md:text-base cursor-pointer">La nevoie</label>
+              </div>
+
+              <div class="flex items-center gap-2 ml-2">
+                <RadioButton value="continuu" inputId="continuu" />
+                <label for="continuu" class="text-sm md:text-base cursor-pointer">Continuu</label>
+              </div>
+
+            </RadioButtonGroup>
+            <Message
+              v-if="$form.frequencyChoice?.invalid"
+              severity="error"
+              size="small"
+              variant="simple"
+              class="text-rose-600 text-xs md:text-sm"
+              >{{ $form.frequencyChoice.error.message }}</Message
+            >
+          </div>
+
+        <div
+          v-if="
+            $form.frequencyChoice?.value === 'standard' ||
+            $form.frequencyChoice?.value === 'alternativ'
+          "
+          class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4"
         >
-        <div class="w-full md:w-3/4">
+          <label for="frequency" class="font-semibold text-sm md:text-base w-full md:w-1/4">
+            Frecventa luarii medicamentului
+          </label>
           <div class="flex flex-row items-center gap-2">
             <InputNumber
-              name="frequency"
+              name="frequencyValue"
               class="w-1/2"
               autocomplete="off"
               inputId="integeronly"
@@ -89,7 +132,7 @@
               :options="frequency"
               placeholder="Unitate"
               fluid
-              class="w-1/2 md:w-1/4"
+              class="w-1/2 md:w-1/3"
             />
           </div>
           <div class="flex flex-col mt-1">
@@ -99,16 +142,18 @@
               size="small"
               variant="simple"
               class="text-rose-600 text-xs md:text-sm"
-              >{{ $form.frequency.error.message }}</Message
             >
+              {{ $form.frequency.error.message }}
+            </Message>
             <Message
               v-if="$form.frequencyUnits?.invalid"
               severity="error"
               size="small"
               variant="simple"
               class="text-rose-600 text-xs md:text-sm"
-              >{{ $form.frequencyUnits.error.message }}</Message
             >
+              {{ $form.frequencyUnits.error.message }}
+            </Message>
           </div>
         </div>
       </div>
@@ -250,6 +295,8 @@ import Select from 'primevue/select'
 import InputNumber from 'primevue/inputnumber'
 import Textarea from 'primevue/textarea'
 import IftaLabel from 'primevue/iftalabel'
+import RadioButton from 'primevue/radiobutton'
+import RadioButtonGroup from 'primevue/radiobuttongroup'
 
 import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
@@ -266,18 +313,29 @@ const emit = defineEmits(['add', 'close'])
 const maxDate = ref(new Date())
 const displayAddDialog = ref(props.displayDialog)
 
-const dosageUnits = ref(['capsula', 'IU', 'mL', 'tableta', 'g', 'mg', 'ug', 'mcg', 'PUFF', 'Altele'])
-
+const dosageUnits = ref([
+  'capsula',
+  'IU',
+  'mL',
+  'tableta',
+  'g',
+  'mg',
+  'ug',
+  'mcg',
+  'PUFF',
+  'Altele',
+])
 const frequency = ref(['pe zi', 'pe saptamana', 'pe luna'])
 
 const initialValues = ref({
   name: '',
   dosage: '',
   dosageUnits: dosageUnits.value[0],
-  frequency: '',
+  frequencyChoice: '',
+  frequencyValue: 0,
   frequencyUnits: frequency.value[0],
   datePrescribed: null,
-  duration: '',
+  duration: 0,
   notes: '',
   form: props.forms[0],
   routes: props.routes[0],
@@ -287,7 +345,7 @@ const resolver = zodResolver(
   z.object({
     name: z.string().nonempty('Numele medicamentului este obligatoriu.'),
     dosage: z.string().nonempty('Doza medicamentului este obligatorie.'),
-    frequency: z
+    frequencyValue: z
       .number('Frecventa luarii medicamentului trebuie sa fie un numar.')
       .int()
       .positive('Frecventa luarii medicamentului trebuie sa fie un numar pozitiv.'),
@@ -305,6 +363,7 @@ const resolver = zodResolver(
     route: z.string().nonempty('Calea de administrare a medicamentului este obligatorie.'),
     dosageUnits: z.string().nonempty('Unitatea de masura a dozei este obligatorie.'),
     frequencyUnits: z.string().nonempty('Unitatea de masura a frecventei este obligatorie.'),
+    frequencyChoice: z.string().min(1, { message: 'Alege o optiune pentru frecventa.' }),
   }),
 )
 
@@ -320,10 +379,28 @@ const addMedication = async (medicationDetails) => {
       formattedDate = `${year}-${month}-${day}`
     }
 
+    let formattedFrequency = () => {
+      switch (medicationDetails.frequencyChoice) {
+        case 'standard':
+          return medicationDetails.frequencyValue + ' ' + medicationDetails.frequencyUnits
+        case 'alternativ':
+          return (
+            medicationDetails.frequencyValue +
+            'la fiecare 2' +
+            ' ' +
+            medicationDetails.frequencyUnits.split()[1]
+          )
+        case 'asNeeded':
+          return 'la nevoie'
+        case 'continuu':
+          return 'continuu'
+      }
+    }
+
     const response = await api.post('me/medications', {
       name: medicationDetails.name,
       dosage: medicationDetails.dosage + medicationDetails.dosageUnits,
-      frequency: medicationDetails.frequency + ' ' + medicationDetails.frequencyUnits,
+      frequency: formattedFrequency(),
       date_prescribed: formattedDate,
       duration_days: medicationDetails.duration,
       notes: medicationDetails.notes,
