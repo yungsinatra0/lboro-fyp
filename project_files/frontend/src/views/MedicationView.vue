@@ -24,7 +24,7 @@
       <div v-else-if="medications.length === 0" class="p-4">
         Nu a fost gasit nici un medicament.
       </div>
-
+<!-- TODO: Change medication cards to an accordion-style view  -->
       <MedicationCard
         v-else
         v-for="medication in medications"

@@ -247,7 +247,6 @@ def add_vaccine(vaccine: VaccineCreate, user_id: uuid.UUID = Depends(validate_se
         provider = new_vaccine.provider,
         date_received = new_vaccine.date_received,
         certificate = new_vaccine.certificate,
-        date_added = new_vaccine.date_added
     )
     
     return {
@@ -375,7 +374,6 @@ def add_allergy(allergy: AllergyCreate, user_id: uuid.UUID = Depends(validate_se
         reactions = reactions,
         severity = severity,
         notes = allergy.notes,
-        date_added = allergy.date_added
         )
           
     session.add(new_allergy)
@@ -705,7 +703,6 @@ def add_medication(medication: MedicationCreate, user_id: uuid.UUID = Depends(va
         form = medication_form,
         notes = medication.notes,
         user = user,
-        date_added = medication.date_added
         )
           
     session.add(new_medication)
