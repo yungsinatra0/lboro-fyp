@@ -154,9 +154,10 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
                 date_added = allergy.date_added
         ))
     
-    # Iterate through medications to get only form names - same as above, expects str for medication form
+    # Iterate through medications to get route and form names - same as above, expects str
     medications_response = []
     for medication in newest_medications:
+        route = medication.route.name if medication.route else None
         form = medication.form.name if medication.form else None
         medications_response.append(
             MedicationResponse(
@@ -166,6 +167,7 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
                 frequency=medication.frequency,
                 date_prescribed=medication.date_prescribed,
                 duration_days=medication.duration_days,
+                route=route,
                 form=form,
                 notes=medication.notes,
                 date_added=medication.date_added               
@@ -668,7 +670,7 @@ def get_healthdata_types(user_id: uuid.UUID = Depends(validate_session), session
 def get_medications(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     user = session.get(User, user_id)
     
-    # Need to do this because each user has multiple medications, and each medication has a form 
+    # Need to do this because each user has multiple medications, and each medication has a route 
     result = []
     for medication in user.medications:
         med = {
@@ -678,6 +680,7 @@ def get_medications(user_id: uuid.UUID = Depends(validate_session), session: Ses
             "frequency": medication.frequency,
             "date_prescribed": medication.date_prescribed,
             "duration_days": medication.duration_days,
+            "route": medication.route.name if medication.route else None,
             "form": medication.form.name if medication.form else None,
             "notes": medication.notes,
             "date_added": medication.date_added    
@@ -691,6 +694,9 @@ def get_medications(user_id: uuid.UUID = Depends(validate_session), session: Ses
 def add_medication(medication: MedicationCreate, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     user = session.get(User, user_id)
     
+    # Find the medication route using the route name
+    medication_route = session.exec(select(MedicationRoute).where(MedicationRoute.name == medication.route)).first()
+    
     # Find the medication form using the form name
     medication_form = session.exec(select(MedicationForm).where(MedicationForm.name == medication.form)).first()
     
@@ -700,6 +706,7 @@ def add_medication(medication: MedicationCreate, user_id: uuid.UUID = Depends(va
         frequency = medication.frequency,
         date_prescribed = medication.date_prescribed,
         duration_days = medication.duration_days,
+        route = medication_route,
         form = medication_form,
         notes = medication.notes,
         user = user,
@@ -758,6 +765,10 @@ def update_medication(medication_id: uuid.UUID, medication_new: MedicationUpdate
     
     medication_data = medication_new.model_dump(exclude_unset=True)
     
+    if "route" in medication_data:
+        route = session.exec(select(MedicationRoute).where(MedicationRoute.name == medication_data["route"])).first()
+        medication_data["route"] = route
+        
     if "form" in medication_data:
         form = session.exec(select(MedicationForm).where(MedicationForm.name == medication_data["form"])).first()
         medication_data["form"] = form
@@ -774,6 +785,7 @@ def update_medication(medication_id: uuid.UUID, medication_new: MedicationUpdate
         frequency = medication_db.frequency,
         date_prescribed = medication_db.date_prescribed,
         duration_days = medication_db.duration_days,
+        route = medication_db.route.name,
         form = medication_db.form.name,
         notes = medication_db.notes,
         date_added = medication_db.date_added
@@ -785,6 +797,12 @@ def update_medication(medication_id: uuid.UUID, medication_new: MedicationUpdate
         "medication": medication_response
     }
     
+# Get all medication routes
+@app.get("/medications/routes", response_model=list[MedicationRouteResponse])
+def get_medication_routes(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    medication_routes = session.exec(select(MedicationRoute)).all()
+    return medication_routes
+
 # Get all medication forms
 @app.get("/medications/forms", response_model=list[MedicationFormResponse])
 def get_medication_forms(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):

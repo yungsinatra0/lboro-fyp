@@ -43,6 +43,7 @@
       @add="addMedication"
       :display-dialog="displayAddDialog"
       :forms="medforms"
+      :routes="medroutes"
     />
 
     <EditMedication
@@ -72,6 +73,7 @@ const displayEditDialog = ref(false)
 const editDialogData = ref(null)
 const medications = ref([])
 const medforms = ref([])
+const medroutes = ref([])
 const loading = ref(true)
 const error = ref(null)
 
@@ -81,6 +83,8 @@ onMounted(async () => {
     medications.value = response.data
     const response2 = await api.get('/medications/forms')
     medforms.value = response2.data.map((form) => form.name) // get only the name of the form
+    const response3 = await api.get('/medications/routes')
+    medroutes.value = response3.data.map((route) => route.name) // get only the name of the route
   } catch (err) {
     error.value = 'A aparut o eroare la incarcarea medicamentelor: ' + err.message
   } finally {

@@ -175,6 +175,29 @@
       </div>
 
       <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 mb-6">
+        <label for="route" class="font-semibold text-sm md:text-base w-full md:w-1/4"
+          >Calea de administrare a medicamentului</label
+        >
+        <div class="w-full md:w-3/4">
+          <Select
+            name="route"
+            :options="routes"
+            placeholder="Calea de administrare"
+            fluid
+            class="w-full md:w-1/3"
+          />
+          <Message
+            v-if="$form.route?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            class="text-rose-600 text-xs md:text-sm mt-1"
+            >{{ $form.route.error.message }}</Message
+          >
+        </div>
+      </div>
+
+      <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 mb-6">
         <label for="notes" class="font-semibold text-sm md:text-base w-full md:w-1/4">Notite</label>
         <div class="w-full md:w-3/4">
           <Textarea
@@ -236,13 +259,14 @@ import { ref } from 'vue'
 const props = defineProps({
   displayDialog: Boolean,
   forms: Array,
+  routes: Array,
 })
 
 const emit = defineEmits(['add', 'close'])
 const maxDate = ref(new Date())
 const displayAddDialog = ref(props.displayDialog)
 
-const dosageUnits = ref(['mg', 'g', 'ml', 'UI'])
+const dosageUnits = ref(['capsula', 'IU', 'mL', 'tableta', 'g', 'mg', 'ug', 'mcg', 'PUFF', 'Altele'])
 
 const frequency = ref(['pe zi', 'pe saptamana', 'pe luna'])
 
@@ -256,6 +280,7 @@ const initialValues = ref({
   duration: '',
   notes: '',
   form: props.forms[0],
+  routes: props.routes[0],
 })
 
 const resolver = zodResolver(
@@ -277,6 +302,7 @@ const resolver = zodResolver(
       .positive('Durata tratamentului trebuie sa fie un numar pozitiv.'),
     notes: z.string().optional(),
     form: z.string().nonempty('Forma medicamentului este obligatorie.'),
+    route: z.string().nonempty('Calea de administrare a medicamentului este obligatorie.'),
     dosageUnits: z.string().nonempty('Unitatea de masura a dozei este obligatorie.'),
     frequencyUnits: z.string().nonempty('Unitatea de masura a frecventei este obligatorie.'),
   }),

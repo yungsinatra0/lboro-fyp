@@ -207,17 +207,21 @@ class MedicationDates(SQLModel):
         return value.strftime("%d-%m-%Y")
 
 # TODO: Add nr of pills per taking (optional)
-# TODO: Add time of day for taking (optional)
+# TODO: Add route of administration (optional)
 class Medication(MedicationDates, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
     dosage: str
     frequency: str
+    time_of_day: str | None = None
     duration_days: int | None = None
     notes: str | None = None
     
     user_id : uuid.UUID = Field(foreign_key="user.id")
     user: User = Relationship(back_populates="medications")
+    
+    route_id : uuid.UUID = Field(foreign_key="medicationroute.id")
+    route: "MedicationRoute" = Relationship(back_populates="medications")
     
     form_id : uuid.UUID = Field(foreign_key="medicationform.id")
     form: "MedicationForm" = Relationship(back_populates="medications")
@@ -228,7 +232,9 @@ class MedicationResponse(MedicationDates):
     name: str
     dosage: str
     frequency: str
+    time_of_day: str | None = None
     duration_days: int | None = None 
+    route: str
     form: str
     notes: str | None = None
 
@@ -237,7 +243,9 @@ class MedicationCreate(MedicationDates):
     name: str
     dosage: str
     frequency: str
+    time_of_day: str | None = None
     duration_days: int | None = None
+    route: str
     form: str
     notes: str | None = None
     
@@ -246,8 +254,10 @@ class MedicationUpdate(SQLModel):
     name: str | None = None
     dosage: str | None = None
     frequency: str | None = None
+    time_of_day: str | None = None
     date_prescribed: date | None = None
     duration_days: int | None = None
+    route: str | None = None
     form: str | None = None
     notes: str | None = None
     
@@ -256,8 +266,17 @@ class MedicationUpdate(SQLModel):
         if value is None:
             return None
         return value.strftime("%d-%m-%Y")
-    
 
+class MedicationRoute(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    name: str
+    
+    medications: list[Medication] = Relationship(back_populates="route")
+    
+class MedicationRouteResponse(SQLModel):
+    id: uuid.UUID
+    name: str
+    
 class MedicationForm(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
