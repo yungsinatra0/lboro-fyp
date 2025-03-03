@@ -14,7 +14,7 @@
       />
     </div>
 
-    <div class="flex flex-col md:flex-row items-center md:items-start gap-2 p-3">
+    <div class="flex-1 p-3 md:p-5 w-full">
       <ProgressSpinner v-if="loading" />
 
       <div v-else-if="error" class="p-4 text-red-500">
@@ -24,16 +24,14 @@
       <div v-else-if="medications.length === 0" class="p-4">
         Nu a fost gasit nici un medicament.
       </div>
-      
-      <div v-else class="md:grid md:grid-cols-3 md:gap-6 md:w-full">
-        <MedicationCard
-          v-for="medication in medications"
-          :key="medication.id"
-          v-bind="medication"
-          @delete="deleteMedication"
-          @open-edit="openEditDialog"
-        />
-      </div>
+
+      <MedicationDataView
+        v-else
+        :medications="medications"
+        @delete="deleteMedication"
+        @open-edit="openEditDialog"
+        class="w-full h-full"
+      />
     </div>
 
     <ConfirmDialog></ConfirmDialog>
@@ -61,13 +59,13 @@
 <script setup>
 import NavBar from '@/components/NavBar.vue'
 import Button from 'primevue/button'
-import MedicationCard from '@/components/medications/MedicationCard.vue'
 import EditMedication from '@/components/medications/EditMedication.vue'
 import AddMedication from '@/components/medications/AddMedication.vue'
 import ProgressSpinner from 'primevue/progressspinner'
 import api from '../services/api'
 import { onMounted, ref } from 'vue'
 import ConfirmDialog from 'primevue/confirmdialog'
+import MedicationDataView from '@/components/medications/MedicationDataView.vue'
 
 const displayAddDialog = ref(false)
 const displayEditDialog = ref(false)

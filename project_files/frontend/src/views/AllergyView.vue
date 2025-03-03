@@ -14,7 +14,7 @@
       />
     </div>
 
-    <div class="flex flex-col md:flex-row items-center md:items-start gap-2 p-3">
+    <div class="flex-1 p-3 md:p-5 w-full">
       <ProgressSpinner v-if="loading" />
 
       <div v-else-if="error" class="p-4 text-red-500">
@@ -23,15 +23,13 @@
 
       <div v-else-if="allergies.length === 0" class="p-4">Nu a fost gasita nici o alergie.</div>
 
-      <div v-else class="md:grid md:grid-cols-3 md:gap-6 md:w-full">
-        <AllergyCard
-          v-for="allergy in allergies"
-          :key="allergy.id"
-          v-bind="allergy"
+        <AllergyDataView  
+          v-else
+          :allergies="allergies"
           @delete="deleteAllergy"
           @open-edit="openEditDialog"
+          class="w-full h-full"
         />
-      </div>
     </div>
 
     <ConfirmDialog></ConfirmDialog>
@@ -63,12 +61,12 @@
 import NavBar from '@/components/NavBar.vue'
 import Button from 'primevue/button'
 import ProgressSpinner from 'primevue/progressspinner'
-import AllergyCard from '@/components/allergies/AllergyCard.vue'
 import AddAllergy from '@/components/allergies/AddAllergy.vue'
 import EditAllergy from '@/components/allergies/EditAllergy.vue'
 import { onMounted, ref } from 'vue'
 import api from '../services/api'
 import ConfirmDialog from 'primevue/confirmdialog'
+import AllergyDataView from '@/components/allergies/AllergyDataView.vue'
 
 const allergies = ref([])
 const allergyReactions = ref([])

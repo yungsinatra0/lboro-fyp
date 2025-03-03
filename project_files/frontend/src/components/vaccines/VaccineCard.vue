@@ -112,5 +112,3 @@ const confirm1 = (event) => {
   })
 }
 </script>
-
-<style scoped></style>

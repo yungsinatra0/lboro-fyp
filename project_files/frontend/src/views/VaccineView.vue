@@ -13,7 +13,7 @@
       />
     </div>
 
-    <div class="flex flex-col items-center gap-4 p-3 md:p-5">
+    <div class="flex-1 p-3 md:p-5 w-full">
       <ProgressSpinner v-if="loading" />
 
       <div v-else-if="error" class="p-4 text-red-500">
@@ -22,15 +22,13 @@
 
       <div v-else-if="vaccines.length === 0" class="p-4">Nu a fost gasit nici un vaccin.</div>
 
-      <VaccineCard
+      <VaccineDataView
         v-else
-        v-for="vaccine in vaccines"
-        :key="vaccine.id"
-        v-bind="vaccine"
-        :has-certificate="vaccine.certificate ? true : false"
+        :vaccines=vaccines
         @delete="deleteVaccine"
         @open-edit="openEditDialog"
         @show-file="showCertificate"
+        class="w-full h-full"
       />
     </div>
 
@@ -67,11 +65,11 @@ import { onMounted, ref } from 'vue'
 import api from '@/services/api'
 import ProgressSpinner from 'primevue/progressspinner'
 import ConfirmDialog from 'primevue/confirmdialog'
-
 import AddVaccine from '@/components/vaccines/AddVaccine.vue'
-import VaccineCard from '@/components/vaccines/VaccineCard.vue'
+// import VaccineCard from '@/components/vaccines/VaccineCard.vue'
 import EditVaccine from '@/components/vaccines/EditVaccine.vue'
 import ShowCertificate from '@/components/vaccines/ShowCertificate.vue'
+import VaccineDataView from '@/components/vaccines/VaccineDataView.vue'
 
 const vaccines = ref([])
 const loading = ref(true)
@@ -87,6 +85,7 @@ onMounted(async () => {
   try {
     const response = await api.get('me/vaccines')
     vaccines.value = response.data
+    console.log(vaccines.value)
   } catch (err) {
     error.value = 'A aparut o eroare la incarcarea vaccinelor' + err
   } finally {
