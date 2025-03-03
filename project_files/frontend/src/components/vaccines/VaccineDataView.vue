@@ -1,15 +1,35 @@
 <template>
   <div class="card">
-    <DataView :value="props.vaccines" :layout="layout" :sortOrder="sortOrder" :sortField="sortField">
+    <DataView
+      :value="filteredVaccines"
+      :layout="layout"
+      :sortOrder="sortOrder"
+      :sortField="sortField"
+    >
       <template #header>
         <div class="flex justify-between items-center">
-          <Select
-            v-model="sortKey"
-            :options="sortOptions"
-            optionLabel="label"
-            placeholder="Sorteaza dupa data adaugarii"
-            @change="onSortChange($event)"
-          />
+          <div class="flex flex-row items-center gap-4">
+            <InputText
+              v-model="searchQuery"
+              placeholder="Caută vaccin..."
+              class="w-full md:w-auto"
+            />
+            <Select
+              v-model="sortKey"
+              :options="sortOptions"
+              optionLabel="label"
+              placeholder="Sorteaza dupa data adaugarii"
+              @change="onSortChange($event)"
+            />
+            <ToggleButton
+              v-model="hasCertificateOnly"
+              onLabel="Doar cu certificat"
+              offLabel="Toate vaccinele"
+              onIcon="pi pi-check"
+              offIcon="pi pi-times"
+              class="p-button-sm"
+            />
+          </div>
           <SelectButton v-model="layout" :options="options" :allowEmpty="false">
             <template #option="{ option }">
               <i :class="[option === 'list' ? 'pi pi-bars' : 'pi pi-table']" />
@@ -104,7 +124,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import DataView from 'primevue/dataview'
 import Button from 'primevue/button'
 import SelectButton from 'primevue/selectbutton'
@@ -112,6 +132,8 @@ import Select from 'primevue/select'
 import Menu from 'primevue/menu'
 import { useConfirm } from 'primevue/useconfirm'
 import api from '@/services/api'
+import ToggleButton from 'primevue/togglebutton'
+import InputText from 'primevue/inputtext'
 
 const props = defineProps({
   vaccines: Object,
@@ -131,6 +153,9 @@ const sortOptions = ref([
   { label: 'Data Tarziu spre Recent', value: '!date_added' },
   { label: 'Data Recent spre Tarziu', value: 'date_added' },
 ])
+const hasCertificateOnly = ref(false)
+const searchQuery = ref('')
+
 const onSortChange = (event) => {
   const value = event.value.value
   const sortValue = event.value
@@ -145,6 +170,24 @@ const onSortChange = (event) => {
     sortKey.value = sortValue
   }
 }
+
+const filteredVaccines = computed(() => {
+  let result = props.vaccines
+
+  if (searchQuery.value) {
+    result = result.filter(
+      (vaccine) =>
+        vaccine.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+        vaccine.provider.toLowerCase().includes(searchQuery.value.toLowerCase())
+    )
+  }
+
+  if (hasCertificateOnly.value) {
+    result = result.filter((vaccine) => vaccine.certificate)
+  }
+
+  return result
+})
 
 const menuItems = ref([
   {

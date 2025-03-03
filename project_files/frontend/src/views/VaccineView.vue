@@ -85,7 +85,6 @@ onMounted(async () => {
   try {
     const response = await api.get('me/vaccines')
     vaccines.value = response.data
-    console.log(vaccines.value)
   } catch (err) {
     error.value = 'A aparut o eroare la incarcarea vaccinelor' + err
   } finally {
