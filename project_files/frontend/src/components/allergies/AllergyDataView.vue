@@ -155,9 +155,10 @@
               <!-- Content section -->
               <div class="p-4 flex-1">
                 <div class="grid grid-cols-2 gap-x-4 gap-y-2">
+
                   <div class="col-span-2">
                     <span class="text-sm text-surface-600 dark:text-surface-400">Alergie la</span>
-                    <div class="grid grid-flow-col grid-rows-2 auto-cols-fr gap-1 mt-0.5">
+                    <div class="grid grid-cols-3 auto-cols-fr gap-1 mt-0.5">
                       <p
                         class="text-base font-semibold text-surface-900 dark:text-surface-0"
                         v-for="allergen in allergy.allergens"
