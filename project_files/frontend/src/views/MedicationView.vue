@@ -52,6 +52,7 @@
       :display-dialog="displayEditDialog"
       :medication="editDialogData"
       :forms="medforms"
+      :routes="medroutes"
     />
   </div>
 </template>

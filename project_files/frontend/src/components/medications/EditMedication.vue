@@ -69,14 +69,53 @@
         </div>
       </div>
 
-      <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 mb-6">
-        <label for="frequency" class="font-semibold text-sm md:text-base w-full md:w-1/4"
-          >Frecventa luarii medicamentului</label
+      <div class="flex flex-col gap-4 md:gap-6 mb-6">
+        <div class="flex flex-row gap-4 items-center">
+          <label class="font-semibold text-sm md:text-base"> Tipul frecventei </label>
+          <RadioButtonGroup name="frequencyChoice" class="flex flex-row">
+            <div class="flex items-center gap-2 ml-2">
+              <RadioButton value="standard" inputId="standard" />
+              <label for="standard" class="text-sm md:text-base cursor-pointer">Standard</label>
+            </div>
+
+            <div class="flex items-center gap-2 ml-2">
+              <RadioButton value="alternativ" inputId="alternativ" />
+              <label for="alternativ" class="text-sm md:text-base cursor-pointer">Alternativ</label>
+            </div>
+
+            <div class="flex items-center gap-2 ml-2">
+              <RadioButton value="asNeeded" inputId="asNeeded" />
+              <label for="asNeeded" class="text-sm md:text-base cursor-pointer">La nevoie</label>
+            </div>
+
+            <div class="flex items-center gap-2 ml-2">
+              <RadioButton value="continuu" inputId="continuu" />
+              <label for="continuu" class="text-sm md:text-base cursor-pointer">Continuu</label>
+            </div>
+          </RadioButtonGroup>
+          <Message
+            v-if="$form.frequencyChoice?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            class="text-rose-600 text-xs md:text-sm"
+            >{{ $form.frequencyChoice.error.message }}</Message
+          >
+        </div>
+
+        <div
+          v-if="
+            $form.frequencyChoice?.value === 'standard' ||
+            $form.frequencyChoice?.value === 'alternativ'
+          "
+          class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4"
         >
-        <div class="w-full md:w-3/4">
+          <label for="frequency" class="font-semibold text-sm md:text-base w-full md:w-1/4">
+            Frecventa luarii medicamentului
+          </label>
           <div class="flex flex-row items-center gap-2">
             <InputNumber
-              name="frequency"
+              name="frequencyValue"
               class="w-1/2"
               autocomplete="off"
               inputId="integeronly"
@@ -89,7 +128,15 @@
               :options="frequency"
               placeholder="Unitate"
               fluid
-              class="w-1/2 md:w-1/4"
+              class="w-1/2"
+            />
+            <Select
+              v-if="$form.frequencyValue?.value === 1 && $form.frequencyUnits?.value === 'pe zi'"
+              name="timeOfDay"
+              :options="['dimineata', 'pranz', 'seara']"
+              placeholder="Momentul zilei"
+              fluid
+              class="w-1/2"
             />
           </div>
           <div class="flex flex-col mt-1">
@@ -99,16 +146,18 @@
               size="small"
               variant="simple"
               class="text-rose-600 text-xs md:text-sm"
-              >{{ $form.frequency.error.message }}</Message
             >
+              {{ $form.frequency.error.message }}
+            </Message>
             <Message
               v-if="$form.frequencyUnits?.invalid"
               severity="error"
               size="small"
               variant="simple"
               class="text-rose-600 text-xs md:text-sm"
-              >{{ $form.frequencyUnits.error.message }}</Message
             >
+              {{ $form.frequencyUnits.error.message }}
+            </Message>
           </div>
         </div>
       </div>
@@ -227,6 +276,8 @@ import Select from 'primevue/select'
 import InputNumber from 'primevue/inputnumber'
 import Textarea from 'primevue/textarea'
 import IftaLabel from 'primevue/iftalabel'
+import RadioButtonGroup from 'primevue/radiobuttongroup'
+import RadioButton from 'primevue/radiobutton'
 
 import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
@@ -240,13 +291,25 @@ const props = defineProps({
   displayDialog: Boolean,
   medication: Object,
   forms: Array,
+  routes: Array,
 })
 
 const emit = defineEmits(['edit', 'close'])
 const maxDate = ref(new Date())
 const displayEditDialog = ref(props.displayDialog)
 
-const dosageUnits = ref(['mg', 'g', 'ml', 'UI'])
+const dosageUnits = ref([
+  'capsula',
+  'IU',
+  'mL',
+  'tableta',
+  'g',
+  'mg',
+  'ug',
+  'mcg',
+  'PUFF',
+  'Altele',
+])
 const frequency = ref(['pe zi', 'pe saptamana', 'pe luna'])
 
 const initialValues = computed(() => {
@@ -254,10 +317,11 @@ const initialValues = computed(() => {
 
   let dosageValue = ''
   let dosageUnit = ''
+  let frequencyChoice = ''
 
   if (props.medication.dosage) {
     // Separate number and string part
-    const dosageMatch = props.medication.dosage.match(/^([\d.]+)(.*)$/)
+    const dosageMatch = props.medication.dosage.match(/^(\d+)(.*)$/)
     if (dosageMatch) {
       dosageValue = dosageMatch[1]
       dosageUnit = dosageMatch[2].trim()
@@ -271,10 +335,46 @@ const initialValues = computed(() => {
 
   if (props.medication.frequency) {
     // Separate number and string part
-    const frequencyMatch = props.medication.frequency.match(/^(\d+)\s*(.*)$/)
-    if (frequencyMatch) {
-      frequencyValue = parseInt(frequencyMatch[1])
-      frequencyUnit = frequencyMatch[2].trim()
+    if (props.medication.frequency.includes('la nevoie')) {
+      frequencyValue = 0
+      frequencyChoice = 'asNeeded'
+    } else if (props.medication.frequency.includes('continuu')) {
+      frequencyValue = 0
+      frequencyChoice = 'continuu'
+    } else {
+      const patterns = [
+        // 2 pe zi/saptamana/luna
+        /^(\d+)\s*(pe\s*(zi|saptamana|luna))$/,
+        // 1 la fiecare 2 zi
+        /^(\d+)\s*la\s*fiecare\s*(\d+)\s*(zi|saptamana|luna)$/,
+      ]
+
+      let matched = false
+      for (const pattern of patterns) {
+        const match = props.medication.frequency.match(pattern)
+        if (match) {
+          matched = true
+          if (props.medication.frequency.includes('fiecare')) {
+            // Handle "la fiecare X zi" pattern
+            frequencyChoice = 'alternativ'
+            frequencyValue = parseInt(match[1]) // Changed to match[2] to get interval value
+            frequencyUnit = 'pe ' + match[3]
+          } else {
+            // Handle regular "pe zi/saptamana/luna" pattern
+            frequencyChoice = 'standard'
+            frequencyValue = parseInt(match[1])
+            frequencyUnit = match[2]
+          }
+          break
+        }
+      }
+
+      if (!matched) {
+        // Default fallback
+        frequencyValue = 1
+        frequencyUnit = 'pe zi'
+        console.warn('Unrecognized frequency pattern:', props.medication.frequency)
+      }
     }
   }
 
@@ -284,12 +384,15 @@ const initialValues = computed(() => {
     name: props.medication.name,
     dosage: dosageValue,
     dosageUnits: dosageUnit,
-    frequency: frequencyValue,
+    frequencyValue: frequencyValue,
     frequencyUnits: frequencyUnit,
     datePrescribed: prescriptionDate,
     duration: props.medication.duration_days,
     notes: props.medication.notes,
     form: props.medication.form,
+    route: props.medication.route,
+    timeOfDay: props.medication.time_of_day,
+    frequencyChoice: frequencyChoice,
   }
 })
 
@@ -317,19 +420,51 @@ const resolver = zodResolver(
     form: z.string().nonempty('Forma medicamentului este obligatorie.'),
     dosageUnits: z.string().nonempty('Unitatea de masura a dozei este obligatorie.'),
     frequencyUnits: z.string().nonempty('Unitatea de masura a frecventei este obligatorie.'),
+    frequencyChoice: z.string().min(1, { message: 'Alege o optiune pentru frecventa.' }),
+    timeOfDay: z.string().optional(),
+    route: z.string().nonempty('Calea de administrare a medicamentului este obligatorie.'),
   }),
 )
 
 const updateMedication = async (medicationDetails) => {
   try {
+    let formattedDate = medicationDetails.datePrescribed
+
+    // Need to format the date as yyyy-mm-dd
+    if (medicationDetails.datePrescribed instanceof Date) {
+      const [day, month, year] = medicationDetails.datePrescribed
+        .toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit', year: 'numeric' })
+        .split('.')
+      formattedDate = `${year}-${month}-${day}`
+    }
+
+    let formattedFrequency = () => {
+      switch (medicationDetails.frequencyChoice) {
+        case 'standard':
+          return medicationDetails.frequencyValue + ' ' + medicationDetails.frequencyUnits
+        case 'alternativ':
+          return (
+            medicationDetails.frequencyValue +
+            ' la fiecare 2 ' +
+            medicationDetails.frequencyUnits.split(' ')[1]
+          )
+        case 'asNeeded':
+          return 'la nevoie'
+        case 'continuu':
+          return 'continuu'
+      }
+    }
+
     const response = await api.patch(`/me/medications/${props.medication.id}`, {
       name: medicationDetails.name,
       dosage: medicationDetails.dosage + medicationDetails.dosageUnits,
-      frequency: medicationDetails.frequency + ' ' + medicationDetails.frequencyUnits,
-      date_prescribed: medicationDetails.datePrescribed,
+      frequency: formattedFrequency(),
+      date_prescribed: formattedDate,
       duration_days: medicationDetails.duration,
       notes: medicationDetails.notes,
       form: medicationDetails.form,
+      route: medicationDetails.route,
+      time_of_day: medicationDetails.timeOfDay,
     })
 
     emit('edit', response.data.medication)
