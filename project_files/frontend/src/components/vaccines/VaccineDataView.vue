@@ -18,15 +18,15 @@
               v-model="sortKey"
               :options="sortOptions"
               optionLabel="label"
-              placeholder="Sorteaza dupa data adaugarii"
+              placeholder="Sorteaza dupa"
               @change="onSortChange($event)"
             />
             <ToggleButton
               v-model="hasCertificateOnly"
               onLabel="Doar cu certificat"
               offLabel="Toate vaccinele"
-              onIcon="pi pi-check"
-              offIcon="pi pi-times"
+              onIcon="pi pi-file-check"
+              offIcon="pi pi-list-check"
               class="p-button-sm"
             />
           </div>
@@ -150,8 +150,8 @@ const sortKey = ref()
 const sortOrder = ref()
 const sortField = ref()
 const sortOptions = ref([
-  { label: 'Data Tarziu spre Recent', value: '!date_added' },
-  { label: 'Data Recent spre Tarziu', value: 'date_added' },
+  { label: 'Adaugat tarziu', value: '!date_added' },
+  { label: 'Adaugat recent', value: 'date_added' },
 ])
 const hasCertificateOnly = ref(false)
 const searchQuery = ref('')

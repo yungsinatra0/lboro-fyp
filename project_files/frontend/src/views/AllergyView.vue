@@ -26,6 +26,9 @@
         <AllergyDataView  
           v-else
           :allergies="allergies"
+          :allergens="allergyAllergens"
+          :reactions="allergyReactions"
+          :severities="allergySeverities"
           @delete="deleteAllergy"
           @open-edit="openEditDialog"
           class="w-full h-full"
