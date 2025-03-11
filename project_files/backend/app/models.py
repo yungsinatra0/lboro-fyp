@@ -4,6 +4,12 @@ from datetime import date, datetime
 import uuid
 from typing import Optional
 
+# API Response model
+class APIResponse(SQLModel):
+    status: int
+    message: str
+    data: dict | list | None = None
+
 # Base model that contains the field serializer for date formatting to dd-mm-yyyy and the date field itself
 class DateFormattingModel(SQLModel):
     dob: date | None = None
