@@ -285,8 +285,6 @@ import api from '@/services/api'
 import { ref, computed } from 'vue'
 import { parse } from 'date-fns'
 
-// TODO: Update edit medication form to match add medication form
-
 const props = defineProps({
   displayDialog: Boolean,
   medication: Object,
