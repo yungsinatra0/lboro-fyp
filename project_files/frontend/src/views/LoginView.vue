@@ -5,7 +5,7 @@
     <div
       class="flex flex-col items-center justify-center bg-surface-0 dark:bg-surface-900 p-6 shadow rounded-border w-full lg:w-6/12 mx-auto"
     >
-      <div class="text-center mb-8">
+      <div class="text-center mb-4">
         <svg
           class="mb-4 mx-auto fill-surface-600 dark:fill-surface-200 h-16"
           viewBox="0 0 30 32"
@@ -32,6 +32,9 @@
           as="router-link"
           class="p-0 pl-1"
         />
+        <h2 v-if="wrongPassword" class="text-rose-600 text-sm text-center">
+            {{ wrongPassword }}
+        </h2>
       </div>
 
       <Form
@@ -88,7 +91,7 @@ import { ref } from 'vue'
 import router from '@/router'
 import Message from 'primevue/message'
 
-
+const wrongPassword = ref(null)
 const initialValues = ref({
   email: '',
   password: '',
@@ -117,8 +120,9 @@ async function login(credentials) {
       password: credentials.password,
     })
     router.push('/dashboard')
-  } catch {
-    console.log('Login failed')
+  } catch (error) {
+    console.error('Error logging in: ', error)
+    wrongPassword.value = 'Parola introdusa este gresita'
   }
 }
 
