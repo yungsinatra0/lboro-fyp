@@ -538,7 +538,7 @@ def get_healthdata(user_id: uuid.UUID = Depends(validate_session), session: Sess
     result = []
     
     for healthdata in user.healthdata:
-        if healthdata.type.name == "Blood Pressure":
+        if healthdata.type.name == "Tensiune arterială":
             result.append({
                 "id": healthdata.id,
                 "name": healthdata.type.name,

@@ -2,7 +2,7 @@
   <Card :pt="cardStyles">
     <template #title>
       <span class="text-xl font-bold p-4"> Valori istorice </span>
-      <div class="flex gap-2 ">
+      <div class="flex gap-2">
         <Select
           v-model="vitalModel"
           :options="props.vitalTypes"
@@ -18,13 +18,23 @@
       </div>
     </template>
     <template #content>
-      <DataTable :value="filteredHealthData" v-if="layout === 'table'">
-        <Column field="date" header="Data adaugarii" sortable></Column>
-        <Column field="value" header="Valoarea" sortable ></Column>
-        <Column field="note" header="Notite"></Column>
-      </DataTable>
+      <div v-if="vitalModel">
+        <DataTable :value="filteredHealthData" v-if="layout === 'table'">
+          <Column field="date_recorded" header="Data adaugarii" sortable></Column>
+          <Column field="value" header="Valoarea" sortable>
+            <template #body="slotProps">
+              <span v-if="slotProps.data.value">{{ slotProps.data.value }} {{ slotProps.data.unit }}</span>
+              <span v-else> {{ slotProps.data.value_systolic }}/{{ slotProps.data.value_diastolic }} {{ slotProps.data.unit }}</span>
+            </template>
+          </Column>
+          <Column field="notes" header="Notite"></Column>
+        </DataTable>
+        <div v-else>
+          <p>Graph</p>
+        </div>
+      </div>
       <div v-else>
-        <p>Graph</p>
+        <h2>Selecteaza tipul mai intai</h2>
       </div>
     </template>
   </Card>
@@ -46,10 +56,11 @@ const props = defineProps({
 const vitalModel = ref()
 const options = ref(['table', 'graph'])
 const layout = ref('table')
+
 const filteredHealthData = computed(() => {
   return vitalModel.value
     ? props.vitals.filter((vital) => vital.name === vitalModel.value.name)
-    : props.vitals
+    : 'Selecteaza tipul mai intai'
 })
 
 const cardStyles = {
