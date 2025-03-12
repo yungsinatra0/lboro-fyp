@@ -60,10 +60,10 @@
                 <div class="flex flex-col md:items-end gap-2">
                   <div class="flex flex-row-reverse md:flex-row gap-2">
                     <Button
-                      v-if="vaccine.hasCertificate"
+                      v-if="vaccine.certificate"
                       icon="pi pi-eye"
                       class="p-button-rounded p-button-text p-button-plain"
-                      @click="showCertificate(vaccine.id)"
+                      @click="emit('showFile', vaccine.id)"
                     />
                     <Button
                       icon="pi pi-ellipsis-h"
