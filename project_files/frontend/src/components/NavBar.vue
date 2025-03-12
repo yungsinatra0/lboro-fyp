@@ -99,7 +99,7 @@ const items = ref([
       {
         label: 'Semne vitale',
         // icon: 'pi pi-wave-pulse',
-        route: '/dashboard',
+        route: '/vitale',
       },
     ],
   },
