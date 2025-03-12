@@ -85,6 +85,5 @@ const user_data = ref('')
 
 onMounted(async () => {
   user_data.value = await api.get('/dashboard')
-  console.log(user_data.value.data)
 })
 </script>
