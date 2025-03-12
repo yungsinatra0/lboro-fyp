@@ -15,9 +15,46 @@
     <div class="flex flex-col mx-3 md:flex-row md:gap-6 md:mx-5 md:justify-between">
       <Card class="h-full" :pt="cardStyles">
         <template #title> Valori curente </template>
-        <template #content> </template>
+        <template #content>
+          <div class="flex flex-row flex-wrap gap-3">
+            <Card v-for="type in healthTypes" :key="type.id" :pt="cardDataStyles">
+              <template #title>
+                <div class="flex flex-row items-center justify-between">
+                  <span> {{ type.name }} </span>
+                  <i
+                    v-if="vitalsTrends[type.name].trend === 'up'"
+                    class="pi pi-arrow-up text-green-500"
+                  ></i>
+                  <i
+                    v-else-if="vitalsTrends[type.name].trend === 'down'"
+                    class="pi pi-arrow-down text-red-500"
+                  ></i>
+                  <i v-else class="pi pi-minus-circle text-gray-500"></i>
+                </div>
+              </template>
+              <template #content> {{ vitalsTrends[type.name].value }} {{ type.unit }} </template>
+            </Card>
+            <Card :pt="cardDataStyles">
+              <template #title>
+                <div class="flex flex-row items-center justify-between">
+                  <span> BMI </span>
+                  <i
+                    v-if="bmiTrend.trend === 'up'"
+                    class="pi pi-arrow-up text-green-500"
+                  ></i>
+                  <i
+                    v-else-if="bmiTrend.trend === 'down'"
+                    class="pi pi-arrow-down text-red-500"
+                  ></i>
+                  <i v-else class="pi pi-minus-circle text-gray-500"></i>
+                </div>
+              </template>
+              <template #content> {{ bmiTrend.value }} </template>
+            </Card>
+          </div>
+        </template>
       </Card>
-      <VitalsHistory class="h-full w-full md:w-2/3" :vital-types="healthTypes.data" :vitals="vitals.data" />
+      <VitalsHistory class="h-full w-full md:w-2/3" :vital-types="healthTypes" :vitals="vitals" />
     </div>
   </div>
 </template>
@@ -25,10 +62,11 @@
 <script setup>
 import NavBar from '@/components/NavBar.vue'
 import VitalsHistory from '@/components/vitals/VitalsHistory.vue'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import Button from 'primevue/button'
 import Card from 'primevue/card'
 import api from '@/services/api'
+import { parse, compareDesc } from 'date-fns'
 
 const healthTypes = ref([])
 const vitals = ref([])
@@ -39,8 +77,10 @@ onMounted(() => {
 
 const fetchData = async () => {
   try {
-    healthTypes.value = await api.get('/healthdata/types')
-    vitals.value = await api.get('/me/healthdata')
+    const response = await api.get('/healthdata/types')
+    healthTypes.value = response.data
+    const response2 = await api.get('/me/healthdata')
+    vitals.value = response2.data
   } catch (error) {
     console.error(error)
   }
@@ -52,6 +92,76 @@ const showAddDialog = () => {
   displayAddDialog.value = true
 }
 
+const vitalsTrends = computed(() => {
+  const result = {}
+
+  healthTypes.value.forEach((type) => {
+    const matchingVitals = vitals.value.filter((vital) => vital.name === type.name)
+
+    if (!matchingVitals.length) {
+      result[type.name] = { value: 'Nu au fost gasit valori', trend: 'stable' }
+      return
+    }
+
+    const sortedVitals = [...matchingVitals].sort((a, b) => {
+      const dateA = parse(a.date_recorded, 'dd-MM-yyyy', new Date())
+      const dateB = parse(b.date_recorded, 'dd-MM-yyyy', new Date())
+      return compareDesc(dateA, dateB)
+    })
+
+    const mostRecent = sortedVitals[0]
+    const previous = sortedVitals[1] ? sortedVitals[1] : null
+
+    if (mostRecent.value !== undefined && mostRecent.value !== null) {
+      result[type.name] = {
+        value: mostRecent.value,
+        trend: previous
+          ? calculateTrend(parseFloat(mostRecent.value), parseFloat(previous?.value))
+          : 'stable',
+      }
+    } else if (mostRecent.value_systolic && mostRecent.value_diastolic) {
+      result[type.name] = {
+        value: `${mostRecent.value_systolic}/${mostRecent.value_diastolic}`,
+        trend: previous
+          ? calculateTrend(parseInt(mostRecent.value_systolic), parseInt(previous?.value_systolic))
+          : 'stable',
+      }
+    } else {
+      result[type.name] = { value: 'Nu au fost gasit valori', trend: 'stable' }
+    }
+  })
+
+  return result
+})
+
+const calculateTrend = (current, previous) => {
+  if (previous === null) return 'stable'
+
+  const threshold = 0.01
+  const percentChange = Math.abs((current - previous) / previous)
+
+  if (percentChange < threshold) return 'stable'
+  return current > previous ? 'up' : 'down'
+}
+
+const bmiTrend = computed(() => {
+  const latestWeight = vitalsTrends.value['Greutate']
+  const latestHeight = vitalsTrends.value['Înălțime']
+
+  if (!latestHeight || !latestWeight) return { available: false, value: 0, trend: 'stable' }
+
+  const weight = parseFloat(latestWeight.value)
+  const height = parseFloat(latestHeight.value) / 100
+
+  const bmi = Math.round((weight / (height * height)) * 10) / 10
+
+  return {
+    available: true,
+    value: bmi,
+    trend: latestWeight.trend,
+  }
+})
+
 const cardStyles = {
   body: { class: 'px-4 py-1 flex flex-col flex-1' },
   content: { class: 'flex-1 flex flex-col' },
@@ -61,5 +171,16 @@ const cardStyles = {
   },
   footer: { class: 'flex mt-auto justify-center items-center' },
   title: { class: 'text-xl font-bold p-4' },
+}
+
+const cardDataStyles = {
+  body: { class: 'px-4 py-1 flex flex-col' },
+  content: { class: 'flex flex-col' },
+  root: {
+    class:
+      'flex bg-surface-0 dark:bg-surface-800 text-surface-700 dark:text-surface-0 dark:border dark:border-surface-700 w-1/3 mb-2',
+  },
+  footer: { class: 'flex mt-auto justify-center items-center' },
+  title: { class: 'font-bold text-base text-surface-700 dark:text-surface-0' },
 }
 </script>

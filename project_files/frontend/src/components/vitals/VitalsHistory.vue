@@ -19,7 +19,7 @@
     </template>
     <template #content>
       <div v-if="vitalModel">
-        <DataTable :value="filteredHealthData" v-if="layout === 'table'">
+        <DataTable :value="filteredHealthData" v-if="layout === 'table'" removableSort>
           <Column field="date_recorded" header="Data adaugarii" sortable></Column>
           <Column field="value" header="Valoarea" sortable>
             <template #body="slotProps">
@@ -46,7 +46,7 @@ import Column from 'primevue/column'
 import Card from 'primevue/card'
 import SelectButton from 'primevue/selectbutton'
 import Select from 'primevue/select'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 const props = defineProps({
   vitals: Array,
@@ -54,6 +54,13 @@ const props = defineProps({
 })
 
 const vitalModel = ref()
+
+watch(() => props.vitalTypes, (newTypes) => {
+  if (newTypes && newTypes.length > 0 && !vitalModel.value) {
+    vitalModel.value = newTypes[0]
+  }
+}, { immediate: true })
+
 const options = ref(['table', 'graph'])
 const layout = ref('table')
 
