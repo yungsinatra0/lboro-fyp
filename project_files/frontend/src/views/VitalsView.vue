@@ -58,12 +58,20 @@
         @delete="deleteVital"
       />
     </div>
+
+    <AddVital 
+    v-if="displayAddDialog" 
+    :vital-types="vitalTypes"
+    :display-dialog="displayAddDialog"
+    @close="displayAddDialog = false" 
+    />
   </div>
 </template>
 
 <script setup>
 import NavBar from '@/components/NavBar.vue'
 import VitalsHistory from '@/components/vitals/VitalsHistory.vue'
+import AddVital from '@/components/vitals/AddVital.vue'
 import { ref, onMounted, computed } from 'vue'
 import Button from 'primevue/button'
 import Card from 'primevue/card'
