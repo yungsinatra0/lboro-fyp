@@ -35,8 +35,6 @@
         />
     </div>
 
-    <ConfirmDialog></ConfirmDialog>
-
     <AddAllergy
       v-if="displayAddDialog"
       @close="displayAddDialog = false"
@@ -67,8 +65,7 @@ import ProgressSpinner from 'primevue/progressspinner'
 import AddAllergy from '@/components/allergies/AddAllergy.vue'
 import EditAllergy from '@/components/allergies/EditAllergy.vue'
 import { onMounted, ref } from 'vue'
-import api from '../services/api'
-import ConfirmDialog from 'primevue/confirmdialog'
+import api from '@/services/api'
 import AllergyDataView from '@/components/allergies/AllergyDataView.vue'
 
 const allergies = ref([])

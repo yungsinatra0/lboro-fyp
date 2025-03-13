@@ -34,8 +34,6 @@
       />
     </div>
 
-    <ConfirmDialog></ConfirmDialog>
-
     <AddMedication
       v-if="displayAddDialog"
       @close="displayAddDialog = false"
@@ -65,7 +63,6 @@ import AddMedication from '@/components/medications/AddMedication.vue'
 import ProgressSpinner from 'primevue/progressspinner'
 import api from '../services/api'
 import { onMounted, ref } from 'vue'
-import ConfirmDialog from 'primevue/confirmdialog'
 import MedicationDataView from '@/components/medications/MedicationDataView.vue'
 
 const displayAddDialog = ref(false)

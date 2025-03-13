@@ -120,6 +120,8 @@
     </DataView>
 
     <Menu ref="menu" id="overlay_menu" :model="menuItems" :popup="true" />
+
+    <ConfirmDialog></ConfirmDialog>
   </div>
 </template>
 
@@ -134,6 +136,7 @@ import { useConfirm } from 'primevue/useconfirm'
 import api from '@/services/api'
 import ToggleButton from 'primevue/togglebutton'
 import InputText from 'primevue/inputtext'
+import ConfirmDialog from 'primevue/confirmdialog'
 
 const props = defineProps({
   vaccines: Object,

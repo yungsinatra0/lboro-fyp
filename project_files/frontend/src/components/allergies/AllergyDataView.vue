@@ -236,6 +236,8 @@
     </DataView>
 
     <Menu ref="menu" id="overlay_menu" :model="menuItems" :popup="true" />
+
+    <ConfirmDialog></ConfirmDialog>
   </div>
 </template>
 
@@ -250,7 +252,8 @@ import Tag from 'primevue/tag'
 import { useConfirm } from 'primevue/useconfirm'
 import api from '@/services/api'
 import InputText from 'primevue/inputtext'
-import MultiSelect from 'primevue/multiselect';
+import MultiSelect from 'primevue/multiselect'
+import ConfirmDialog from 'primevue/confirmdialog'
 
 const props = defineProps({
   allergies: Object,
