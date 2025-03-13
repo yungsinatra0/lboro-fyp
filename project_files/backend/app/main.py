@@ -582,13 +582,24 @@ def add_healthdata(healthdata: SimpleHealthDataCreate, user_id: uuid.UUID = Depe
     
     if healthdata.notes:
         new_healthdata.notes = healthdata.notes
+        
+    healthdata_response = HealthDataResponse(
+        id = new_healthdata.id,
+        name = new_healthdata.type.name,
+        unit = new_healthdata.type.unit,
+        value = new_healthdata.value,
+        date_recorded = new_healthdata.date_recorded,
+        notes = new_healthdata.notes,
+        date_added = new_healthdata.date_added
+    )
           
     session.add(new_healthdata)
     session.commit()
     session.refresh(new_healthdata)
     return {
         "status": status.HTTP_201_CREATED,
-        "message": "Health data added successfully"
+        "message": "Health data added successfully",
+        "healthdata": healthdata_response
     }
     
 # Add health data - blood pressure
@@ -608,13 +619,25 @@ def add_complex_healthdata(healthdata: BloodPressureCreate, user_id: uuid.UUID =
     
     if healthdata.notes:
         new_healthdata.notes = healthdata.notes
+        
+    healthdata_response = HealthDataResponse(
+        id = new_healthdata.id,
+        name = new_healthdata.type.name,
+        unit = new_healthdata.type.unit,
+        value_systolic = new_healthdata.value_systolic,
+        value_diastolic = new_healthdata.value_diastolic,
+        date_recorded = new_healthdata.date_recorded,
+        notes = new_healthdata.notes,
+        date_added = new_healthdata.date_added
+    )
           
     session.add(new_healthdata)
     session.commit()
     session.refresh(new_healthdata)
     return {
         "status": status.HTTP_201_CREATED,
-        "message": "Health data added successfully"
+        "message": "Health data added successfully",
+        "healthdata": healthdata_response
     }
     
 # Delete health data

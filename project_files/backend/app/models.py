@@ -331,13 +331,11 @@ class HealthDataResponse(HealthDataDates):
 # Health data create model
 class SimpleHealthDataCreate(HealthDataDates):
     name: str
-    unit: str | None = None
     value: float
     notes: str | None = None
     
 class BloodPressureCreate(HealthDataDates):
     name: str
-    unit: str | None = None
     value_systolic: float
     value_diastolic: float
     notes: str | None = None

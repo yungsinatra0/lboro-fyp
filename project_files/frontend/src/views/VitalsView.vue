@@ -63,7 +63,8 @@
     v-if="displayAddDialog" 
     :vital-types="vitalTypes"
     :display-dialog="displayAddDialog"
-    @close="displayAddDialog = false" 
+    @close="displayAddDialog = false"
+    @add="addVital" 
     />
   </div>
 </template>
@@ -104,6 +105,10 @@ const showAddDialog = () => {
 
 const deleteVital = (id) => {
   vitals.value = vitals.value.filter((vital) => vital.id !== id)
+}
+
+const addVital = (vital) => {
+  vitals.value.push(vital)
 }
 
 const vitalsTrends = computed(() => {

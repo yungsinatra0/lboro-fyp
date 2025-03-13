@@ -34,8 +34,8 @@
           >{{ $form.vitalDataTypes.error.message }}</Message
         >
       </div>
-      <div class="flex items-center gap-4 mb-4">
-        <label for="value" class="font-semibold w-24">Valoarea semnului</label>
+      <div class="flex items-center gap-4 mb-4" v-if="$form.vitalDataTypes && $form.vitalDataTypes.value.is_compound === false">
+        <label for="value" class="font-semibold w-24">Valoarea</label>
         <InputNumber
           name="value"
           class="flex w-1/2 md:w-1/3"
@@ -52,6 +52,41 @@
           class="text-rose-600 text-sm"
           >{{ $form.value.error.message }}</Message
         >
+      </div>
+      <div class="flex items-center gap-4 mb-4" v-if="$form.vitalDataTypes && $form.vitalDataTypes.value.is_compound === true">
+        <label for="valueSystolic" class="font-semibold w-24">Valoarea sistolica</label>
+        <InputNumber
+          name="valueSystolic"
+          class="flex w-1/2 md:w-1/3"
+          :maxFractionDigits="2"
+          :min="0"
+          fluid
+        />
+        <label for="valueDiastolic" class="font-semibold w-24">Valoarea diastolica</label>
+        <InputNumber
+          name="valueDiastolic"
+          class="flex w-1/2 md:w-1/3"
+          :maxFractionDigits="2"
+          :min="0"
+          fluid
+        />
+        <span v-if="$form.vitalDataTypes && $form.vitalDataTypes.value"> {{ $form.vitalDataTypes.value.unit }} </span>
+        <Message
+          v-if="$form.valueSystolic?.invalid"
+          severity="error"
+          size="small"
+          variant="simple"
+          class="text-rose-600 text-sm"
+          >{{ $form.valueSystolic.error.message }}</Message
+        >
+        <Message
+          v-if="$form.valueDiastolic?.invalid"
+          severity="error"
+          size="small"
+          variant="simple"
+          class="text-rose-600 text-sm"
+          >{{ $form.valueDiastolic.error.message }}</Message
+        >    
       </div>
       <div class="flex items-center gap-4 mb-4">
         <label for="dateRecorded" class="font-semibold w-24"
@@ -134,6 +169,8 @@ const displayAddDialog = ref(props.displayDialog)
 
 const initialValues = ref({
   value: 0,
+  valueSystolic: 0,
+  valueDiastolic: 0,
   dateRecorded: null,
   vitalDataTypes: '',
   notes: '',
@@ -141,7 +178,9 @@ const initialValues = ref({
 
 const resolver = zodResolver(
   z.object({
-    value: z.number('Valoarea trebuie sa fie un numar.').positive('Valoarea trebuie sa fie pozitiva.'),
+    value: z.number('Valoarea trebuie sa fie un numar.').positive('Valoarea trebuie sa fie pozitiva.').optional(),
+    valueSystolic: z.number('Valoarea trebuie sa fie un numar.').positive('Valoarea trebuie sa fie pozitiva.').optional(),
+    valueDiastolic: z.number('Valoarea trebuie sa fie un numar.').positive('Valoarea trebuie sa fie pozitiva.').optional(),
     dateRecorded: z.date().refine((date) => date <= new Date(), {
       message: 'Data inregistrarii nu poate fi in viitor',
     }),
@@ -156,7 +195,35 @@ const resolver = zodResolver(
 )
 
 const addVitals = async (values) => {
-  // will do some logic here soon
+    if (values.vitalDataTypes.is_compound) {
+      try {
+        const response = await api.post('/me/healthdata/bp', {
+          name: values.vitalDataTypes.name,
+          value_systolic: values.valueSystolic,
+          value_diastolic: values.valueDiastolic,
+          date_recorded: values.dateRecorded,
+          notes: values.notes,
+        })
+        emit('add', response.data.healthdata)
+        displayAddDialog.value = false
+      } catch (error) {
+        console.error(error)
+      }
+    }
+    else {
+        try {
+            const response = await api.post('/me/healthdata', {
+            name: values.vitalDataTypes.name,
+            value: values.value,
+            date_recorded: values.dateRecorded,
+            notes: values.notes,
+            })
+            emit('add', response.data.healthdata)
+            displayAddDialog.value = false
+        } catch (error) {
+            console.error(error)
+        }
+    }
 }
 
 const onFormSubmit = (e) => {
