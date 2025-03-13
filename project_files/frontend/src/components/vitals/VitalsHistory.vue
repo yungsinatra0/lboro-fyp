@@ -20,7 +20,7 @@
       </template>
       <template #content>
         <div v-if="vitalModel">
-          <DataTable :value="filteredHealthData" v-if="layout === 'table'" removableSort>
+          <DataTable :value="filteredVitalData" v-if="layout === 'table'" removableSort>
             <Column field="date_recorded" header="Data adaugarii" sortable></Column>
             <Column field="value" header="Valoarea" sortable>
               <template #body="slotProps">
@@ -98,7 +98,7 @@ watch(
 const options = ref(['table', 'graph'])
 const layout = ref('table')
 
-const filteredHealthData = computed(() => {
+const filteredVitalData = computed(() => {
   return vitalModel.value
     ? props.vitals.filter((vital) => vital.name === vitalModel.value.name)
     : 'Selecteaza tipul mai intai'

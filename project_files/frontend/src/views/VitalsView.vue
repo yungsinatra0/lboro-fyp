@@ -17,7 +17,7 @@
         <template #title> Valori curente </template>
         <template #content>
           <div class="flex flex-row flex-wrap gap-3">
-            <Card v-for="type in healthTypes" :key="type.id" :pt="cardDataStyles">
+            <Card v-for="type in vitalTypes" :key="type.id" :pt="cardDataStyles">
               <template #title>
                 <div class="flex flex-row items-center justify-between">
                   <span> {{ type.name }} </span>
@@ -38,10 +38,7 @@
               <template #title>
                 <div class="flex flex-row items-center justify-between">
                   <span> BMI </span>
-                  <i
-                    v-if="bmiTrend.trend === 'up'"
-                    class="pi pi-arrow-up text-green-500"
-                  ></i>
+                  <i v-if="bmiTrend.trend === 'up'" class="pi pi-arrow-up text-green-500"></i>
                   <i
                     v-else-if="bmiTrend.trend === 'down'"
                     class="pi pi-arrow-down text-red-500"
@@ -54,7 +51,12 @@
           </div>
         </template>
       </Card>
-      <VitalsHistory class="h-full w-full md:w-2/3" :vital-types="healthTypes" :vitals="vitals" @delete="deleteHealthData" />
+      <VitalsHistory
+        class="h-full w-full md:w-2/3"
+        :vital-types="vitalTypes"
+        :vitals="vitals"
+        @delete="deleteVital"
+      />
     </div>
   </div>
 </template>
@@ -68,7 +70,7 @@ import Card from 'primevue/card'
 import api from '@/services/api'
 import { parse, compareDesc } from 'date-fns'
 
-const healthTypes = ref([])
+const vitalTypes = ref([])
 const vitals = ref([])
 
 onMounted(() => {
@@ -78,7 +80,7 @@ onMounted(() => {
 const fetchData = async () => {
   try {
     const response = await api.get('/healthdata/types')
-    healthTypes.value = response.data
+    vitalTypes.value = response.data
     const response2 = await api.get('/me/healthdata')
     vitals.value = response2.data
   } catch (error) {
@@ -92,14 +94,14 @@ const showAddDialog = () => {
   displayAddDialog.value = true
 }
 
-const deleteHealthData = (id) => {
+const deleteVital = (id) => {
   vitals.value = vitals.value.filter((vital) => vital.id !== id)
 }
 
 const vitalsTrends = computed(() => {
   const result = {}
 
-  healthTypes.value.forEach((type) => {
+  vitalTypes.value.forEach((type) => {
     const matchingVitals = vitals.value.filter((vital) => vital.name === type.name)
 
     if (!matchingVitals.length) {
