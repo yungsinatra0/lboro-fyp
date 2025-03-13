@@ -54,7 +54,7 @@
           </div>
         </template>
       </Card>
-      <VitalsHistory class="h-full w-full md:w-2/3" :vital-types="healthTypes" :vitals="vitals" />
+      <VitalsHistory class="h-full w-full md:w-2/3" :vital-types="healthTypes" :vitals="vitals" @delete="deleteHealthData" />
     </div>
   </div>
 </template>
@@ -90,6 +90,10 @@ const displayAddDialog = ref(false)
 
 const showAddDialog = () => {
   displayAddDialog.value = true
+}
+
+const deleteHealthData = (id) => {
+  vitals.value = vitals.value.filter((vital) => vital.id !== id)
 }
 
 const vitalsTrends = computed(() => {
