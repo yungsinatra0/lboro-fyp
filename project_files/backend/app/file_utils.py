@@ -53,6 +53,4 @@ def save_file(content: bytes, record_id: uuid.UUID, user_id: uuid.UUID, file_id:
     with open(file_path, "wb") as f:
         f.write(encrypted_content)
         
-    return secure_name, file_path
-    
-    
+    return secure_name, file_path  

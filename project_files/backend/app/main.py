@@ -305,9 +305,13 @@ def delete_vaccine(vaccine_id: uuid.UUID, user_id: uuid.UUID = Depends(validate_
         # Delete file from the file system
         file_path = file_record.file_path
         if os.path.exists(file_path):
-            os.remove(file_path)
             folder_path = os.path.dirname(file_path)
-            os.rmdir(folder_path)           
+            os.remove(file_path)
+            try:
+                os.rmdir(folder_path)
+            except PermissionError:
+                print("Error deleting folder due to Windows permissions error")
+                  
         session.delete(file_record)
     
     session.delete(vaccine)
