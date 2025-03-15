@@ -273,8 +273,8 @@ const sortKey = ref()
 const sortOrder = ref()
 const sortField = ref()
 const sortOptions = ref([
-  { label: 'Adaugat tarziu', value: '!date_added' },
-  { label: 'Adaugat recent', value: 'date_added' },
+  { label: 'Adaugat tarziu', value: 'date_added' },
+  { label: 'Adaugat recent', value: '!date_added' },
 ])
 const selectedAllergens = ref([])
 const selectedReactions = ref([])
