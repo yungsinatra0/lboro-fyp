@@ -56,6 +56,7 @@
         :vital-types="vitalTypes"
         :vitals="vitals"
         @delete="deleteVital"
+        @open-edit="openEditDialog"
       />
     </div>
 
@@ -65,6 +66,15 @@
       :display-dialog="displayAddDialog"
       @close="displayAddDialog = false"
       @add="addVital"
+    />
+
+    <EditVital
+      v-if="displayEditDialog"
+      :display-dialog="displayEditDialog"
+      @edit="refreshUpdatedVital"
+      @close="displayEditDialog = false"
+      :vital="editDialogData"
+      :vital-types="vitalTypes"
     />
   </div>
 </template>
@@ -78,9 +88,13 @@ import Button from 'primevue/button'
 import Card from 'primevue/card'
 import api from '@/services/api'
 import { parse, compareDesc } from 'date-fns'
+import EditVital from '@/components/vitals/EditVital.vue'
 
 const vitalTypes = ref([])
 const vitals = ref([])
+const displayAddDialog = ref(false)
+const displayEditDialog = ref(false)
+const editDialogData = ref(null)
 
 onMounted(() => {
   fetchData()
@@ -103,7 +117,16 @@ const fetchData = async () => {
   }
 }
 
-const displayAddDialog = ref(false)
+const openEditDialog = (id) => {
+  displayEditDialog.value = true
+  const vital = vitals.value.find((vital) => vital.id === id)
+  editDialogData.value = vital
+}
+
+const refreshUpdatedVital = (updatedVital) => {
+  const index = vitals.value.findIndex((vital) => vital.id === updatedVital.id)
+  vitals.value[index] = updatedVital
+}
 
 const showAddDialog = () => {
   displayAddDialog.value = true
