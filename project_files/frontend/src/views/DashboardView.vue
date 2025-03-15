@@ -21,7 +21,7 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-[4fr_3fr_3fr] gap-4 mx-5">
+    <div class="grid grid-cols-1 md:grid-cols-[5fr_3fr_3fr] gap-4 mx-5">
       <Card class="mb-4 md:mb-0 md:h-full md:flex md:flex-col">
         <template #title>
           <h2 class="text-xl font-bold">Istoric medical</h2>
