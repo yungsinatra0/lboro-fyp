@@ -16,43 +16,43 @@
       <Card class="h-full" :pt="cardStyles">
         <template #title> Valori curente </template>
         <template #content>
-          <div class="flex flex-row flex-wrap gap-3">
-            <Card v-for="type in vitalTypes" :key="type.id" :pt="cardDataStyles">
+            <div class="grid grid-cols-2 gap-3">
+            <Card v-for="type in vitalTypes" :key="type.id" :pt="cardDataStyles" class="w-full">
               <template #title>
-                <div class="flex flex-row items-center justify-between">
-                  <span> {{ type.name }} </span>
-                  <i
-                    v-if="vitalsTrends[type.name].trend === 'up'"
-                    class="pi pi-arrow-up text-green-500"
-                  ></i>
-                  <i
-                    v-else-if="vitalsTrends[type.name].trend === 'down'"
-                    class="pi pi-arrow-down text-red-500"
-                  ></i>
-                  <i v-else class="pi pi-minus-circle text-gray-500"></i>
-                </div>
+              <div class="flex flex-row items-center justify-between">
+              <span> {{ type.name }} </span>
+              <i
+              v-if="vitalsTrends[type.name].trend === 'up'"
+              class="pi pi-arrow-up text-green-500"
+              ></i>
+              <i
+              v-else-if="vitalsTrends[type.name].trend === 'down'"
+              class="pi pi-arrow-down text-red-500"
+              ></i>
+              <i v-else class="pi pi-minus-circle text-gray-500"></i>
+              </div>
               </template>
               <template #content> {{ vitalsTrends[type.name].value }} {{ type.unit }} </template>
             </Card>
-            <Card :pt="cardDataStyles">
+            <Card :pt="cardDataStyles" class="w-full">
               <template #title>
-                <div class="flex flex-row items-center justify-between">
-                  <span> BMI </span>
-                  <i v-if="bmiTrend.trend === 'up'" class="pi pi-arrow-up text-green-500"></i>
-                  <i
-                    v-else-if="bmiTrend.trend === 'down'"
-                    class="pi pi-arrow-down text-red-500"
-                  ></i>
-                  <i v-else class="pi pi-minus-circle text-gray-500"></i>
-                </div>
+              <div class="flex flex-row items-center justify-between">
+              <span> BMI </span>
+              <i v-if="bmiTrend.trend === 'up'" class="pi pi-arrow-up text-green-500"></i>
+              <i
+              v-else-if="bmiTrend.trend === 'down'"
+              class="pi pi-arrow-down text-red-500"
+              ></i>
+              <i v-else class="pi pi-minus-circle text-gray-500"></i>
+              </div>
               </template>
               <template #content> {{ bmiTrend.value }} </template>
             </Card>
-          </div>
+            </div>
         </template>
       </Card>
       <VitalsHistory
-        class="h-full w-full md:w-2/3"
+        class="h-full w-full md:w-5/6"
         :vital-types="vitalTypes"
         :vitals="vitals"
         @delete="deleteVital"

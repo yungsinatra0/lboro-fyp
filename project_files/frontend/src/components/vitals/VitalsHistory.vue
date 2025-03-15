@@ -28,8 +28,10 @@
             :sortOrder="-1"
           >
             <Column field="date_recorded" header="Data adaugarii" sortable>
-              <template #body="slotProps"> {{ slotProps.data.original_date_recorded }} </template
-            ></Column>
+              <template #body="slotProps">
+                {{ slotProps.data.original_date_recorded }}
+              </template></Column
+            >
             <Column field="value" header="Valoarea" sortable>
               <template #body="slotProps">
                 <span v-if="slotProps.data.value"
@@ -52,8 +54,8 @@
               </template>
             </Column>
           </DataTable>
-          <div v-else>
-            <p>Graph</p>
+          <div v-else class="h-[40vh] md:h-[50vh] relative">
+            <Line :data="chartData" :options="chartOptions"/>
           </div>
         </div>
         <div v-else>
@@ -80,7 +82,27 @@ import api from '@/services/api'
 import Button from 'primevue/button'
 import ConfirmDialog from 'primevue/confirmdialog'
 import { ref, computed, watch } from 'vue'
-// import { parse } from 'date-fns'
+import { Line } from 'vue-chartjs'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js'
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+)
 
 const props = defineProps({
   vitals: Array,
@@ -108,14 +130,58 @@ const options = ref(['table', 'graph'])
 const layout = ref('table')
 
 const filteredVitalData = computed(() => {
-  // props.vitals.map((vital) => {
-  //   vital.date_recorded = parse(vital.date_recorded, 'dd-MM-yyyy', new Date())
-  //   return vital
-  // })
-
   return vitalModel.value
     ? props.vitals.filter((vital) => vital.name === vitalModel.value.name)
     : []
+})
+
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false
+}
+
+const chartData = computed(() => {
+  if (!filteredVitalData.value.length) {
+    return {}
+  }
+
+  if (vitalModel.value.is_compound) {
+    return {
+      labels: filteredVitalData.value.map((vital) => vital.original_date_recorded),
+      datasets: [
+        {
+          label: `Tensiunea arteriala sistolica`,
+          data: filteredVitalData.value.map((vital) => vital.value_systolic),
+          fill: false,
+          borderColor: 'rgb(75, 192, 192)',
+          tension: 0.5,
+          pointRadius: 5,
+        },
+        {
+          label: `Tensiunea arteriala diastolica`,
+          data: filteredVitalData.value.map((vital) => vital.value_diastolic),
+          fill: false,
+          borderColor: 'rgb(192, 75, 75)',
+          tension: 0.5,
+          pointRadius: 5,
+        },
+      ],
+    }
+  }
+  
+  return {
+    labels: filteredVitalData.value.map((vital) => vital.original_date_recorded),
+    datasets: [
+      {
+        label: `Valoare, in ${vitalModel.value.unit}`,
+        data: filteredVitalData.value.map((vital) => vital.value),
+        fill: false,
+        borderColor: 'rgb(75, 192, 192)',
+        tension: 0.5,
+        pointRadius: 5,
+      }
+    ]
+  }
 })
 
 const toggle = (event, id) => {
@@ -184,6 +250,6 @@ const cardStyles = {
       'bg-surface-0 dark:bg-surface-800 text-surface-700 dark:text-surface-0 dark:border dark:border-surface-700',
   },
   footer: { class: 'flex mt-auto justify-center items-center' },
-  title: { class: 'flex flex-row justify-between items-center' },
+  title: { class: 'flex flex-col md:flex-row justify-between items-center' },
 }
 </script>
