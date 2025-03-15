@@ -127,7 +127,7 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
     
     newest_vaccines = session.exec(select(Vaccine).where(Vaccine.user_id == user_id).order_by(col(Vaccine.date_added).desc()).limit(5)).all()
     newest_allergies = session.exec(select(Allergy).where(Allergy.user_id == user_id).order_by(col(Allergy.date_added).desc()).limit(5)).all()
-    # newest_healthdata = session.exec(select(HealthData).where(HealthData.user_id == user_id).order_by(col(HealthData.date_added).desc()).limit(5)).all()
+    newest_healthdata = session.exec(select(HealthData).where(HealthData.user_id == user_id).order_by(col(HealthData.date_added).desc()).limit(5)).all()
     newest_medications = session.exec(select(Medication).where(Medication.user_id == user_id).order_by(col(Medication.date_added).desc()).limit(5)).all()
     
     vaccines_response = []
@@ -176,13 +176,41 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
                 notes=medication.notes,
                 date_added=medication.date_added               
         ))
+        
+    healthdata_response = []
+    for healthdata in newest_healthdata:
+        if healthdata.type.name == "Tensiune arterială": {
+            healthdata_response.append(
+                HealthDataResponse(
+                    id = healthdata.id,
+                    name = healthdata.type.name,
+                    unit = healthdata.type.unit,
+                    value_systolic = healthdata.value_systolic,
+                    value_diastolic = healthdata.value_diastolic,
+                    date_recorded = healthdata.date_recorded,
+                    notes = healthdata.notes,
+                    date_added = healthdata.date_added
+                ))
+        }
+        else: {
+            healthdata_response.append(
+                HealthDataResponse(
+                    id = healthdata.id,
+                    name = healthdata.type.name,
+                    unit = healthdata.type.unit,
+                    value = healthdata.value,
+                    date_recorded = healthdata.date_recorded,
+                    notes = healthdata.notes,
+                    date_added = healthdata.date_added
+                ))
+        }
     
     user_dashboard = UserDashboard(
         id = user.id,
         name = user.name,
         vaccines = vaccines_response,
         allergies = allergies_response,
-        # healthdata = newest_healthdata,
+        vitals = healthdata_response,
         medications = medications_response
     )
     

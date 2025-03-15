@@ -51,7 +51,7 @@ class UserDashboard(SQLModel):
     vaccines: list["VaccineResponse"]
     allergies: list["AllergyResponse"]
     medications: list["MedicationResponse"]
-    # healthdata: list["HealthDataResponse"]
+    vitals: list["HealthDataResponse"]
 
 # User Data model used for login and registration  
 class UserAuth(DateFormattingModel):
