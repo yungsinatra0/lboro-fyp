@@ -579,7 +579,8 @@ def get_healthdata(user_id: uuid.UUID = Depends(validate_session), session: Sess
                 "value_diastolic": healthdata.value_diastolic,
                 "date_recorded": healthdata.date_recorded,
                 "notes": healthdata.notes,
-                "date_added": healthdata.date_added
+                "date_added": healthdata.date_added,
+                "normal_range": healthdata.type.normal_range
             })
         else:
             result.append({
@@ -589,7 +590,8 @@ def get_healthdata(user_id: uuid.UUID = Depends(validate_session), session: Sess
                 "value": healthdata.value,
                 "date_recorded": healthdata.date_recorded,
                 "notes": healthdata.notes,
-                "date_added": healthdata.date_added
+                "date_added": healthdata.date_added,
+                "normal_range": healthdata.type.normal_range
             })
     
     return result
@@ -618,7 +620,8 @@ def add_healthdata(healthdata: SimpleHealthDataCreate, user_id: uuid.UUID = Depe
         value = new_healthdata.value,
         date_recorded = new_healthdata.date_recorded,
         notes = new_healthdata.notes,
-        date_added = new_healthdata.date_added
+        date_added = new_healthdata.date_added,
+        normal_range = new_healthdata.type.normal_range
     )
           
     session.add(new_healthdata)
@@ -638,8 +641,8 @@ def add_complex_healthdata(healthdata: BloodPressureCreate, user_id: uuid.UUID =
     data_type = session.exec(select(HealthDataType).where(HealthDataType.name == healthdata.name)).first()
     
     new_healthdata = HealthData(
-        systolic = healthdata.value_systolic,
-        diastolic = healthdata.value_diastolic,
+        value_systolic = healthdata.value_systolic,
+        value_diastolic = healthdata.value_diastolic,
         date_recorded = healthdata.date_recorded,
         user = user,
         type = data_type,
@@ -656,7 +659,8 @@ def add_complex_healthdata(healthdata: BloodPressureCreate, user_id: uuid.UUID =
         value_diastolic = new_healthdata.value_diastolic,
         date_recorded = new_healthdata.date_recorded,
         notes = new_healthdata.notes,
-        date_added = new_healthdata.date_added
+        date_added = new_healthdata.date_added,
+        normal_range = new_healthdata.type.normal_range
     )
           
     session.add(new_healthdata)
@@ -725,6 +729,7 @@ def update_healthdata(healthdata_id: uuid.UUID, healthdata_new: HealthDataUpdate
         id = healthdata_db.id,
         name = healthdata_db.type.name,
         unit = healthdata_db.type.unit,
+        normal_range = healthdata_db.type.normal_range,
         date_recorded = healthdata_db.date_recorded,
         notes = healthdata_db.notes,
         date_added = healthdata_db.date_added

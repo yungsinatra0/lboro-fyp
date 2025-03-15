@@ -19,6 +19,9 @@
         </div>
       </template>
       <template #content>
+        <Message v-if="vitalModel && vitalModel.normal_range" severity="info" icon="pi pi-info-circle" class="mb-4">
+          Interval de referinta: {{ vitalModel.normal_range }}
+        </Message>
         <div v-if="vitalModel">
           <DataTable
             :value="filteredVitalData"
@@ -55,7 +58,7 @@
             </Column>
           </DataTable>
           <div v-else class="h-[40vh] md:h-[50vh] relative">
-            <Line :data="chartData" :options="chartOptions"/>
+            <Line :data="chartData" :options="chartOptions" />
           </div>
         </div>
         <div v-else>
@@ -93,16 +96,9 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js'
+import Message from 'primevue/message'
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-)
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
 const props = defineProps({
   vitals: Array,
@@ -137,7 +133,7 @@ const filteredVitalData = computed(() => {
 
 const chartOptions = {
   responsive: true,
-  maintainAspectRatio: false
+  maintainAspectRatio: false,
 }
 
 const chartData = computed(() => {
@@ -168,7 +164,7 @@ const chartData = computed(() => {
       ],
     }
   }
-  
+
   return {
     labels: filteredVitalData.value.map((vital) => vital.original_date_recorded),
     datasets: [
@@ -179,8 +175,8 @@ const chartData = computed(() => {
         borderColor: 'rgb(75, 192, 192)',
         tension: 0.5,
         pointRadius: 5,
-      }
-    ]
+      },
+    ],
   }
 })
 

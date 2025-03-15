@@ -326,7 +326,8 @@ class HealthDataResponse(HealthDataDates):
     value: float | None = None
     value_systolic: float | None = None
     value_diastolic: float | None = None
-    notes: str | None = None     
+    notes: str | None = None
+    normal_range: str | None = None     
     
 # Health data create model
 class SimpleHealthDataCreate(HealthDataDates):
@@ -347,7 +348,6 @@ class HealthDataUpdate(SQLModel):
     value_systolic: float | None = None
     value_diastolic: float | None = None
     date_recorded: date | None = None
-    unit: str | None = None
     notes: str | None = None
     
     @field_serializer('date_recorded')
@@ -361,6 +361,7 @@ class HealthDataType(SQLModel, table=True):
     name: str
     unit: str
     is_compound: bool = False
+    normal_range: str | None = None
     
     healthdata: list[HealthData] = Relationship(back_populates="type")
     
@@ -369,6 +370,7 @@ class HealthDataTypeResponse(SQLModel):
     name: str
     unit: str
     is_compound: bool
+    normal_range: str | None = None
     
 # File Table models used for table creation
 class FileUpload(SQLModel, table=True):
