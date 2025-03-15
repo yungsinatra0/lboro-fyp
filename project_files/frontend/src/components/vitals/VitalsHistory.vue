@@ -25,7 +25,7 @@
             v-if="layout === 'table'"
             removableSort
             sortField="date_recorded"
-            sortOrder="-1"
+            :sortOrder="-1"
           >
             <Column field="date_recorded" header="Data adaugarii" sortable>
               <template #body="slotProps"> {{ slotProps.data.original_date_recorded }} </template
