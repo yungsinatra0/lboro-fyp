@@ -394,8 +394,6 @@ const initialValues = computed(() => {
   }
 })
 
-console.log(initialValues.value)
-
 const resolver = zodResolver(
   z.object({
     name: z.string().nonempty('Numele medicamentului este obligatoriu.'),
