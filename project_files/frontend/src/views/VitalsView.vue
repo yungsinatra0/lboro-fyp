@@ -59,12 +59,12 @@
       />
     </div>
 
-    <AddVital 
-    v-if="displayAddDialog" 
-    :vital-types="vitalTypes"
-    :display-dialog="displayAddDialog"
-    @close="displayAddDialog = false"
-    @add="addVital" 
+    <AddVital
+      v-if="displayAddDialog"
+      :vital-types="vitalTypes"
+      :display-dialog="displayAddDialog"
+      @close="displayAddDialog = false"
+      @add="addVital"
     />
   </div>
 </template>
@@ -91,7 +91,13 @@ const fetchData = async () => {
     const response = await api.get('/healthdata/types')
     vitalTypes.value = response.data
     const response2 = await api.get('/me/healthdata')
-    vitals.value = response2.data
+    vitals.value = response2.data.map((vital) => {
+      return {
+        ...vital,
+        original_date_recorded: vital.date_recorded,
+        date_recorded: parse(vital.date_recorded, 'dd-MM-yyyy', new Date()),
+      }
+    })
   } catch (error) {
     console.error(error)
   }
@@ -123,8 +129,8 @@ const vitalsTrends = computed(() => {
     }
 
     const sortedVitals = [...matchingVitals].sort((a, b) => {
-      const dateA = parse(a.date_recorded, 'dd-MM-yyyy', new Date())
-      const dateB = parse(b.date_recorded, 'dd-MM-yyyy', new Date())
+      const dateA = a.date_recorded
+      const dateB = b.date_recorded
       return compareDesc(dateA, dateB)
     })
 

@@ -20,8 +20,16 @@
       </template>
       <template #content>
         <div v-if="vitalModel">
-          <DataTable :value="filteredVitalData" v-if="layout === 'table'" removableSort>
-            <Column field="date_recorded" header="Data adaugarii" sortable></Column>
+          <DataTable
+            :value="filteredVitalData"
+            v-if="layout === 'table'"
+            removableSort
+            sortField="date_recorded"
+            sortOrder="-1"
+          >
+            <Column field="date_recorded" header="Data adaugarii" sortable>
+              <template #body="slotProps"> {{ slotProps.data.original_date_recorded }} </template
+            ></Column>
             <Column field="value" header="Valoarea" sortable>
               <template #body="slotProps">
                 <span v-if="slotProps.data.value"
@@ -72,6 +80,7 @@ import api from '@/services/api'
 import Button from 'primevue/button'
 import ConfirmDialog from 'primevue/confirmdialog'
 import { ref, computed, watch } from 'vue'
+// import { parse } from 'date-fns'
 
 const props = defineProps({
   vitals: Array,
@@ -99,9 +108,14 @@ const options = ref(['table', 'graph'])
 const layout = ref('table')
 
 const filteredVitalData = computed(() => {
+  // props.vitals.map((vital) => {
+  //   vital.date_recorded = parse(vital.date_recorded, 'dd-MM-yyyy', new Date())
+  //   return vital
+  // })
+
   return vitalModel.value
     ? props.vitals.filter((vital) => vital.name === vitalModel.value.name)
-    : 'Selecteaza tipul mai intai'
+    : []
 })
 
 const toggle = (event, id) => {
