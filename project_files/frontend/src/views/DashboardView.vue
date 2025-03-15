@@ -22,7 +22,6 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-[4fr_3fr_3fr] gap-4 mx-5">
-
       <Card class="mb-4 md:mb-0 md:h-full md:flex md:flex-col">
         <template #title>
           <h2 class="text-xl font-bold">Istoric medical</h2>
@@ -35,18 +34,8 @@
           </p>
         </template>
       </Card>
-      <Card class="mb-4 md:mb-0 md:h-full md:flex md:flex-col">
-        <template #title>
-          <h2 class="text-xl font-bold">Semne vitale</h2>
-        </template>
-        <template #content>
-          <p>
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Asperiores ullam maiores et
-            illo omnis? Quasi optio qui, soluta adipisci sed deserunt veniam labore atque
-            perspiciatis expedita sapiente quae at deleniti.
-          </p>
-        </template>
-      </Card>
+
+      <RecentHealthData :vitals="user_data?.data?.vitals" class="mb-4 md:mb-0 md:h-full" />
 
       <RecentMeds :medications="user_data?.data?.medications" class="mb-4 md:mb-0 md:h-full" />
 
@@ -67,7 +56,6 @@
 
       <RecentAllergies :allergies="user_data?.data?.allergies" class="mb-4 md:mb-0 md:h-full" />
     </div>
-
   </div>
 </template>
 
@@ -80,10 +68,39 @@ import api from '@/services/api'
 import RecentVaccines from '@/components/dashboard/RecentVaccines.vue'
 import RecentAllergies from '@/components/dashboard/RecentAllergies.vue'
 import RecentMeds from '@/components/dashboard/RecentMeds.vue'
+import RecentHealthData from '@/components/dashboard/RecentHealthData.vue'
+import { parse } from 'date-fns'
 
-const user_data = ref('')
+const user_data = ref()
 
 onMounted(async () => {
-  user_data.value = await api.get('/dashboard')
+  try {
+    const response = await api.get('/dashboard')
+    console.log(response.data)
+    user_data.value = {
+      data: {
+        id: response.data.id,
+        name: response.data.name,
+        vitals: response.data.vitals.map((vital) => ({
+          ...vital,
+          original_date_recorded: vital.date_recorded,
+          date_recorded: parse(vital.date_recorded, 'dd-MM-yyyy', new Date()),
+        })),
+        medications: response.data.medications.map((med) => ({
+          ...med,
+          original_date_prescribed: med.date_prescribed,
+          date_prescribed: parse(med.date_prescribed, 'dd-MM-yyyy', new Date()),
+        })),
+        vaccines: response.data.vaccines.map((vaccine) => ({
+          ...vaccine,
+          original_date_received: vaccine.date_received,
+          date_received: parse(vaccine.date_received, 'dd-MM-yyyy', new Date()),
+        })),
+        allergies: response.data.allergies,
+      },
+    }
+  } catch (error) {
+    console.error(error)
+  }
 })
 </script>

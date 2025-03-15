@@ -7,13 +7,15 @@
       <DataTable :value="props.vaccines" removableSort>
         <Column field="name" header="Numele" sortable> </Column>
         <Column field="provider" header="Furnizorul" sortable> </Column>
-        <Column field="date_received" header="Data primirii" sortable> </Column>
+        <Column field="date_received" header="Data primirii" sortable>
+          <template #body="slotProps">
+            <span> {{ slotProps.data.original_date_received }} </span>
+          </template>
+        </Column>
       </DataTable>
     </template>
     <template #footer>
-        <RouterLink to="/vaccine" class="p-button p-button-text"
-          >Vezi toate vaccinurile</RouterLink
-        >
+      <RouterLink to="/vaccine" class="p-button p-button-text">Vezi toate vaccinurile</RouterLink>
     </template>
   </Card>
 </template>
@@ -36,6 +38,6 @@ const cardStyles = {
     class:
       'bg-surface-0 dark:bg-surface-800 text-surface-700 dark:text-surface-0 dark:border dark:border-surface-700',
   },
-  footer : { class: 'flex mt-auto justify-center items-center' },
+  footer: { class: 'flex mt-auto justify-center items-center' },
 }
 </script>
