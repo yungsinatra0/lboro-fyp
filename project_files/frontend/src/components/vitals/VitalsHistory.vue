@@ -20,7 +20,7 @@
       </template>
       <template #content>
         <Message v-if="vitalModel && vitalModel.normal_range" severity="info" icon="pi pi-info-circle" class="mb-4">
-          Interval de referinta: {{ vitalModel.normal_range }}
+          <span class="font-bold"> Interval de referinta: </span> {{ vitalModel.normal_range }}
         </Message>
         <div v-if="vitalModel">
           <DataTable
