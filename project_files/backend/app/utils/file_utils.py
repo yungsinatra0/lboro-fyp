@@ -1,11 +1,11 @@
 from fastapi import HTTPException, status, File, UploadFile
-from models import FileUpload, Vaccine
-from sqlmodel import Session, select
+from ..models import Vaccine
+from sqlmodel import Session
 from pathlib import Path
 import uuid
 from datetime import datetime
 
-from encrypt_utils import encrypt_file
+from .encrypt_utils import encrypt_file
 
 async def validate_file(file: UploadFile) -> bytes:
     

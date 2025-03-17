@@ -4,8 +4,8 @@ from fastapi import HTTPException, status, Depends, Request
 from sqlmodel import Session, select
 import uuid
 
-from models import AuthSession
-from database import get_session
+from ..models import AuthSession
+from .database import get_session
 
 EXPIRE_MINUTES = 60 # 1 hour by default
 
