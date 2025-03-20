@@ -6,3 +6,4 @@ from .allergy import router as allergy_router
 from .healthdata import router as healthdata_router
 from .medication import router as medication_router
 from .dashboard import router as dashboard_router
+from .medhistory import router as medhistory_router
