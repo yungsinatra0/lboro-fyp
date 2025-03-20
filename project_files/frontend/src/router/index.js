@@ -9,6 +9,7 @@ import MedicationView from '@/views/MedicationView.vue'
 import AllergyView from '@/views/AllergyView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import VitalsView from '@/views/VitalsView.vue'
+import MedHistoryView from '@/views/MedHistoryView.vue'
 
 const router = createRouter({
   history: createWebHistory(), // Will need to change base URL if not using root
@@ -65,6 +66,12 @@ const router = createRouter({
       path: '/vitale',
       name: 'Vitale',
       component: VitalsView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/istoric',
+      name: 'Istoric',
+      component: MedHistoryView,
       meta: { requiresAuth: true },
     }
   ],
