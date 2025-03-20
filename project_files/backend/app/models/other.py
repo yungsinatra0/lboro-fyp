@@ -5,6 +5,7 @@ import uuid
 from typing import Optional, Any
 
 Vaccine = Any # Using this to avoid Pylance errors
+MedicalHistory = Any # Using this to avoid Pylance errors
 
 # API Response model
 class APIResponse(SQLModel):
@@ -23,6 +24,9 @@ class FileUpload(SQLModel, table=True):
     
     vaccine_id : uuid.UUID | None = Field(default=None, foreign_key="vaccine.id")
     vaccine: Optional["Vaccine"] = Relationship(back_populates="certificate")
+    
+    medhistory_id : uuid.UUID | None = Field(default=None, foreign_key="medicalhistory.id")
+    medicalhistory: Optional["MedicalHistory"] = Relationship(back_populates="file")
     
     @field_serializer('uploaded_at')
     def serialize_uploaded_at(self, value: datetime) -> str:

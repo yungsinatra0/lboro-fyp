@@ -7,9 +7,9 @@ load_dotenv()  # Load environment variables from .env
 
 def get_encryption_key() -> bytes:
     
-    key = os.getenv("SECRET_KEY")
+    file_key = os.getenv("FILE_KEY")
     
-    if not key:
+    if not file_key:
         new_key = Fernet.generate_key().decode()
         print("New key generated:", new_key)
         raise HTTPException(
@@ -17,7 +17,7 @@ def get_encryption_key() -> bytes:
             detail="Encryption key not found in .env file. A new key has been generated. Check the logs and restart the server."
         )
         
-    return key.encode()
+    return file_key.encode()
 
 def encrypt_file(content: bytes) -> bytes:
     key = get_encryption_key()

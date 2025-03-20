@@ -5,4 +5,5 @@ from .medication import *
 from .healthdata import *
 from .allergy import *
 
-from .user import *
+from .medhistory import *
+from .other import *
