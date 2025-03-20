@@ -56,6 +56,7 @@ class MedicalHistoryResponse(MedicalHistoryDates):
     notes: str | None = None
     category: str
     subcategory: str
+    file: "FileUpload"
     
 # Medical History create model
 class MedicalHistoryCreate(MedicalHistoryDates):

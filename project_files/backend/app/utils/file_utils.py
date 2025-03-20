@@ -1,5 +1,5 @@
 from fastapi import HTTPException, status, File, UploadFile
-from ..models import Vaccine
+from ..models import Vaccine, MedicalHistory
 from sqlmodel import Session
 from pathlib import Path
 import uuid
@@ -21,8 +21,8 @@ async def validate_file(file: UploadFile) -> bytes:
 
 async def get_connected_record(record_type: str, record_id: uuid.UUID, user_id: uuid.UUID, session: Session):
     type_map = {
-        "vaccine": Vaccine
-        # Will add more record types here later
+        "vaccine": Vaccine,
+        "medicalhistory": MedicalHistory
     }
     
     if record_type not in type_map:

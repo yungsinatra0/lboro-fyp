@@ -43,7 +43,10 @@ async def upload_file(
     if record_type == "vaccine":
         new_file.vaccine_id = record_id
         new_file.vaccine = record
-    # Add more record types here later
+    
+    elif record_type == "medicalhistory":
+        new_file.medhistory_id = record_id
+        new_file.medicalhistory = record
 
     session.add(new_file)
     session.commit()
@@ -72,7 +75,9 @@ async def get_file(
     # Will need to change this to something more elegant later, but for now it works
     if record_type == "vaccine":
         file_record = record.certificate
-    
+        
+    elif record_type == "medicalhistory":
+        file_record = record.file   
     
     if not file_record:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File not found")
