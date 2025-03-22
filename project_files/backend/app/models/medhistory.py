@@ -1,7 +1,7 @@
 from sqlmodel import Field, SQLModel, Relationship
 from pydantic import field_serializer
 from datetime import date, datetime
-from typing import Any
+from typing import Any, Optional
 import uuid
 from .other import FileUpload
 
@@ -20,7 +20,7 @@ class MedicalHistory(MedicalHistoryDates, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
     doctor_name: str
-    place: str
+    place: str | None = None
     notes: str | None = None
     
     category_id: uuid.UUID = Field(foreign_key="medicalcategory.id")
@@ -32,7 +32,7 @@ class MedicalHistory(MedicalHistoryDates, table=True):
     user_id: uuid.UUID = Field(foreign_key="user.id")
     user: "User" = Relationship(back_populates="medicalhistory")
     
-    file: "FileUpload" = Relationship(back_populates="medicalhistory", cascade_delete=True)
+    file: Optional["FileUpload"] = Relationship(back_populates="medicalhistory", cascade_delete=True)
     
 class MedicalCategory(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
@@ -51,11 +51,11 @@ class MedicalHistoryResponse(MedicalHistoryDates):
     id: uuid.UUID
     name: str
     doctor_name: str
-    place: str
+    place: str | None = None
     notes: str | None = None
     category: str
     subcategory: str
-    file: "FileUpload"
+    file: Optional["FileUpload"]
     
 # Medical History create model
 class MedicalHistoryCreate(MedicalHistoryDates):

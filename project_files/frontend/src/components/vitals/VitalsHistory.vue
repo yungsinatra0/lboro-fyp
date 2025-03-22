@@ -125,6 +125,7 @@ watch(
 const options = ref(['table', 'graph'])
 const layout = ref('table')
 
+// TODO: Add filtering via date range
 const filteredVitalData = computed(() => {
   return vitalModel.value
     ? props.vitals.filter((vital) => vital.name === vitalModel.value.name)

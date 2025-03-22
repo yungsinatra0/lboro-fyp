@@ -1,14 +1,34 @@
 <template>
   <div class="h-full w-full px-4">
     <DataTable :value="filteredHistory" :rows="10" removableSort>
-      <Column field="name" header="Vizita"></Column>
-      <Column field="doctor_name" header="Numele Doctorului"></Column>
-      <Column field="place" header="Locatia"></Column>
-      <Column field="date" header="Data"></Column>
-      <Column field="category" header="Categoria"></Column>
-      <Column field="subcategory" header="Subcategoria"></Column>
-      <Column field="notes" header="Notite"></Column>
-      <Column field="date_consultation" header="Data Consultatiei"></Column>
+      <Column field="date_consultation" header="Data Consultatiei" sortable>
+        <template #body="slotProps">
+          {{ slotProps.data.original_date_consultation }}
+        </template>
+      </Column>
+      <Column field="name" header="Descriere"></Column>
+      <Column field="doctor_name" header="Numele Doctorului" sortable></Column>
+      <Column field="place" header="Locatia" sortable>
+        <template #body="slotProps">
+          {{ slotProps.data.place ? slotProps.data.place : '-' }}
+        </template>
+      </Column>
+      <Column field="category" header="Categoria" sortable>
+        <template #body="slotProps">
+          <Tag :value="slotProps.data.category" severity="info" rounded />
+        </template>
+      </Column>
+      <Column field="subcategory" header="Subcategoria" sortable>
+        <template #body="slotProps">
+          <Tag :value="slotProps.data.subcategory" severity="info" rounded />
+        </template>
+      </Column>
+      <Column field="notes" header="Notite">
+        <template #body="slotProps">
+          {{ slotProps.data.notes ? slotProps.data.notes : '-' }}
+        </template>
+      </Column>
+      <!-- TODO: Add view file icon to the last column -->
       <Column class="w-24 !text-end" header="Optiuni">
         <template #body="{ data }">
           <Button
@@ -30,6 +50,7 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Button from 'primevue/button'
 import Menu from 'primevue/menu'
+import Tag from 'primevue/tag'
 import { useConfirm } from 'primevue/useconfirm'
 import ConfirmDialog from 'primevue/confirmdialog'
 import api from '@/services/api'

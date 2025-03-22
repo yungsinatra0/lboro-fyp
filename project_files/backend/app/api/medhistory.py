@@ -13,7 +13,24 @@ router = APIRouter()
 @router.get("/me/medicalhistory", response_model=list[MedicalHistoryResponse])
 def get_medicalhistory(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     user = session.get(User, user_id)
-    return user.medicalhistory
+    
+    result = []
+    
+    for history in user.medicalhistory:
+        result.append({
+            "id": history.id,
+            "name": history.name,
+            "doctor_name": history.doctor_name,
+            "place": history.place,
+            "notes": history.notes,
+            "category": history.category.name,
+            "subcategory": history.subcategory.name,
+            "file": history.file,
+            "date_consultation": history.date_consultation,
+            "date_added": history.date_added
+        })
+    
+    return result
 
 # Add a medical history record
 @router.post("/me/medicalhistory")
