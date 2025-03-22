@@ -67,7 +67,7 @@ const items = ref([
       {
         label: 'Vizite medici',
         // icon: 'pi pi-calendar',
-        route: '/dashboard',
+        route: '/istoric',
       },
       {
         label: 'Analize laborator',

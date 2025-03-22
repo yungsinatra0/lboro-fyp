@@ -12,9 +12,8 @@ class MedicalHistoryDates(SQLModel):
     date_consultation: date
     date_added: datetime = Field(default_factory=datetime.now)
     
-    
     @field_serializer('date_consultation')
-    def serialize_date_added(self, value: date) -> str:
+    def serialize_date_consultation(self, value: date) -> str:
         return value.strftime("%d-%m-%Y")
     
 class MedicalHistory(MedicalHistoryDates, table=True):
@@ -72,13 +71,13 @@ class MedicalHistoryUpdate(SQLModel):
     name: str | None = None
     doctor_name: str | None = None
     place: str | None = None
-    date_consulation: date | None = None
+    date_consultation: date | None = None
     notes: str | None = None
     category: str | None = None
     subcategory: str | None = None
     
-    @field_serializer('date_prescribed')
-    def serialize_date_prescribed(self, value: date) -> str | None:
+    @field_serializer('date_consultation')
+    def serialize_date_consultation(self, value: date) -> str | None:
         if value is None:
             return None
         return value.strftime("%d-%m-%Y")

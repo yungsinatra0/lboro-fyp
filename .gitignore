@@ -857,7 +857,7 @@ $RECYCLE.BIN/
 
 # Uploaded files
 
-project_files/backend/app/uploads/
+project_files/backend/uploads
 
 # Generators
 

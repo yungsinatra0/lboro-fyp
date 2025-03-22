@@ -7,3 +7,5 @@ from .allergy import *
 
 from .medhistory import *
 from .other import *
+
+from .user import *

@@ -6,7 +6,7 @@ from .vaccine import Vaccine, VaccineResponse
 from .allergy import Allergy, AllergyResponse
 from .medication import Medication, MedicationResponse
 from .healthdata import HealthData, HealthDataResponse
-
+from .medhistory import MedicalHistory, MedicalHistoryResponse
 
 # Base model that contains the field serializer for date formatting to dd-mm-yyyy and the date field itself
 class DateFormattingModel(SQLModel):
@@ -36,6 +36,7 @@ class User(DateFormattingModel, table=True):
     allergies: list["Allergy"] = Relationship(back_populates="user", cascade_delete=True)
     medications: list["Medication"] = Relationship(back_populates="user", cascade_delete=True)
     healthdata: list["HealthData"] = Relationship(back_populates="user", cascade_delete=True)
+    medicalhistory: list["MedicalHistory"] = Relationship(back_populates="user", cascade_delete=True)
 
 class UserResponse(DateFormattingModel):
     id: uuid.UUID
@@ -50,6 +51,8 @@ class UserDashboard(SQLModel):
     allergies: list["AllergyResponse"]
     medications: list["MedicationResponse"]
     vitals: list["HealthDataResponse"]
+    # medicalhistory: list["MedicalHistoryResponse"]
+    #TODO: Don't forget to add medical history to the dashboard
 
 # User Data model used for login and registration  
 class UserAuth(DateFormattingModel):
