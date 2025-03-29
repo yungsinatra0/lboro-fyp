@@ -31,11 +31,22 @@
       <!-- TODO: Add view file icon to the last column -->
       <Column class="w-24 !text-end" header="Optiuni">
         <template #body="{ data }">
-          <Button
-            icon="pi pi-ellipsis-h"
-            @click="(event) => toggle(event, data.id)"
-            severity="secondary"
-          ></Button>
+          <div class="flex flex-row gap-2 justify-end">
+            <Button 
+              icon="pi pi-eye"
+              class="p-button-rounded p-button-text p-button-plain"
+              @click="(event) => emit('showFile', data.id)"
+              severity="secondary"
+              v-if="data.file"
+            >
+            </Button>
+            <Button
+              icon="pi pi-ellipsis-h"
+              class="p-button-rounded p-button-text p-button-plain"
+              @click="(event) => toggle(event, data.id)"
+              severity="secondary"
+            ></Button>
+          </div>
         </template>
       </Column>
     </DataTable>
@@ -63,7 +74,7 @@ const props = defineProps({
 const selectedHistoryId = ref(null)
 const menu = ref(null)
 const confirm = useConfirm()
-const emit = defineEmits(['delete', 'openEdit'])
+const emit = defineEmits(['delete', 'openEdit', 'showFile'])
 
 const filteredHistory = computed(() => {
   return props.history

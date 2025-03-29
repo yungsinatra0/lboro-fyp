@@ -61,7 +61,7 @@ class MedicalHistoryResponse(MedicalHistoryDates):
 class MedicalHistoryCreate(MedicalHistoryDates):
     name: str
     doctor_name: str
-    place: str
+    place: str | None = None
     notes: str | None = None
     category: str
     subcategory: str

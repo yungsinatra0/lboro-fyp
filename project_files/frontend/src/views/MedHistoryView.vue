@@ -17,8 +17,19 @@
         :history="history"
         @delete="deleteHistory"
         @open-edit="openEditDialog"
+        @show-file="showFile"
       />
     </div>
+
+    <AddHistory
+      v-if="displayAddDialog"
+      @close="displayAddDialog = false"
+      @add="addHistory"
+      :display-dialog="displayAddDialog"
+      :categories="categories"
+      :subcategories="subcategories"
+    />
+    
   </div>
 </template>
 
@@ -27,10 +38,14 @@ import NavBar from '@/components/NavBar.vue'
 import Button from 'primevue/button'
 import { ref, onMounted } from 'vue'
 import HistoryTableView from '@/components/medhistory/HistoryTableView.vue'
+import AddHistory from '@/components/medhistory/AddHistory.vue'
 import { parse } from 'date-fns'
 import api from '@/services/api'
 
 const history = ref([])
+const displayAddDialog = ref(false)
+const categories = ref([])
+const subcategories = ref([])
 
 onMounted(() => {
   fetchData()
@@ -46,8 +61,32 @@ const fetchData = async () => {
         date_consultation: parse(item.date_consultation, 'dd-MM-yyyy', new Date()),
       }
     })
+    const categoriesResponse = await api.get('/medicalcategories')
+    const subcategoriesResponse = await api.get('/medicalsubcategories')
+    categories.value = categoriesResponse.data.map((category) => category.name)
+    subcategories.value = subcategoriesResponse.data.map((subcategory) => subcategory.name)
   } catch (error) {
     console.error(error)
   }
+}
+
+const showAddDialog = () => {
+  displayAddDialog.value = true
+}
+
+const openEditDialog = (id) => {
+  // Open edit dialog with the selected id
+}
+
+const addHistory = (visit) => {
+  history.value.push(visit)
+}
+
+const deleteHistory = (id) => {
+  history.value = history.value.filter((item) => item.id !== id)
+}
+
+const showFile = (id) => {
+  // Show file dialog with the selected id
 }
 </script>

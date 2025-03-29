@@ -6,6 +6,7 @@
     class="w-full md:w-1/2"
     @hide="emit('close')"
   >
+  <!-- TODO: Add option for PDF file  -->
     <Image :src="`http://localhost:8000/files/vaccine/${props.vaccineId}`" alt="Certificat vaccin" preview />
 
   </Dialog>

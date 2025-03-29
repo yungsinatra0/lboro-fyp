@@ -47,7 +47,8 @@ def create_medicalhistory(medhistory: MedicalHistoryCreate, user_id: uuid.UUID =
         notes = medhistory.notes,
         category = category,
         subcategory = subcategory,
-        user = user)
+        user = user,
+        date_consultation = medhistory.date_consultation,)
     
     session.add(new_medicalhistory)
     session.commit()
@@ -62,6 +63,7 @@ def create_medicalhistory(medhistory: MedicalHistoryCreate, user_id: uuid.UUID =
         category = new_medicalhistory.category.name,
         subcategory = new_medicalhistory.subcategory.name,
         file = new_medicalhistory.file,
+        date_consultation = new_medicalhistory.date_consultation,
     )
     
     return {
