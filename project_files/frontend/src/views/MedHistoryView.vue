@@ -29,6 +29,13 @@
       :categories="categories"
       :subcategories="subcategories"
     />
+
+    <ShowFile
+      v-if="displayFileDialog"
+      :display-dialog="displayFileDialog"
+      @close="displayFileDialog = false"
+      :history-id="historyIdForFile"
+    />
     
   </div>
 </template>
@@ -39,11 +46,14 @@ import Button from 'primevue/button'
 import { ref, onMounted } from 'vue'
 import HistoryTableView from '@/components/medhistory/HistoryTableView.vue'
 import AddHistory from '@/components/medhistory/AddHistory.vue'
+import ShowFile from '@/components/medhistory/ShowFile.vue'
 import { parse } from 'date-fns'
 import api from '@/services/api'
 
 const history = ref([])
 const displayAddDialog = ref(false)
+const displayFileDialog = ref(false)
+const historyIdForFile = ref(null)
 const categories = ref([])
 const subcategories = ref([])
 
@@ -87,6 +97,7 @@ const deleteHistory = (id) => {
 }
 
 const showFile = (id) => {
-  // Show file dialog with the selected id
+  displayFileDialog.value = true
+  historyIdForFile.value = id
 }
 </script>

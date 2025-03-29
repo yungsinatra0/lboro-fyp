@@ -158,7 +158,7 @@ import Button from 'primevue/button'
 import FileUpload from 'primevue/fileupload'
 import Select from 'primevue/select'
 import Textarea from 'primevue/textarea'
-
+import { parse } from 'date-fns'
 import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import api from '@/services/api'
@@ -236,7 +236,12 @@ const addMedicalHistory = async (medicalHistoryDetails) => {
       hasFile = true
     }
 
-    emit('add', { ...response.data.medicalhistory, file: hasFile })
+    emit('add', {
+      ...response.data.medicalhistory,
+      original_date_consultation: response.data.date_consultation,
+      date_consultation: parse(response.data.date_consultation, 'dd-MM-yyyy', new Date()),
+      file: hasFile,
+    })
     emit('close')
   } catch (error) {
     console.error('Error in medical history operation:', error)

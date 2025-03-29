@@ -31,3 +31,8 @@ class FileUpload(SQLModel, table=True):
     @field_serializer('uploaded_at')
     def serialize_uploaded_at(self, value: datetime) -> str:
         return value.strftime("%d-%m-%Y %H:%M:%S")
+    
+class FileResponse(SQLModel):
+    name: str
+    file_type: str
+    file_path: str
