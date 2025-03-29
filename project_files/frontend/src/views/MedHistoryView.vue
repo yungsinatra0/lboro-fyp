@@ -36,7 +36,16 @@
       @close="displayFileDialog = false"
       :history-id="historyIdForFile"
     />
-    
+
+    <EditHistory
+      v-if="displayEditDialog"
+      :display-dialog="displayEditDialog"
+      :medical-history="editDialogData"
+      :categories="categories"
+      :subcategories="subcategories"
+      @edit="refreshUpdatedHistory"
+      @close="displayEditDialog = false"
+    />
   </div>
 </template>
 
@@ -47,12 +56,15 @@ import { ref, onMounted } from 'vue'
 import HistoryTableView from '@/components/medhistory/HistoryTableView.vue'
 import AddHistory from '@/components/medhistory/AddHistory.vue'
 import ShowFile from '@/components/medhistory/ShowFile.vue'
+import EditHistory from '@/components/medhistory/EditHistory.vue'
 import { parse } from 'date-fns'
 import api from '@/services/api'
 
 const history = ref([])
 const displayAddDialog = ref(false)
 const displayFileDialog = ref(false)
+const displayEditDialog = ref(false)
+const editDialogData = ref(null)
 const historyIdForFile = ref(null)
 const categories = ref([])
 const subcategories = ref([])
@@ -85,7 +97,9 @@ const showAddDialog = () => {
 }
 
 const openEditDialog = (id) => {
-  // Open edit dialog with the selected id
+  displayEditDialog.value = true
+  const selectedHistory = history.value.find((item) => item.id === id)
+  editDialogData.value = selectedHistory
 }
 
 const addHistory = (visit) => {
@@ -94,6 +108,17 @@ const addHistory = (visit) => {
 
 const deleteHistory = (id) => {
   history.value = history.value.filter((item) => item.id !== id)
+}
+
+const refreshUpdatedHistory = (visit) => {
+  const index = history.value.findIndex((item) => item.id === visit.id)
+  if (index !== -1) {
+    history.value[index] = {
+      ...visit,
+      original_date_consultation: visit.date_consultation,
+      date_consultation: parse(visit.date_consultation, 'dd-MM-yyyy', new Date()),
+    }
+  }
 }
 
 const showFile = (id) => {

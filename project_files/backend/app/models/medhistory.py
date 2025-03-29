@@ -55,7 +55,7 @@ class MedicalHistoryResponse(MedicalHistoryDates):
     notes: str | None = None
     category: str
     subcategory: str
-    file: Optional["FileUpload"]
+    file: Optional["FileUpload"] = None
     
 # Medical History create model
 class MedicalHistoryCreate(MedicalHistoryDates):

@@ -97,6 +97,7 @@ def update_medicalhistory(medhistory_id: uuid.UUID, medhistory: MedicalHistoryUp
         notes = medhistory_db.notes,
         category = medhistory_db.category.name,
         subcategory = medhistory_db.subcategory.name,
+        date_consultation= medhistory_db.date_consultation,
         # file = medhistory_db.file,
     )
     
