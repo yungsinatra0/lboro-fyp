@@ -3,13 +3,22 @@
     <Card :pt="cardStyles">
       <template #title>
         <span class="text-xl font-bold p-4"> Valori istorice </span>
-        <div class="flex gap-2">
+        <div class="flex flex-row gap-2">
           <Select
             v-model="vitalModel"
             :options="props.vitalTypes"
             optionLabel="name"
             placeholder="Selecteaza tipul"
             class="text-base"
+          />
+          <DatePicker
+            v-model="selectedDates"
+            placeholder="Selecteaza datele"
+            selectionMode="range"
+            showIcon
+            dateFormat="dd/mm/yy"
+            class="text-base"
+            showButtonBar
           />
           <SelectButton v-model="layout" :options="options" :allowEmpty="false">
             <template #option="{ option }">
@@ -19,7 +28,12 @@
         </div>
       </template>
       <template #content>
-        <Message v-if="vitalModel && vitalModel.normal_range" severity="info" icon="pi pi-info-circle" class="mb-4">
+        <Message
+          v-if="vitalModel && vitalModel.normal_range"
+          severity="info"
+          icon="pi pi-info-circle"
+          class="mb-4"
+        >
           <span class="font-bold"> Interval de referinta: </span> {{ vitalModel.normal_range }}
         </Message>
         <div v-if="vitalModel">
@@ -84,6 +98,7 @@ import { useConfirm } from 'primevue/useconfirm'
 import api from '@/services/api'
 import Button from 'primevue/button'
 import ConfirmDialog from 'primevue/confirmdialog'
+import DatePicker from 'primevue/datepicker'
 import { ref, computed, watch } from 'vue'
 import { Line } from 'vue-chartjs'
 import {
@@ -112,6 +127,8 @@ const selectedVitalId = ref(null)
 const menu = ref()
 const confirm = useConfirm()
 
+const selectedDates = ref(null)
+
 watch(
   () => props.vitalTypes,
   (newTypes) => {
@@ -125,8 +142,23 @@ watch(
 const options = ref(['table', 'graph'])
 const layout = ref('table')
 
-// TODO: Add filtering via date range
 const filteredVitalData = computed(() => {
+  if (selectedDates.value) {
+    if (!selectedDates.value[1]) {
+      return props.vitals.filter((vital) => {
+        return vital.date_recorded >= selectedDates.value[0] && vital.name === vitalModel.value.name
+      })
+    } else if (selectedDates.value[0] && selectedDates.value[1]) {
+      return props.vitals.filter((vital) => {
+        return (
+          vital.date_recorded >= selectedDates.value[0] &&
+          vital.date_recorded <= selectedDates.value[1] &&
+          vital.name === vitalModel.value.name
+        )
+      })
+    }
+  }
+
   return vitalModel.value
     ? props.vitals.filter((vital) => vital.name === vitalModel.value.name)
     : []
