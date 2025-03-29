@@ -46,7 +46,6 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 // import ColumnGroup from 'primevue/columngroup' // optional
 // import Row from 'primevue/row' // optional
-// TODO: Change vitals shown to be one of each, not most recent of all
 const props = defineProps({
   vitals: Array,
 })

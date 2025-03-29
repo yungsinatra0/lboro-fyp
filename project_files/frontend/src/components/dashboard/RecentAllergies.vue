@@ -60,7 +60,6 @@ import Column from 'primevue/column'
 import Tag from 'primevue/tag'
 // import ColumnGroup from 'primevue/columngroup' // optional
 // import Row from 'primevue/row' // optional
-// TODO: Display only severe and moderate allergies
 
 const props = defineProps({
   allergies: Array,
