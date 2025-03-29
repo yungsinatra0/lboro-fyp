@@ -18,12 +18,12 @@
             ></Tag>
           </template>
         </Column>
-        <Column field="date_prescribed" header="Data prescrierii" sortable>
+        <Column field="date_prescribed" header="Prescris" sortable>
           <template #body="slotProps">
             <span> {{ slotProps.data.original_date_prescribed }} </span>
           </template>
         </Column>
-        <Column field="duration_days" header="Durata tratamentului" sortable>
+        <Column field="duration_days" header="Durata" sortable>
           <template #body="slotProps">
             {{ slotProps.data.duration_days + ' zile' }}
           </template>

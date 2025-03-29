@@ -1,7 +1,7 @@
 <template>
   <Card :pt="cardStyles" class="h-full">
     <template #title>
-      <h2 class="text-xl font-bold p-4">Alergiile recent adaugate</h2>
+      <h2 class="text-xl font-bold p-4">Alergiile severe/moderate recent adaugate</h2>
     </template>
     <template #content>
       <DataTable :value="props.allergies" removableSort>

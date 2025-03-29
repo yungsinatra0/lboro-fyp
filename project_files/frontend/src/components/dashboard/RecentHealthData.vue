@@ -1,7 +1,7 @@
 <template>
   <Card :pt="cardStyles" class="h-full">
     <template #title>
-      <h2 class="text-xl font-bold p-4">Semne vitale recent adaugate</h2>
+      <h2 class="text-xl font-bold p-4">Semne vitale recent inregistrate</h2>
     </template>
     <template #content>
       <DataTable :value="props.vitals" removableSort>
@@ -17,9 +17,19 @@
             </span>
           </template>
         </Column>
-        <Column field="date_recorded" header="Data adaugarii" sortable>
+        <Column field="date_recorded" header="Adaugat" sortable>
           <template #body="slotProps">
             <span> {{ slotProps.data.original_date_recorded }} </span>
+          </template>
+        </Column>
+        <Column field="trend" header="Trend">
+          <template #body="slotProps">
+            <i v-if="slotProps.data.trend === 'up'" class="pi pi-arrow-up text-green-500"></i>
+            <i
+              v-else-if="slotProps.data.trend === 'down'"
+              class="pi pi-arrow-down text-red-500"
+            ></i>
+            <i v-else class="pi pi-minus-circle text-gray-500"></i>
           </template>
         </Column>
       </DataTable>
@@ -36,7 +46,7 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 // import ColumnGroup from 'primevue/columngroup' // optional
 // import Row from 'primevue/row' // optional
-
+// TODO: Change vitals shown to be one of each, not most recent of all
 const props = defineProps({
   vitals: Array,
 })

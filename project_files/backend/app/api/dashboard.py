@@ -17,7 +17,7 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
     
     newest_vaccines = session.exec(select(Vaccine).where(Vaccine.user_id == user_id).order_by(col(Vaccine.date_added).desc()).limit(5)).all()
     newest_allergies = session.exec(select(Allergy).where(Allergy.user_id == user_id).order_by(col(Allergy.date_added).desc()).limit(5)).all()
-    newest_healthdata = session.exec(select(HealthData).where(HealthData.user_id == user_id).order_by(col(HealthData.date_added).desc()).limit(5)).all()
+    newest_healthdata = session.exec(select(HealthData).where(HealthData.user_id == user_id).order_by(col(HealthData.date_added))).all()
     newest_medications = session.exec(select(Medication).where(Medication.user_id == user_id).order_by(col(Medication.date_added).desc()).limit(5)).all()
     
     vaccines_response = []
@@ -35,18 +35,19 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
     # Iterate through allergies to get only allergen names and reactions - this is because AllergyResponse expects a list of str for allergens and reactions
     allergies_response = []
     for allergy in newest_allergies:
-        allergens = [allergen.name for allergen in allergy.allergens]
-        reactions = [reaction.name for reaction in allergy.reactions]
-        allergies_response.append(
-            AllergyResponse(
-                id = allergy.id,
-                date_diagnosed = allergy.date_diagnosed,
-                allergens = allergens,
-                reactions = reactions,
-                severity = allergy.severity.name,
-                notes = allergy.notes,
-                date_added = allergy.date_added
-        ))
+        if allergy.severity.name == 'Severă' or allergy.severity.name == 'Moderată':
+            allergens = [allergen.name for allergen in allergy.allergens]
+            reactions = [reaction.name for reaction in allergy.reactions]
+            allergies_response.append(
+                AllergyResponse(
+                    id = allergy.id,
+                    date_diagnosed = allergy.date_diagnosed,
+                    allergens = allergens,
+                    reactions = reactions,
+                    severity = allergy.severity.name,
+                    notes = allergy.notes,
+                    date_added = allergy.date_added
+            ))
     
     # Iterate through medications to get route and form names - same as above, expects str
     medications_response = []
@@ -66,34 +67,36 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
                 notes=medication.notes,
                 date_added=medication.date_added               
         ))
+    
+    grouped_healthdata = group_compare_healthdata(newest_healthdata)
         
     healthdata_response = []
-    for healthdata in newest_healthdata:
-        if healthdata.type.name == "Tensiune arterială": {
-            healthdata_response.append(
-                HealthDataResponse(
-                    id = healthdata.id,
-                    name = healthdata.type.name,
-                    unit = healthdata.type.unit,
-                    value_systolic = healthdata.value_systolic,
-                    value_diastolic = healthdata.value_diastolic,
-                    date_recorded = healthdata.date_recorded,
-                    notes = healthdata.notes,
-                    date_added = healthdata.date_added
-                ))
-        }
-        else: {
-            healthdata_response.append(
-                HealthDataResponse(
-                    id = healthdata.id,
-                    name = healthdata.type.name,
-                    unit = healthdata.type.unit,
-                    value = healthdata.value,
-                    date_recorded = healthdata.date_recorded,
-                    notes = healthdata.notes,
-                    date_added = healthdata.date_added
-                ))
-        }
+    for data in grouped_healthdata:
+        healthdata = data["healthdata"]
+        response = None
+        if healthdata.type.name == "Tensiune arterială":
+            response = HealthDataResponse(
+                id = healthdata.id,
+                name = healthdata.type.name,
+                unit = healthdata.type.unit,
+                value_systolic = healthdata.value_systolic,
+                value_diastolic = healthdata.value_diastolic,
+                date_recorded = healthdata.date_recorded,
+                notes = healthdata.notes,
+                date_added = healthdata.date_added
+            )
+        else:
+            response = HealthDataResponse(
+                id = healthdata.id,
+                name = healthdata.type.name,
+                unit = healthdata.type.unit,
+                value = healthdata.value,
+                date_recorded = healthdata.date_recorded,
+                notes = healthdata.notes,
+                date_added = healthdata.date_added
+            )
+        response.trend = data["trend"]
+        healthdata_response.append(response)
     
     user_dashboard = UserDashboard(
         id = user.id,
@@ -105,3 +108,49 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
     )
     
     return user_dashboard
+
+def group_compare_healthdata(healthdata: list[HealthData]):
+    grouped_data = {}
+    
+    # Iterate through the health data and group by type
+    for data in healthdata:
+        if data.type.name not in grouped_data:
+            grouped_data[data.type.name] = []
+        grouped_data[data.type.name].append(data)
+    
+    print("GROUPED DATA", grouped_data)
+        
+    data_trends = []        
+    # Get latest and 2nd latest values for each type
+    for key, values in grouped_data.items():
+        if not values:
+            continue
+        
+        latest = values[0]
+        second_latest = values[1] if len(values) > 1 else None
+        
+        if latest.value_systolic is not None and latest.value_diastolic is not None:
+            trend = latest.value_systolic - latest.value_diastolic
+            if trend > 0:
+                trend = "up"
+            elif trend < 0:
+                trend = "down"
+            else:
+                trend = "stable"
+        elif latest.value is not None:
+            trend = latest.value - (second_latest.value if second_latest else latest.value)
+            if trend > 0:
+                trend = "up"
+            elif trend < 0:
+                trend = "down"
+            else:
+                trend = "stable"
+            
+        data_trends.append({
+            "healthdata": latest,
+            "trend": trend,
+        })
+        
+    print("DATA TRENDS", data_trends)
+          
+    return data_trends

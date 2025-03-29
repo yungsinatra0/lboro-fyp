@@ -37,7 +37,8 @@ class HealthDataResponse(HealthDataDates):
     value_systolic: float | None = None
     value_diastolic: float | None = None
     notes: str | None = None
-    normal_range: str | None = None     
+    normal_range: str | None = None
+    trend: str | None = None     
     
 # Health data create model
 class SimpleHealthDataCreate(HealthDataDates):
