@@ -28,7 +28,6 @@
           {{ slotProps.data.notes ? slotProps.data.notes : '-' }}
         </template>
       </Column>
-      <!-- TODO: Add view file icon to the last column -->
       <Column class="w-24 !text-end" header="Optiuni">
         <template #body="{ data }">
           <div class="flex flex-row gap-2 justify-end">

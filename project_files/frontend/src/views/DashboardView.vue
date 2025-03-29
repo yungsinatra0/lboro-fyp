@@ -22,19 +22,10 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-[5fr_3fr_3fr] gap-4 mx-5">
-      <Card class="mb-4 md:mb-0 md:h-full md:flex md:flex-col">
-        <template #title>
-          <h2 class="text-xl font-bold">Istoric medical</h2>
-        </template>
-        <template #content>
-          <p>
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Asperiores ullam maiores et
-            illo omnis? Quasi optio qui, soluta adipisci sed deserunt veniam labore atque
-            perspiciatis expedita sapiente quae at deleniti.
-          </p>
-        </template>
-      </Card>
-
+      <RecentMedicalHistory
+        :medhistory="user_data?.data?.medhistory"
+        class="mb-4 md:mb-0 md:h-full"
+      />
       <RecentHealthData :vitals="user_data?.data?.vitals" class="mb-4 md:mb-0 md:h-full" />
 
       <RecentMeds :medications="user_data?.data?.medications" class="mb-4 md:mb-0 md:h-full" />
@@ -69,6 +60,7 @@ import RecentVaccines from '@/components/dashboard/RecentVaccines.vue'
 import RecentAllergies from '@/components/dashboard/RecentAllergies.vue'
 import RecentMeds from '@/components/dashboard/RecentMeds.vue'
 import RecentHealthData from '@/components/dashboard/RecentHealthData.vue'
+import RecentMedicalHistory from '@/components/dashboard/RecentMedicalHistory.vue'
 import { parse } from 'date-fns'
 
 const user_data = ref()
@@ -97,6 +89,11 @@ onMounted(async () => {
           date_received: parse(vaccine.date_received, 'dd-MM-yyyy', new Date()),
         })),
         allergies: response.data.allergies,
+        medhistory: response.data.medicalhistory.map((history) => ({
+          ...history,
+          original_date_consultation: history.date_consultation,
+          date_consultation: parse(history.date_consultation, 'dd-MM-yyyy', new Date()),
+        })),
       },
     }
   } catch (error) {

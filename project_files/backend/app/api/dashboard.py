@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status, Response, Request, APIRouter
 from sqlmodel import Session, select, col
 import uuid
 
-from ..models import User, Vaccine, VaccineResponse, Allergy, AllergyResponse, HealthData, HealthDataResponse, Medication, MedicationResponse, UserDashboard
+from ..models import User, Vaccine, VaccineResponse, Allergy, AllergyResponse, HealthData, HealthDataResponse, Medication, MedicationResponse, UserDashboard, MedicalHistory, MedicalHistoryResponse
 from ..utils import get_session, validate_session
 
 router = APIRouter()
@@ -19,6 +19,7 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
     newest_allergies = session.exec(select(Allergy).where(Allergy.user_id == user_id).order_by(col(Allergy.date_added).desc()).limit(5)).all()
     newest_healthdata = session.exec(select(HealthData).where(HealthData.user_id == user_id).order_by(col(HealthData.date_added))).all()
     newest_medications = session.exec(select(Medication).where(Medication.user_id == user_id).order_by(col(Medication.date_added).desc()).limit(5)).all()
+    newest_medicalhistory = session.exec(select(MedicalHistory).where(MedicalHistory.user_id == user_id).order_by(col(MedicalHistory.date_added).desc()).limit(5)).all()
     
     vaccines_response = []
     for vaccine in newest_vaccines:
@@ -97,6 +98,24 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
             )
         response.trend = data["trend"]
         healthdata_response.append(response)
+        
+    medicalhistory_response = []
+    for history in newest_medicalhistory:
+        category = history.category.name if history.category else None
+        subcategory = history.subcategory.name if history.subcategory else None
+        medicalhistory_response.append(
+            MedicalHistoryResponse(
+                id = history.id,
+                name = history.name,
+                doctor_name = history.doctor_name,
+                place = history.place,
+                notes = history.notes,
+                category = category,
+                subcategory = subcategory,
+                file = history.file,
+                date_consultation = history.date_consultation,
+                date_added = history.date_added
+            ))
     
     user_dashboard = UserDashboard(
         id = user.id,
@@ -104,7 +123,8 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
         vaccines = vaccines_response,
         allergies = allergies_response,
         vitals = healthdata_response,
-        medications = medications_response
+        medications = medications_response,
+        medicalhistory = medicalhistory_response
     )
     
     return user_dashboard

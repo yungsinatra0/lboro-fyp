@@ -51,8 +51,7 @@ class UserDashboard(SQLModel):
     allergies: list["AllergyResponse"]
     medications: list["MedicationResponse"]
     vitals: list["HealthDataResponse"]
-    # medicalhistory: list["MedicalHistoryResponse"]
-    #TODO: Don't forget to add medical history to the dashboard
+    medicalhistory: list["MedicalHistoryResponse"]
 
 # User Data model used for login and registration  
 class UserAuth(DateFormattingModel):
