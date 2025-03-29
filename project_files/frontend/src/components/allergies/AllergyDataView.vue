@@ -386,7 +386,7 @@ const getSeverityType = (severity) => {
     case 'Ușoară':
       return 'success'
     case 'Moderată':
-      return 'warning'
+      return 'warn'
     case 'Severă':
       return 'danger'
     default:
