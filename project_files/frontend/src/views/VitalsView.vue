@@ -15,6 +15,7 @@
     <div class="flex flex-col mx-3 md:flex-row md:gap-6 md:mx-5 md:justify-between">
       <Card class="h-full" :pt="cardStyles">
         <template #title> Valori curente </template>
+        <!-- Show the arrows for current values whether they fall within the normal range instead -->
         <template #content>
             <div class="grid grid-cols-2 gap-3">
             <Card v-for="type in vitalTypes" :key="type.id" :pt="cardDataStyles" class="w-full">

@@ -33,6 +33,7 @@
 </template>
 
 <script setup>
+// TODO: Add support for medical imagining file types like DICOM. Redirect to 3rd party if needed (if 3D).
 import Dialog from 'primevue/dialog'
 import Image from 'primevue/image'
 import { ref, onMounted } from 'vue'
