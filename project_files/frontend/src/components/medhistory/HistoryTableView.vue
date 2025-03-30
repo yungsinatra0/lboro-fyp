@@ -1,7 +1,7 @@
 <template>
   <div class="h-full w-full px-4">
     <DataTable :value="filteredHistory" :rows="10" removableSort>
-      <Column field="date_consultation" header="Data Consultatiei" sortable>
+      <Column field="date_consultation" header="Data efectuării" sortable>
         <template #body="slotProps">
           {{ slotProps.data.original_date_consultation }}
         </template>

@@ -11,12 +11,13 @@
         <span class="font-bold whitespace-nowrap text-2xl">Înregistrare medicală nouă</span>
       </div>
     </template>
-    <span class="text-surface-500 dark:text-surface-400 block mb-8"
+    <span class="text-surface-500 dark:text-surface-400 block mb-2"
       >Adaugă informații pentru o nouă înregistrare medicală.</span
     >
+    <span class="text-rose-600 text-sm block mb-8">* Câmpurile marcate sunt obligatorii</span>
     <Form v-slot="$form" :initialValues="initialValues" @submit="onFormSubmit" :resolver="resolver">
       <div class="flex items-center gap-4 mb-4">
-        <label for="name" class="font-semibold w-24">Descriere</label>
+        <label for="name" class="font-semibold w-24">Descriere <span class="text-rose-600">*</span></label>
         <InputText name="name" class="flex w-1/2" autocomplete="off" type="text" fluid />
         <Message
           v-if="$form.name?.invalid"
@@ -28,7 +29,7 @@
         >
       </div>
       <div class="flex items-center gap-4 mb-4">
-        <label for="doctor_name" class="font-semibold w-24">Numele doctorului</label>
+        <label for="doctor_name" class="font-semibold w-24">Numele doctorului <span class="text-rose-600">*</span></label>
         <InputText name="doctor_name" class="flex w-1/2" autocomplete="off" type="text" fluid />
         <Message
           v-if="$form.doctor_name?.invalid"
@@ -52,26 +53,7 @@
         >
       </div>
       <div class="flex items-center gap-4 mb-4">
-        <label for="date_consultation" class="font-semibold w-24">Data consultării</label>
-        <DatePicker
-          name="date_consultation"
-          dateFormat="dd/mm/yy"
-          placeholder="Data"
-          showIcon
-          fluid
-          :maxDate="maxDate"
-        />
-        <Message
-          v-if="$form.date_consultation?.invalid"
-          severity="error"
-          size="small"
-          variant="simple"
-          class="text-rose-600 text-sm"
-          >{{ $form.date_consultation.error.message }}</Message
-        >
-      </div>
-      <div class="flex items-center gap-4 mb-4">
-        <label for="category" class="font-semibold w-24">Categorie</label>
+        <label for="category" class="font-semibold w-24">Categorie <span class="text-rose-600">*</span></label>
         <Select
           name="category"
           :options="categories"
@@ -88,8 +70,8 @@
           >{{ $form.category.error.message }}</Message
         >
       </div>
-      <div class="flex items-center gap-4 mb-4">
-        <label for="subcategory" class="font-semibold w-24">Subcategorie</label>
+      <div class="flex items-center gap-4 mb-4" v-if="$form.category?.value === 'Consultație'">
+        <label for="subcategory" class="font-semibold w-24">Subcategorie consultație</label>
         <Select
           name="subcategory"
           :options="subcategories"
@@ -104,6 +86,43 @@
           variant="simple"
           class="text-rose-600 text-sm"
           >{{ $form.subcategory.error.message }}</Message
+        >
+      </div>
+      <div class="flex items-center gap-4 mb-4" v-if="$form.category?.value === 'Laborator'">
+        <label for="labsubcategory" class="font-semibold w-24">Subcategorie laborator</label>
+        <Select
+          name="labsubcategory"
+          :options="labsubcategories"
+          placeholder="Selectează subcategoria"
+          class="flex w-1/2"
+          fluid
+        />
+        <Message
+          v-if="$form.labsubcategory?.invalid"
+          severity="error"
+          size="small"
+          variant="simple"
+          class="text-rose-600 text-sm"
+          >{{ $form.labsubcategory.error.message }}</Message
+        >
+      </div>
+      <div class="flex items-center gap-4 mb-4">
+        <label for="date_consultation" class="font-semibold w-24">Data efectuării<span class="text-rose-600">*</span></label>
+        <DatePicker
+          name="date_consultation"
+          dateFormat="dd/mm/yy"
+          placeholder="Data"
+          showIcon
+          fluid
+          :maxDate="maxDate"
+        />
+        <Message
+          v-if="$form.date_consultation?.invalid"
+          severity="error"
+          size="small"
+          variant="simple"
+          class="text-rose-600 text-sm"
+          >{{ $form.date_consultation.error.message }}</Message
         >
       </div>
       <div class="flex gap-4 mb-4">
@@ -168,6 +187,7 @@ const props = defineProps({
   displayDialog: Boolean,
   categories: Array,
   subcategories: Array,
+  labsubcategories: Array,
 })
 
 const emit = defineEmits(['add', 'close'])
@@ -196,7 +216,8 @@ const resolver = zodResolver(
         message: 'Data consultării nu poate fi în viitor.',
       }),
     category: z.string().nonempty('Categoria este obligatorie.'),
-    subcategory: z.string().nonempty('Subcategoria este obligatorie.'),
+    subcategory: z.string().optional(),
+    labsubcategory: z.string().optional(),
     notes: z.string().optional(),
   }),
 )

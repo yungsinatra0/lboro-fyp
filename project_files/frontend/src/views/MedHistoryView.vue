@@ -28,6 +28,7 @@
       :display-dialog="displayAddDialog"
       :categories="categories"
       :subcategories="subcategories"
+      :labsubcategories="labsubcategories"
     />
 
     <ShowFile
@@ -43,6 +44,7 @@
       :medical-history="editDialogData"
       :categories="categories"
       :subcategories="subcategories"
+      :labsubcategories="labsubcategories"
       @edit="refreshUpdatedHistory"
       @close="displayEditDialog = false"
     />
@@ -68,6 +70,7 @@ const editDialogData = ref(null)
 const historyIdForFile = ref(null)
 const categories = ref([])
 const subcategories = ref([])
+const labsubcategories = ref([])
 
 onMounted(() => {
   fetchData()
@@ -85,6 +88,8 @@ const fetchData = async () => {
     })
     const categoriesResponse = await api.get('/medicalcategories')
     const subcategoriesResponse = await api.get('/medicalsubcategories')
+    const labsubcategoriesResponse = await api.get('/labsubcategories')
+    labsubcategories.value = labsubcategoriesResponse.data.map((labsubcategory) => labsubcategory.name)
     categories.value = categoriesResponse.data.map((category) => category.name)
     subcategories.value = subcategoriesResponse.data.map((subcategory) => subcategory.name)
   } catch (error) {

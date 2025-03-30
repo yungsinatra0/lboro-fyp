@@ -3,7 +3,7 @@ from sqlmodel import Session, select
 import uuid
 import os
 
-from ..models import MedicalHistory, MedicalHistoryResponse, MedicalHistoryCreate, MedicalHistoryUpdate, User, MedicalCategory, MedicalSubcategory, MedicalCategoryResponse, MedicalSubcategoryResponse
+from ..models import MedicalHistory, MedicalHistoryResponse, MedicalHistoryCreate, MedicalHistoryUpdate, User, MedicalCategory, MedicalSubcategory, MedicalCategoryResponse, MedicalSubcategoryResponse, LabSubcategory, LabSubcategoryResponse
 from ..utils import get_session, validate_session
 
 router = APIRouter()
@@ -169,3 +169,8 @@ def get_medicalcategories(session: Session = Depends(get_session)):
 @router.get("/medicalsubcategories", response_model=list[MedicalSubcategoryResponse])
 def get_medicalsubcategories(session: Session = Depends(get_session)):
     return session.exec(select(MedicalSubcategory)).all()
+
+# Get all lab subcategories
+@router.get("/labsubcategories", response_model=list[LabSubcategoryResponse])
+def get_labsubcategories(session: Session = Depends(get_session)):
+    return session.exec(select(LabSubcategory)).all()
