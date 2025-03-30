@@ -17,19 +17,25 @@ def get_medicalhistory(user_id: uuid.UUID = Depends(validate_session), session: 
     result = []
     
     for history in user.medicalhistory:
-        result.append({
+        item = {
             "id": history.id,
             "name": history.name,
             "doctor_name": history.doctor_name,
             "place": history.place,
             "notes": history.notes,
             "category": history.category.name,
-            "subcategory": history.subcategory.name,
             "file": history.file,
             "date_consultation": history.date_consultation,
             "date_added": history.date_added
-        })
-    
+        }
+        
+        if history.subcategory:
+            item["subcategory"] = history.subcategory.name
+        if history.labsubcategory:
+            item["labsubcategory"] = history.labsubcategory.name
+        
+        result.append(item)          
+            
     return result
 
 # Add a medical history record
@@ -39,6 +45,7 @@ def create_medicalhistory(medhistory: MedicalHistoryCreate, user_id: uuid.UUID =
     
     category = session.exec(select(MedicalCategory).where(MedicalCategory.name == medhistory.category)).first()
     subcategory = session.exec(select(MedicalSubcategory).where(MedicalSubcategory.name == medhistory.subcategory)).first()
+    labsubcategory = session.exec(select(MedicalSubcategory).where(MedicalSubcategory.name == medhistory.labsubcategory)).first()
     
     new_medicalhistory = MedicalHistory(
         name = medhistory.name,
@@ -47,6 +54,7 @@ def create_medicalhistory(medhistory: MedicalHistoryCreate, user_id: uuid.UUID =
         notes = medhistory.notes,
         category = category,
         subcategory = subcategory,
+        labsubcategory= labsubcategory,
         user = user,
         date_consultation = medhistory.date_consultation,)
     
@@ -62,6 +70,7 @@ def create_medicalhistory(medhistory: MedicalHistoryCreate, user_id: uuid.UUID =
         notes = new_medicalhistory.notes,
         category = new_medicalhistory.category.name,
         subcategory = new_medicalhistory.subcategory.name,
+        labsubcategory = new_medicalhistory.labsubcategory.name,
         file = new_medicalhistory.file,
         date_consultation = new_medicalhistory.date_consultation,
     )
@@ -96,10 +105,13 @@ def update_medicalhistory(medhistory_id: uuid.UUID, medhistory: MedicalHistoryUp
         place = medhistory_db.place,
         notes = medhistory_db.notes,
         category = medhistory_db.category.name,
-        subcategory = medhistory_db.subcategory.name,
-        date_consultation= medhistory_db.date_consultation,
-        # file = medhistory_db.file,
+        date_consultation = medhistory_db.date_consultation,
     )
+    
+    if medhistory_db.subcategory:
+        medicalhistory_response.subcategory = medhistory_db.subcategory.name
+    if medhistory_db.labsubcategory:
+        medicalhistory_response.labsubcategory = medhistory_db.labsubcategory.name
     
     return {
         "status": status.HTTP_200_OK,

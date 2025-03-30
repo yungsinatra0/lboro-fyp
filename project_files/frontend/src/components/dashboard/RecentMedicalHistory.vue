@@ -9,12 +9,13 @@
         <Column field="doctor_name" header="Doctor" sortable> </Column>
         <Column field="category" header="Categoria">
           <template #body="slotProps">
-            <Tag :value="slotProps.data.category" severity="info" rounded />
+            <Tag :value="slotProps.data.category" severity="info" rounded class="text-sm self-start md:self-auto" />
           </template>
         </Column>
-        <Column field="subcategory" header="Subcategoria">
+        <Column header="Subcategoria">
           <template #body="slotProps">
-            <Tag :value="slotProps.data.subcategory" severity="info" rounded />
+            <Tag v-if="slotProps.data.subcategory" :value="slotProps.data.subcategory" severity="info" rounded class="text-sm self-start md:self-auto" />
+            <Tag v-else-if="slotProps.data.labsubcategory" :value="slotProps.data.labsubcategory" severity="info" rounded class="text-sm self-start md:self-auto" />
           </template>
         </Column>
         <Column field="date_consultation" header="Data consult" sortable>

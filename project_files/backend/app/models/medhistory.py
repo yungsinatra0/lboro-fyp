@@ -26,8 +26,11 @@ class MedicalHistory(MedicalHistoryDates, table=True):
     category_id: uuid.UUID = Field(foreign_key="medicalcategory.id")
     category: "MedicalCategory" = Relationship(back_populates="medicalhistory")
     
-    subcategory_id: uuid.UUID = Field(foreign_key="medicalsubcategory.id")
-    subcategory: "MedicalSubcategory" = Relationship(back_populates="medicalhistory")
+    subcategory_id: uuid.UUID | None = Field(default=None, foreign_key="medicalsubcategory.id")
+    subcategory: Optional["MedicalSubcategory"] = Relationship(back_populates="medicalhistory")
+    
+    labsubcategory_id: uuid.UUID | None = Field(default=None, foreign_key="labsubcategory.id")
+    labsubcategory: Optional["LabSubcategory"] = Relationship(back_populates="medicalhistory")
     
     user_id: uuid.UUID = Field(foreign_key="user.id")
     user: "User" = Relationship(back_populates="medicalhistory")
@@ -45,6 +48,12 @@ class MedicalSubcategory(SQLModel, table=True):
     name: str
     
     medicalhistory: list["MedicalHistory"] = Relationship(back_populates="subcategory")
+    
+class LabSubcategory(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    name: str
+    
+    medicalhistory: list["MedicalHistory"] = Relationship(back_populates="labsubcategory")
 
 # Medical History response model
 class MedicalHistoryResponse(MedicalHistoryDates):
@@ -54,7 +63,8 @@ class MedicalHistoryResponse(MedicalHistoryDates):
     place: str | None = None
     notes: str | None = None
     category: str
-    subcategory: str
+    subcategory: str | None = None
+    labsubcategory: str | None = None
     file: Optional["FileUpload"] = None
     
 # Medical History create model
@@ -64,7 +74,8 @@ class MedicalHistoryCreate(MedicalHistoryDates):
     place: str | None = None
     notes: str | None = None
     category: str
-    subcategory: str
+    subcategory: str | None = None
+    labsubcategory: str | None = None
     
 # Medical History update model
 class MedicalHistoryUpdate(SQLModel):
@@ -87,5 +98,9 @@ class MedicalCategoryResponse(SQLModel):
     name: str
     
 class MedicalSubcategoryResponse(SQLModel):
+    id: uuid.UUID
+    name: str
+    
+class LabSubcategoryResponse(SQLModel):
     id: uuid.UUID
     name: str

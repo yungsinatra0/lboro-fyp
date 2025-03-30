@@ -8,7 +8,7 @@
         <Column field="name" header="Numele" sortable> </Column>
         <Column field="dosage" header="Doza" sortable> </Column>
         <Column field="frequency" header="Frecventa" sortable> </Column>
-        <Column field="form" header="Forma" sortable>
+        <!-- <Column field="form" header="Forma" sortable>
           <template #body="slotProps">
             <Tag
               :value="slotProps.data.form"
@@ -17,7 +17,7 @@
               class="text-sm self-start md:self-auto"
             ></Tag>
           </template>
-        </Column>
+        </Column> -->
         <Column field="date_prescribed" header="Prescris" sortable>
           <template #body="slotProps">
             <span> {{ slotProps.data.original_date_prescribed }} </span>
@@ -42,7 +42,7 @@
 import Card from 'primevue/card'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import Tag from 'primevue/tag'
+// import Tag from 'primevue/tag'
 // import ColumnGroup from 'primevue/columngroup' // optional
 // import Row from 'primevue/row' // optional
 

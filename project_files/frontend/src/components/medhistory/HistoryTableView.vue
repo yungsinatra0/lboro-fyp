@@ -13,14 +13,15 @@
           {{ slotProps.data.place ? slotProps.data.place : '-' }}
         </template>
       </Column>
-      <Column field="category" header="Categoria" sortable>
+      <Column field="category" header="Categoria">
         <template #body="slotProps">
           <Tag :value="slotProps.data.category" severity="info" rounded />
         </template>
       </Column>
-      <Column field="subcategory" header="Subcategoria" sortable>
+      <Column header="Subcategoria">
         <template #body="slotProps">
-          <Tag :value="slotProps.data.subcategory" severity="info" rounded />
+          <Tag v-if="slotProps.data.subcategory" :value="slotProps.data.subcategory" severity="info" rounded />
+          <Tag v-else-if="slotProps.data.labsubcategory" :value="slotProps.data.labsubcategory" severity="info" rounded />
         </template>
       </Column>
       <Column field="notes" header="Notite">

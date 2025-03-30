@@ -22,10 +22,10 @@ class FileUpload(SQLModel, table=True):
     file_size: int
     uploaded_at: datetime = Field(default_factory=datetime.now)
     
-    vaccine_id : uuid.UUID | None = Field(default=None, foreign_key="vaccine.id")
+    vaccine_id : uuid.UUID | None = Field(default=None, foreign_key="vaccine.id", ondelete="CASCADE")
     vaccine: Optional["Vaccine"] = Relationship(back_populates="certificate")
     
-    medhistory_id : uuid.UUID | None = Field(default=None, foreign_key="medicalhistory.id")
+    medhistory_id : uuid.UUID | None = Field(default=None, foreign_key="medicalhistory.id", ondelete="CASCADE")
     medicalhistory: Optional["MedicalHistory"] = Relationship(back_populates="file")
     
     @field_serializer('uploaded_at')

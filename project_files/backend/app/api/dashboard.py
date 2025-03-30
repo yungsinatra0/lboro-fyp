@@ -103,6 +103,7 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
     for history in newest_medicalhistory:
         category = history.category.name if history.category else None
         subcategory = history.subcategory.name if history.subcategory else None
+        labsubcategory = history.labsubcategory.name if history.labsubcategory else None
         medicalhistory_response.append(
             MedicalHistoryResponse(
                 id = history.id,
@@ -112,6 +113,7 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
                 notes = history.notes,
                 category = category,
                 subcategory = subcategory,
+                labsubcategory= labsubcategory,
                 file = history.file,
                 date_consultation = history.date_consultation,
                 date_added = history.date_added
