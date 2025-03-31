@@ -15,6 +15,7 @@
     <div class="flex flex-col">
       <HistoryTableView
         :history="history"
+        :categories="categories"
         @delete="deleteHistory"
         @open-edit="openEditDialog"
         @show-file="showFile"
