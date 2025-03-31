@@ -24,7 +24,7 @@
         </Column>
         <Column field="trend" header="Trend">
           <template #body="slotProps">
-            <i v-if="slotProps.data.trend === 'up'" class="pi pi-arrow-up text-green-500"></i>
+            <i v-if="slotProps.data.trend === 'up'" class="pi pi-arrow-up text-red-500"></i>
             <i
               v-else-if="slotProps.data.trend === 'down'"
               class="pi pi-arrow-down text-red-500"

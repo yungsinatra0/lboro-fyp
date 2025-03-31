@@ -134,45 +134,51 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
 def group_compare_healthdata(healthdata: list[HealthData]):
     grouped_data = {}
     
-    # Iterate through the health data and group by type
     for data in healthdata:
         if data.type.name not in grouped_data:
             grouped_data[data.type.name] = []
         grouped_data[data.type.name].append(data)
-    
-    print("GROUPED DATA", grouped_data)
         
     data_trends = []        
-    # Get latest and 2nd latest values for each type
     for key, values in grouped_data.items():
         if not values:
             continue
         
         latest = values[0]
-        second_latest = values[1] if len(values) > 1 else None
+        trend = "stable"
         
-        if latest.value_systolic is not None and latest.value_diastolic is not None:
-            trend = latest.value_systolic - latest.value_diastolic
-            if trend > 0:
-                trend = "up"
-            elif trend < 0:
-                trend = "down"
-            else:
-                trend = "stable"
-        elif latest.value is not None:
-            trend = latest.value - (second_latest.value if second_latest else latest.value)
-            if trend > 0:
-                trend = "up"
-            elif trend < 0:
-                trend = "down"
-            else:
+        if latest.type.name in ["Înălțime", "Greutate"]:
+            trend = "stable"
+
+        elif latest.type.name == "Tensiune arterială":
+            range_str = latest.type.normal_range
+            if range_str:
+                low, high = range_str.split(" - ")
+                low_sys = float(low.split("/")[0].strip())
+                high_sys = float(high.split(' ')[0].split("/")[0].strip())
+                
+                if latest.value_systolic > high_sys:
+                    trend = "up"
+                elif latest.value_systolic < low_sys:
+                    trend = "down"
+        
+        elif latest.type.normal_range:
+            range_str = latest.type.normal_range
+            try:
+                low, high = range_str.split(" - ")
+                range_min = float(low.strip())
+                range_max = float(high.split(" ")[0].strip())                
+                
+                if latest.value > range_max:
+                    trend = "up"
+                elif latest.value < range_min:
+                    trend = "down"
+            except (ValueError, AttributeError):
                 trend = "stable"
             
         data_trends.append({
             "healthdata": latest,
             "trend": trend,
         })
-        
-    print("DATA TRENDS", data_trends)
           
     return data_trends

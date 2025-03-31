@@ -17,39 +17,39 @@
         <template #title> Valori curente </template>
         <!-- Show the arrows for current values whether they fall within the normal range instead -->
         <template #content>
-            <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-2 gap-3">
             <Card v-for="type in vitalTypes" :key="type.id" :pt="cardDataStyles" class="w-full">
               <template #title>
-              <div class="flex flex-row items-center justify-between">
-              <span> {{ type.name }} </span>
-              <i
-              v-if="vitalsTrends[type.name].trend === 'up'"
-              class="pi pi-arrow-up text-green-500"
-              ></i>
-              <i
-              v-else-if="vitalsTrends[type.name].trend === 'down'"
-              class="pi pi-arrow-down text-red-500"
-              ></i>
-              <i v-else class="pi pi-minus-circle text-gray-500"></i>
-              </div>
+                <div class="flex flex-row items-center justify-between">
+                  <span> {{ type.name }} </span>
+                  <i
+                    v-if="vitalsTrends[type.name].trend === 'up'"
+                    class="pi pi-arrow-up text-red-500"
+                  ></i>
+                  <i
+                    v-else-if="vitalsTrends[type.name].trend === 'down'"
+                    class="pi pi-arrow-down text-red-500"
+                  ></i>
+                  <i v-else class="pi pi-minus-circle text-gray-500"></i>
+                </div>
               </template>
               <template #content> {{ vitalsTrends[type.name].value }} {{ type.unit }} </template>
             </Card>
             <Card :pt="cardDataStyles" class="w-full">
               <template #title>
-              <div class="flex flex-row items-center justify-between">
-              <span> BMI </span>
-              <i v-if="bmiTrend.trend === 'up'" class="pi pi-arrow-up text-green-500"></i>
-              <i
-              v-else-if="bmiTrend.trend === 'down'"
-              class="pi pi-arrow-down text-red-500"
-              ></i>
-              <i v-else class="pi pi-minus-circle text-gray-500"></i>
-              </div>
+                <div class="flex flex-row items-center justify-between">
+                  <span> BMI </span>
+                  <i v-if="bmiTrend.trend === 'up'" class="pi pi-arrow-up text-red-500"></i>
+                  <i
+                    v-else-if="bmiTrend.trend === 'down'"
+                    class="pi pi-arrow-down text-red-500"
+                  ></i>
+                  <i v-else class="pi pi-minus-circle text-gray-500"></i>
+                </div>
               </template>
               <template #content> {{ bmiTrend.value }} </template>
             </Card>
-            </div>
+          </div>
         </template>
       </Card>
       <VitalsHistory
@@ -159,21 +159,18 @@ const vitalsTrends = computed(() => {
     })
 
     const mostRecent = sortedVitals[0]
-    const previous = sortedVitals[1] ? sortedVitals[1] : null
 
     if (mostRecent.value !== undefined && mostRecent.value !== null) {
+      const value = parseFloat(mostRecent.value)
       result[type.name] = {
-        value: mostRecent.value,
-        trend: previous
-          ? calculateTrend(parseFloat(mostRecent.value), parseFloat(previous?.value))
-          : 'stable',
+        value: value,
+        trend: type.normal_range ? calculateRangeTrend(value, type.normal_range) : 'stable',
       }
     } else if (mostRecent.value_systolic && mostRecent.value_diastolic) {
+      const systolic = parseInt(mostRecent.value_systolic)
       result[type.name] = {
-        value: `${mostRecent.value_systolic}/${mostRecent.value_diastolic}`,
-        trend: previous
-          ? calculateTrend(parseInt(mostRecent.value_systolic), parseInt(previous?.value_systolic))
-          : 'stable',
+        value: `${systolic}/${mostRecent.value_diastolic}`,
+        trend: type.normal_range ? calculateRangeTrend(systolic, type.normal_range) : 'stable',
       }
     } else {
       result[type.name] = { value: 'Nu au fost gasit valori', trend: 'stable' }
@@ -183,14 +180,23 @@ const vitalsTrends = computed(() => {
   return result
 })
 
-const calculateTrend = (current, previous) => {
-  if (previous === null) return 'stable'
+const calculateRangeTrend = (value, range) => {
+  if (!range) return 'stable'
 
-  const threshold = 0.01
-  const percentChange = Math.abs((current - previous) / previous)
+  let min = 0
+  let max = 0
 
-  if (percentChange < threshold) return 'stable'
-  return current > previous ? 'up' : 'down'
+  if (!range.includes('mmHg')) {
+    min = parseFloat(range.split('-')[0].trim())
+    max = parseFloat(range.split('-')[1].trim())
+  } else {
+    min = parseFloat(range.split('-')[0].split('/')[0])
+    max = parseFloat(range.split('-')[1].split('/')[0])
+  }
+
+  if (value < min) return 'down'
+  if (value > max) return 'up'
+  return 'stable'
 }
 
 const bmiTrend = computed(() => {
@@ -204,10 +210,13 @@ const bmiTrend = computed(() => {
 
   const bmi = Math.round((weight / (height * height)) * 10) / 10
 
+  // BMI ranges: < 18.5 (underweight), 18.5-24.9 (normal), > 24.9 (overweight)
+  const trend = calculateRangeTrend(bmi, '18.5-24.9')
+
   return {
     available: true,
     value: bmi,
-    trend: latestWeight.trend,
+    trend: trend,
   }
 })
 
