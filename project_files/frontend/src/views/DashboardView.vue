@@ -7,12 +7,6 @@
       </h1>
       <div class="flex flex-col md:flex-row gap-2">
         <Button
-          label="Adauga un document nou"
-          icon="pi pi-file-plus"
-          class="p-button-outlined mr-2"
-          @click="showAddDialog"
-        />
-        <Button
           label="Distribuie codul medicului"
           icon="pi pi-share-alt"
           class="p-button-outlined mr-2"
