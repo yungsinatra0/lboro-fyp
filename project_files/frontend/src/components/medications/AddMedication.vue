@@ -358,7 +358,8 @@ const resolver = zodResolver(
     frequencyValue: z
       .number('Frecventa luarii medicamentului trebuie sa fie un numar.')
       .int()
-      .positive('Frecventa luarii medicamentului trebuie sa fie un numar pozitiv.'),
+      .positive('Frecventa luarii medicamentului trebuie sa fie un numar pozitiv.')
+      .optional(),
     datePrescribed: z
       .date({ message: 'Data prescrierii medicamentului este obligatorie.' })
       .refine((value) => value < new Date(), {
@@ -372,9 +373,9 @@ const resolver = zodResolver(
     timeOfDay: z.string().optional(),
     form: z.string().nonempty('Forma medicamentului este obligatorie.'),
     route: z.string().nonempty('Calea de administrare a medicamentului este obligatorie.'),
-    dosageUnits: z.string().nonempty('Unitatea de masura a dozei este obligatorie.'),
+    dosageUnits: z.string().optional(),
     frequencyUnits: z.string().nonempty('Unitatea de masura a frecventei este obligatorie.'),
-    frequencyChoice: z.string().min(1, { message: 'Alege o optiune pentru frecventa.' }),
+    frequencyChoice: z.string().nonempty('Alege o optiune pentru frecventa.'),
   }),
 )
 
