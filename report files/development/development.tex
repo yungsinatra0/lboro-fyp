@@ -660,6 +660,202 @@ Due to the complexity of the system and time pressure, barely any kind of automa
 
 \section{Sprint \#4}
 
+The fourth sprint of the project focused on adding the ability to add health records, such as lab tests, doctor consultations or imaging results. This was one of the main features requested by the stakeholders, as it would allow a patient to have all their medical history in one place, making it easier for them to view and share it with their doctors.
+
+Additionally, at the end of sprint \#3, the stakeholders provided feedback regarding the features implemented in the previous sprint. Some of the feedback included:
+
+\begin{itemize}
+    \item The graph in the Vitals page should show the normal range for that specific vital type in graph.
+    \item The Vitals signs page should have a date filtering functionality to choose a date range for the signs displayed in the graph or table.
+    \item Weight and height should not have a normal range.
+    \item Previously, the trend most recent vitals signs were compared with the 2nd most recent ones, which was not a good choice for comparison. The most recent vitals signs should be compared with the normal range for that specific vital type.
+    \item On the main dashboard, the most recent vitals section should show the most recent values for one each type of vital signs, instead of the most recent 5 values for each type.
+    \item On the main dashboard, only the allergies with moderate and severe allergies should be displayed.
+\end{itemize}
+
+\subsection{Health Records}
+
+As mentioned in the introduction to this section, the main focus of this sprint was creating the functionality to add health records such as lab tests, doctor consultations or imaging results in the system. This was a crucial feature and a main requirement of the system, as it would allow patients to create their medical history in the system, upload the files associated with these records and then refer to them whenever needed or share them with doctors to allow them to have a more accurate patient history and thus offer better treatment.
+
+The choice was made to display the record history in a tabular format, as that would allow to display the important information in a readable way, but also to sort the information based on different fields such as the date of the consultation or filter by fields such as doctor or institution name for easier search. PrimeVue has a DataTable component, which allowed the inclusion of all these features with little effort that are displayed in a user-friendly way. An example of the health records page can be seen below in figure~\ref{fig:healthrecordspage}.
+
+\begin{figure}[ht]
+  \centering
+  \subfloat[Desktop version]{%
+      \includegraphics[width=\textwidth]{Desktop_HistoryView.png}%
+  }
+  \\[\baselineskip]
+  \subfloat[Mobile version]{%
+      \includegraphics[width=0.4\textwidth]{Mobile_HistoryView.png}%
+  }
+  \caption{Desktop and Mobile version of the History page}\label{fig:healthrecordspage}
+\end{figure}
+
+\FloatBarrier{}
+
+DataTable also comes with an in-built filtering option, which allowed to add a search bar for the whole table, but also search functions for specific fields. Example of the search bar can be seen in the screenshots above, and the filter menu can be seen below in figure~\ref{fig:filtermenu}. A code snippet of the filter function in a column can also be seen below.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{Desktop_HistoryView_Filter.png}
+  \caption{Filter Menu for Health Records}\label{fig:filtermenu}
+\end{figure}
+
+\begin{lstlisting}[language=HTML, caption=Filter Function for Health Records]
+  <template>
+  <div class="h-full w-full px-4">
+    <DataTable 
+      v-model:filters="filters" 
+      :value="history" 
+      :rows="10" 
+      paginator 
+      dataKey="id" 
+      filterDisplay="menu"
+      :loading="loading"
+      :globalFilterFields="['name', 'doctor_name', 'place', 'category']"
+      removableSort
+      responsiveLayout="stack"
+      breakpoint="960px"
+    >
+      <template #header>
+        <div class="flex justify-end">
+          <IconField>
+            <InputIcon>
+              <i class="pi pi-search" />
+            </InputIcon>
+            <InputText size="small" v-model="filters['global'].value" placeholder="Cauta..." />
+          </IconField>
+        </div>
+      </template>
+
+      <!-- Previous columns here -->
+
+      <Column field="doctor_name" header="Numele Doctorului" :showFilterMenu="true">
+      <template #filter="{ filterModel, filterCallback }">
+        <InputText v-model="filterModel.value" type="text" class="w-full" @input="filterCallback()" placeholder="Cauta dupa doctor" />
+      </template>
+    </Column>
+
+    <!-- Next columns here -->
+    </DataTable>
+  </div>
+</template>
+\end{lstlisting}
+
+Finally, with the addition of health records page, the ability to view and upload PDF files was also added to the system. This was an important feature to add, as files related to health records are usually sent in a PDF format. There was a slight challenge as to how to display the PDF files in the frontend, however in the end it was decided to use a simple approach that utilised in-built functionality through the use of object element from HTML. To allow mobile users to view the files, the system instead used a button to allow mobile users to download the file, as mobile browsers do not support the object element. The code for the PDF viewer can be seen below and a screenshot in figure~\ref{fig:pdfviewer}.
+
+\begin{lstlisting}[language=HTML, caption=PDF viewer Function for Health]<template>
+  <Dialog
+    v-model:visible="visible"
+    modal
+    header="Vizualizeaza fisierul"
+    class="w-full md:w-3/4 md:h-3/4"
+    @hide="emit('close')"
+  >
+    <div v-if="metadata?.file_type == 'application/pdf'">
+      <object
+        :data="`http://localhost:8000/files/medicalhistory/${props.historyId}`"
+        type="application/pdf"
+        class="w-full h-[70vh] hidden md:block"
+      />
+      <div class="block md:hidden text-center mt-2">
+        <a
+          :href="`http://localhost:8000/files/medicalhistory/${props.historyId}`"
+          target="_blank"
+          class="bg-blue-500 text-white px-4 py-2 rounded-md inline-block mb-4"
+        >
+          Deschide certificatul PDF
+        </a>
+      </div>
+    </div>
+    <Image
+      v-else
+      :src="`http://localhost:8000/files/medicalhistory/${props.historyId}`"
+      alt="Fisier consultatie"
+      class="w-full h-screen"
+      preview
+    />
+  </Dialog>
+</template>
+\end{lstlisting}
+
+\begin{figure}[ht]
+  \centering
+  \subfloat[Desktop version]{%
+      \includegraphics[width=\textwidth]{Desktop_History_PDF.png}%
+  }
+  \\[\baselineskip]
+  \subfloat[Mobile version]{%
+      \includegraphics[width=0.4\textwidth]{Mobile_History_PDF.png}%
+  }
+  \caption{Desktop and Mobile version of the PDF viewer}\label{fig:pdfviewer}
+\end{figure}
+
+\FloatBarrier{}
+
+\subsection{Backend changes}
+
+To enable the health record functionality to work properly, new tables had to be created in the database to store the records: MedicalHistory for the main table, MedicalCategory for main categories of the records (lab tests, doctor consultations, etc) and additional tables like MedicalSubCategory and LabSubcategory for the subcategories of the records (blood test, urine test, etc). The new tables can be seen below in figure~\ref{fig:erd_s4}.
+
+\noindent\begin{minipage}{\textwidth}
+  \begin{center}
+      \rotatebox[origin=c]{270}{
+          \includegraphics[width=0.95\textheight,keepaspectratio]{ERD_updatedS4.png}
+      }
+      \captionof{figure}{Updated Entity Relationship Diagram \- Sprint \#4}\label{fig:erd_s4}
+  \end{center}
+\end{minipage}
+
+\FloatBarrier{}
+
+Additionally, endpoints were created to allow the user to add, edit and delete health records. The endpoints were created in a similar way to the other endpoints in the system, using FastAPI and SQLModel.
+
+\subsection{Work on stakeholder feedback}
+
+As mentioned in the section introduction, in this sprint work was done to address the feedback received from stakeholder meetings regarding the features implemented in the previous sprint.
+
+The biggest changes were related to how the vital signs are displayed and filtered in the system. The graph now shows lines for the upper and lower ranges for the respective vital signs, and a date range filter was added to the page, allowing the user to select a date range for the data displayed in the graph. 
+
+Additionally, the most recent vitals are now compared to the normal range instead of the previous value. This change was implemented to ensure the normal range is used effectively to show whether their vitals signs are within or outside of it to allow for more informed decision making. These changes can be seen below in figure~\ref{fig:vitalchanges}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{Desktop_Vitals_Updated.png}
+  \caption{Updated Vitals View based on stakeholder feedback}\label{fig:vitalchanges}
+\end{figure}
+
+\FloatBarrier{}
+
+The main dashboard page was also slightly changed to show the most recent vitals signs for each type of vital sign, instead of the most recent 5 values for each type. This was done to ensure that the dashboard page is not cluttered with too much information and that the user can easily see their most recent vitals signs.
+
+Finally, the allergies section on the dashboard page was also changed to only show the moderate and severe allergies, as it was suggested by the stakeholders that this would be more useful for patients to track their most important allergies. The new dashboard can be seen below in figure~\ref{fig:dashboardchanges}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{Desktop_DashboardView_Updated.png}
+  \caption{Updated Dashboard View based on stakeholder feedback}\label{fig:dashboardchanges}
+\end{figure}
+
+\FloatBarrier{}
+
+\subsection{Challenges}
+
+The main challenge encountered in this sprint was actually not related to the project itself. Instead, the biggest challenge that was presented in this sprint was sickness, which led to the student being unable to work on the project for a week. This limited the amount of work that could be done in this sprint, leading to some of the preparatory work that was planned for this sprint to be moved to the next one.
+
+\subsection{Requirements completed}
+
+\begin{itemize}
+  \item The system must allow the patient to specify and categorise the type of document they are uploading (lab test, doctor consultation, etc).
+  \item The system must allow patients to upload their own medical records in a variety of formats (PDF, DOC, etc).
+  \item The system must display the patient's history in a chronological order in the form of a timeline.
+  \item When viewing doctor consultations, the system should divide them into categories based on the domain of the doctor (cardiology, neurology, etc).
+  \item The system must allow the patient to add a description of the document they are uploading.
+  \item The system should allow the patient to add a date for the document they are uploading.
+  \item The system should allow the patient to add a location for the document they are uploading.
+  \item The system should allow the patient to add the doctor name for the document they are uploading.
+  \item The system should allow the patient to sort and filter the documents based on the type of document, date, location, and doctor name. 
+\end{itemize}
+
 \section{Sprint \#5}
 
 \section{Sprint \#6}
