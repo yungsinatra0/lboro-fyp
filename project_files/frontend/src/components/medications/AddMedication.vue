@@ -310,6 +310,7 @@ import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import api from '@/services/api'
 import { ref } from 'vue'
+import { format } from 'date-fns'
 
 const props = defineProps({
   displayDialog: Boolean,
@@ -379,15 +380,7 @@ const resolver = zodResolver(
 
 const addMedication = async (medicationDetails) => {
   try {
-    let formattedDate = medicationDetails.datePrescribed
-
-    // Need to format the date as yyyy-mm-dd
-    if (medicationDetails.datePrescribed instanceof Date) {
-      const [day, month, year] = medicationDetails.datePrescribed
-        .toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit', year: 'numeric' })
-        .split('.')
-      formattedDate = `${year}-${month}-${day}`
-    }
+    let formattedDate = format(medicationDetails.datePrescribed, 'yyyy-MM-dd')
 
     let formattedFrequency = () => {
       switch (medicationDetails.frequencyChoice) {

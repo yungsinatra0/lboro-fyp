@@ -101,6 +101,7 @@ import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import api from '@/services/api'
 import { ref } from 'vue'
+import { format } from 'date-fns'
 
 const props = defineProps({
   displayDialog: Boolean,
@@ -130,15 +131,7 @@ const resolver = zodResolver(
 
 const addVaccine = async (vaccineDetails) => {
   try {
-    let formattedDate = vaccineDetails.dateReceived
-
-    // Need to format the date as yyyy-mm-dd
-    if (vaccineDetails.dateReceived instanceof Date) {
-      const [day, month, year] = vaccineDetails.dateReceived
-        .toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit', year: 'numeric' })
-        .split('.')
-      formattedDate = `${year}-${month}-${day}`
-    }
+    let formattedDate = format(vaccineDetails.dateReceived, 'yyyy-MM-dd')
 
     const response = await api.post('me/vaccines', {
       name: vaccineDetails.name,

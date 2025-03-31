@@ -177,7 +177,7 @@ import Button from 'primevue/button'
 import FileUpload from 'primevue/fileupload'
 import Select from 'primevue/select'
 import Textarea from 'primevue/textarea'
-import { parse } from 'date-fns'
+import { parse, format } from 'date-fns'
 import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import api from '@/services/api'
@@ -202,6 +202,7 @@ const initialValues = ref({
   date_consultation: null,
   category: [],
   subcategory: [],
+  labsubcategory: [],
   notes: '',
 })
 
@@ -224,15 +225,7 @@ const resolver = zodResolver(
 
 const addMedicalHistory = async (medicalHistoryDetails) => {
   try {
-    let formattedDate = medicalHistoryDetails.date_consultation
-
-    // Format the date as yyyy-mm-dd
-    if (medicalHistoryDetails.date_consultation instanceof Date) {
-      const [day, month, year] = medicalHistoryDetails.date_consultation
-        .toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit', year: 'numeric' })
-        .split('.')
-      formattedDate = `${year}-${month}-${day}`
-    }
+    let formattedDate = format(medicalHistoryDetails.date_consultation, 'yyyy-MM-dd')
 
     const response = await api.post('me/medicalhistory', {
       name: medicalHistoryDetails.name,
@@ -259,8 +252,8 @@ const addMedicalHistory = async (medicalHistoryDetails) => {
 
     emit('add', {
       ...response.data.medicalhistory,
-      original_date_consultation: response.data.date_consultation,
-      date_consultation: parse(response.data.date_consultation, 'dd-MM-yyyy', new Date()),
+      original_date_consultation: response.data.medicalhistory.date_consultation,
+      date_consultation: parse(response.data.medicalhistory.date_consultation, 'dd-MM-yyyy', new Date()),
       file: hasFile,
     })
     emit('close')

@@ -157,6 +157,7 @@ import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import api from '@/services/api'
 import { ref } from 'vue'
+import { format } from 'date-fns'
 
 const props = defineProps({
   displayDialog: Boolean,
@@ -197,11 +198,13 @@ const resolver = zodResolver(
 const addVitals = async (values) => {
     if (values.vitalDataTypes.is_compound) {
       try {
+        let formattedDate = format(values.dateRecorded, 'yyyy-MM-dd')
+
         const response = await api.post('/me/healthdata/bp', {
           name: values.vitalDataTypes.name,
           value_systolic: values.valueSystolic,
           value_diastolic: values.valueDiastolic,
-          date_recorded: values.dateRecorded,
+          date_recorded: formattedDate,
           notes: values.notes,
         })
         emit('add', response.data.healthdata)
@@ -212,10 +215,12 @@ const addVitals = async (values) => {
     }
     else {
         try {
+            let formattedDate = format(values.dateRecorded, 'yyyy-MM-dd')
+
             const response = await api.post('/me/healthdata', {
             name: values.vitalDataTypes.name,
             value: values.value,
-            date_recorded: values.dateRecorded,
+            date_recorded: formattedDate,
             notes: values.notes,
             })
             emit('add', response.data.healthdata)
