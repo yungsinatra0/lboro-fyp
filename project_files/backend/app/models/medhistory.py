@@ -86,6 +86,7 @@ class MedicalHistoryUpdate(SQLModel):
     notes: str | None = None
     category: str | None = None
     subcategory: str | None = None
+    labsubcategory: str | None = None
     
     @field_serializer('date_consultation')
     def serialize_date_consultation(self, value: date) -> str | None:

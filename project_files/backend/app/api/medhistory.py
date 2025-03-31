@@ -69,8 +69,8 @@ def create_medicalhistory(medhistory: MedicalHistoryCreate, user_id: uuid.UUID =
         place = new_medicalhistory.place,
         notes = new_medicalhistory.notes,
         category = new_medicalhistory.category.name,
-        subcategory = new_medicalhistory.subcategory.name,
-        labsubcategory = new_medicalhistory.labsubcategory.name,
+        subcategory = new_medicalhistory.subcategory.name if new_medicalhistory.subcategory else None,
+        labsubcategory = new_medicalhistory.labsubcategory.name if new_medicalhistory.labsubcategory else None,
         file = new_medicalhistory.file,
         date_consultation = new_medicalhistory.date_consultation,
     )
@@ -82,7 +82,7 @@ def create_medicalhistory(medhistory: MedicalHistoryCreate, user_id: uuid.UUID =
     }
     
 # Update a medical history record
-@router.put("/me/medicalhistory/{medhistory_id}")
+@router.patch("/me/medicalhistory/{medhistory_id}")
 def update_medicalhistory(medhistory_id: uuid.UUID, medhistory: MedicalHistoryUpdate, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     medhistory_db = session.get(MedicalHistory, medhistory_id)
     
@@ -92,7 +92,39 @@ def update_medicalhistory(medhistory_id: uuid.UUID, medhistory: MedicalHistoryUp
     if medhistory_db.user_id != user_id:
         raise HTTPException(status_code=403, detail="You do not have permission to update this medical history record")
     
-    medhistory_data = medhistory.model_dump(exclude_unset=True)
+    medhistory_data = medhistory.model_dump(exclude_unset=False)
+    
+    if medhistory_data["category"] is not None:
+        category_name = medhistory_data.pop("category")
+        category = session.exec(select(MedicalCategory).where(MedicalCategory.name == category_name)).first()
+        
+        if category:
+            medhistory_db.category = category
+            
+            match category_name:
+                case "Imagistică":
+                    medhistory_db.subcategory = None
+                    medhistory_db.labsubcategory = None
+                case "Laborator":
+                    medhistory_db.subcategory = None
+                case "Consultație":
+                    medhistory_db.labsubcategory = None
+    
+    if medhistory_data["subcategory"] is not None:
+        subcategory_name = medhistory_data.pop("subcategory")
+        subcategory = session.exec(select(MedicalSubcategory).where(MedicalSubcategory.name == subcategory_name)).first()
+        
+        if subcategory:
+            medhistory_db.subcategory = subcategory
+            
+    if medhistory_data["labsubcategory"] is not None:
+        labsubcategory_name = medhistory_data.pop("labsubcategory")
+        labsubcategory = session.exec(select(LabSubcategory).where(LabSubcategory.name == labsubcategory_name)).first()
+        
+        if labsubcategory:
+            medhistory_db.labsubcategory = labsubcategory
+    
+    
     medhistory_db.sqlmodel_update(medhistory_data)
     session.add(medhistory_db)
     session.commit()

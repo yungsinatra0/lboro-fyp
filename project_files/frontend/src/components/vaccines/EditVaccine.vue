@@ -98,7 +98,7 @@ import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import api from '@/services/api'
 import { ref } from 'vue'
-import { parse } from 'date-fns'
+import { parse, format } from 'date-fns'
 
 const props = defineProps({
   displayDialog: Boolean,
@@ -128,9 +128,11 @@ const resolver = zodResolver(
 
 const updateVaccine = async (vaccineDetails) => {
   try {
+    let formattedDate = format(vaccineDetails.dateReceived, 'yyyy-MM-dd')
+
     const response = await api.patch(`me/vaccines/${props.vaccine.id}`, {
       name: vaccineDetails.name,
-      date_received: vaccineDetails.dateReceived,
+      date_received: formattedDate,
       provider: vaccineDetails.provider,
     })
     emit('edit', response.data.vaccine)

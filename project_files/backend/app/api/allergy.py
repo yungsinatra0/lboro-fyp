@@ -117,23 +117,33 @@ def update_allergy(allergy_id: uuid.UUID, allergy_new: AllergyUpdate, user_id: u
     
     allergy_data = allergy_new.model_dump(exclude_unset=True)
     
-    if "severity" in allergy_data:
-        severity = session.exec(select(Severity).where(Severity.name == allergy_data["severity"])).first()
-        allergy_data["severity"] = severity
+    
+    if allergy_data["severity"] is not None:
+        severity_name = allergy_data.pop("severity")
+        severity = session.exec(select(Severity).where(Severity.name == severity_name)).first()
         
-    if "allergens" in allergy_data:
+        if severity:
+            allergy_db.severity = severity
+    
+    
+    if allergy_data["allergens"] is not None:
         allergens = []
         for allergen_name in allergy_data["allergens"]:
             allergen_db = session.exec(select(Allergens).where(Allergens.name == allergen_name)).first()
             allergens.append(allergen_db)
-        allergy_data["allergens"] = allergens
+            
+        if allergens:
+            allergy_db.allergens = allergens
         
-    if "reactions" in allergy_data:
+    
+    if allergy_data["reactions"] is not None:
         reactions = []
         for reaction_name in allergy_data["reactions"]:
             reaction_db = session.exec(select(Reactions).where(Reactions.name == reaction_name)).first()
             reactions.append(reaction_db)
-        allergy_data["reactions"] = reactions        
+            
+        if reactions:
+            allergy_db.reactions = reactions    
     
     allergy_db.sqlmodel_update(allergy_data)
     session.add(allergy_db)

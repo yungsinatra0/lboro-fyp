@@ -125,13 +125,19 @@ def update_medication(medication_id: uuid.UUID, medication_new: MedicationUpdate
     
     medication_data = medication_new.model_dump(exclude_unset=True)
     
-    if "route" in medication_data:
-        route = session.exec(select(MedicationRoute).where(MedicationRoute.name == medication_data["route"])).first()
-        medication_data["route"] = route
+    if medication_data["route"] is not None:
+        route_name = medication_data.pop("route")
+        route = session.exec(select(MedicationRoute).where(MedicationRoute.name == route_name)).first()
         
-    if "form" in medication_data:
-        form = session.exec(select(MedicationForm).where(MedicationForm.name == medication_data["form"])).first()
-        medication_data["form"] = form
+        if route:
+            medication_db.route = route
+    
+    if medication_data["form"] is not None:
+        form_name = medication_data.pop("form")
+        form = session.exec(select(MedicationForm).where(MedicationForm.name == form_name)).first()
+        
+        if form:
+            medication_db.form = form
     
     medication_db.sqlmodel_update(medication_data)
     session.add(medication_db)

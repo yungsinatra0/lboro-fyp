@@ -167,7 +167,7 @@ import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import api from '@/services/api'
 import { ref, computed } from 'vue'
-import { parse } from 'date-fns'
+import { parse, format } from 'date-fns'
 
 const props = defineProps({
   displayDialog: Boolean,
@@ -221,13 +221,8 @@ const resolver = zodResolver(
 
 const updateVitals = async (vitalDetails) => {
   try {
-    let formattedDate = vitalDetails.dateRecorded
-    if (vitalDetails.dateRecorded instanceof Date) {
-      const [day, month, year] = vitalDetails.dateRecorded
-        .toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit', year: 'numeric' })
-        .split('.')
-      formattedDate = `${year}-${month}-${day}`
-    }
+    let formattedDate = format(vitalDetails.dateRecorded, 'yyyy-MM-dd')
+
     const response = await api.patch(`/me/healthdata/${props.vital.id}`, 
         {
             name: vitalDetails.vitalDataTypes.name,

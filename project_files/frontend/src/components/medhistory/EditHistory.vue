@@ -223,7 +223,7 @@ import Button from 'primevue/button'
 
 import Select from 'primevue/select'
 import Textarea from 'primevue/textarea'
-import { parse } from 'date-fns'
+import { parse, format } from 'date-fns'
 
 import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
@@ -283,22 +283,15 @@ const resolver = zodResolver(
 
 const updateMedicalHistory = async (medicalHistoryDetails) => {
   try {
-    let formattedDate = null
+    let formattedDate = format(medicalHistoryDetails.date_consultation, 'yyyy-MM-dd')
 
-    // Format the date as yyyy-mm-dd
-    if (medicalHistoryDetails.date_consultation instanceof Date) {
-      const [day, month, year] = medicalHistoryDetails.date_consultation
-        .toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit', year: 'numeric' })
-        .split('.')
-      formattedDate = `${year}-${month}-${day}`
+    if (medicalHistoryDetails.category === 'Imagistică') {
+      medicalHistoryDetails.subcategory = null
+    } else if (medicalHistoryDetails.category === 'Laborator') {
+      medicalHistoryDetails.subcategory = null
     }
 
-    if (!formattedDate) {
-      console.error('Date is required but not properly formatted')
-      return
-    }
-
-    const response = await api.put(`me/medicalhistory/${props.medicalHistory.id}`, {
+    const response = await api.patch(`me/medicalhistory/${props.medicalHistory.id}`, {
       name: medicalHistoryDetails.name,
       doctor_name: medicalHistoryDetails.doctor_name,
       place: medicalHistoryDetails.place || null,

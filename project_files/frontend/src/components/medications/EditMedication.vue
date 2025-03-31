@@ -158,6 +158,15 @@
             >
               {{ $form.frequencyUnits.error.message }}
             </Message>
+            <Message
+              v-if="$form.timeOfDay?.invalid"
+              severity="error"
+              size="small"
+              variant="simple"
+              class="text-rose-600 text-xs md:text-sm"
+            >
+              {{ $form.timeOfDay.error.message }}</Message
+            >
           </div>
         </div>
       </div>
@@ -224,6 +233,29 @@
       </div>
 
       <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 mb-6">
+        <label for="route" class="font-semibold text-sm md:text-base w-full md:w-1/4"
+          >Calea de administrare a medicamentului</label
+        >
+        <div class="w-full md:w-3/4">
+          <Select
+            name="route"
+            :options="routes"
+            placeholder="Calea de administrare"
+            fluid
+            class="w-full md:w-1/3"
+          />
+          <Message
+            v-if="$form.route?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            class="text-rose-600 text-xs md:text-sm mt-1"
+            >{{ $form.route.error.message }}</Message
+          >
+        </div>
+      </div>
+
+      <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 mb-6">
         <label for="notes" class="font-semibold text-sm md:text-base w-full md:w-1/4">Notite</label>
         <div class="w-full md:w-3/4">
           <Textarea
@@ -283,7 +315,7 @@ import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import api from '@/services/api'
 import { ref, computed } from 'vue'
-import { parse } from 'date-fns'
+import { parse, format } from 'date-fns'
 
 const props = defineProps({
   displayDialog: Boolean,
@@ -382,7 +414,7 @@ const initialValues = computed(() => {
     name: props.medication.name,
     dosage: dosageValue,
     dosageUnits: dosageUnit,
-    frequencyValue: frequencyValue,
+    frequencyValue: frequencyValue, //
     frequencyUnits: frequencyUnit,
     datePrescribed: prescriptionDate,
     duration: props.medication.duration_days,
@@ -398,10 +430,6 @@ const resolver = zodResolver(
   z.object({
     name: z.string().nonempty('Numele medicamentului este obligatoriu.'),
     dosage: z.string().nonempty('Doza medicamentului este obligatorie.'),
-    frequency: z
-      .number('Frecventa luarii medicamentului trebuie sa fie un numar.')
-      .int()
-      .positive('Frecventa luarii medicamentului trebuie sa fie un numar pozitiv.'),
     datePrescribed: z
       .date({ message: 'Data prescrierii medicamentului este obligatorie.' })
       .refine((value) => value < new Date(), {
@@ -415,8 +443,13 @@ const resolver = zodResolver(
     notes: z.string().optional(),
     form: z.string().nonempty('Forma medicamentului este obligatorie.'),
     dosageUnits: z.string().nonempty('Unitatea de masura a dozei este obligatorie.'),
-    frequencyUnits: z.string().nonempty('Unitatea de masura a frecventei este obligatorie.'),
-    frequencyChoice: z.string().min(1, { message: 'Alege o optiune pentru frecventa.' }),
+    frequencyUnits: z.string().optional(),
+    frequencyValue: z
+      .number('Frecventa luarii medicamentului trebuie sa fie un numar.')
+      .int()
+      .positive('Frecventa luarii medicamentului trebuie sa fie un numar pozitiv.')
+      .optional(),
+    frequencyChoice: z.string().nonempty('Alege o optiune pentru frecventa.'),
     timeOfDay: z.string().optional(),
     route: z.string().nonempty('Calea de administrare a medicamentului este obligatorie.'),
   }),
@@ -424,15 +457,7 @@ const resolver = zodResolver(
 
 const updateMedication = async (medicationDetails) => {
   try {
-    let formattedDate = medicationDetails.datePrescribed
-
-    // Need to format the date as yyyy-mm-dd
-    if (medicationDetails.datePrescribed instanceof Date) {
-      const [day, month, year] = medicationDetails.datePrescribed
-        .toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit', year: 'numeric' })
-        .split('.')
-      formattedDate = `${year}-${month}-${day}`
-    }
+    let formattedDate = format(medicationDetails.datePrescribed, 'yyyy-MM-dd')
 
     let formattedFrequency = () => {
       switch (medicationDetails.frequencyChoice) {
@@ -482,6 +507,10 @@ const onFormSubmit = (e) => {
     console.error('Error updating medication: ', e.errors)
     return
   }
+
+  console.log('Form values:', e.values)
+  console.log('Form states:', e.states)
+  console.log('Initial values:', {...initialValues.value})
 
   updateMedication(e.values)
 }

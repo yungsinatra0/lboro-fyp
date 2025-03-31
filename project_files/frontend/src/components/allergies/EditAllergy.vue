@@ -7,12 +7,12 @@
   >
     <template #header>
       <div class="flex items-center justify-center gap-2">
-        <span class="font-bold text-xl md:text-2xl">Alergie nouă</span>
+        <span class="font-bold text-xl md:text-2xl">Editeaza alergie</span>
       </div>
     </template>
 
     <span class="text-gray-500 dark:text-gray-400 block mb-4 md:mb-8 text-sm md:text-base">
-      Adaugă informația pentru o alergie nouă.
+      Schimba informația pentru alergia selectată.
     </span>
 
     <Form v-slot="$form" :initialValues @submit="onFormSubmit" :resolver="resolver">
@@ -166,7 +166,7 @@ import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import api from '@/services/api'
 import { ref } from 'vue'
-import { parse } from 'date-fns'
+import { parse, format } from 'date-fns'
 
 const props = defineProps({
   displayDialog: Boolean,
@@ -204,8 +204,10 @@ const resolver = zodResolver(
 
 const updateAllergy = async (allergyDetails) => {
   try {
+    let formattedDate = format(allergyDetails.dateDiagnosed, 'yyyy-MM-dd')
+
     const response = await api.patch(`/me/allergies/${props.allergy.id}`, {
-      date_diagnosed: allergyDetails.dateDiagnosed,
+      date_diagnosed: formattedDate,
       reactions: allergyDetails.reactions,
       allergens: allergyDetails.allergens,
       severity: allergyDetails.severity,
