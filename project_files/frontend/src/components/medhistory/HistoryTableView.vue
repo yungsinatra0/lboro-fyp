@@ -6,10 +6,12 @@
       :rows="10" 
       paginator 
       dataKey="id" 
-      filterDisplay="row"
+      filterDisplay="menu"
       :loading="loading"
       :globalFilterFields="['name', 'doctor_name', 'place', 'category']"
       removableSort
+      responsiveLayout="stack"
+      breakpoint="960px"
     >
       <template #header>
         <div class="flex justify-end">
@@ -31,28 +33,28 @@
         </template>
       </Column>
       
-      <Column field="name" header="Descriere">
+      <Column field="name" header="Descriere" :showFilterMenu="true">
         <template #filter="{ filterModel, filterCallback }">
-          <InputText v-model="filterModel.value" type="text" size="small" @input="filterCallback()" placeholder="Cauta dupa descriere" class="w-full" />
+          <InputText v-model="filterModel.value" type="text" class="w-full" @input="filterCallback()" placeholder="Cauta dupa descriere" />
         </template>
       </Column>
       
-      <Column field="doctor_name" header="Numele Doctorului">
+      <Column field="doctor_name" header="Numele Doctorului" :showFilterMenu="true">
         <template #filter="{ filterModel, filterCallback }">
-          <InputText v-model="filterModel.value" type="text" size="small" @input="filterCallback()" placeholder="Cauta dupa doctor" class="w-full" />
+          <InputText v-model="filterModel.value" type="text" class="w-full" @input="filterCallback()" placeholder="Cauta dupa doctor" />
         </template>
       </Column>
       
-      <Column field="place" header="Locatia">
+      <Column field="place" header="Locatia" :showFilterMenu="true">
         <template #body="slotProps">
           {{ slotProps.data.place ? slotProps.data.place : '-' }}
         </template>
         <template #filter="{ filterModel, filterCallback }">
-          <InputText v-model="filterModel.value" type="text" size="small" @input="filterCallback()" placeholder="Cauta dupa locatie" class="w-full" />
+          <InputText v-model="filterModel.value" type="text" class="w-full" @input="filterCallback()" placeholder="Cauta dupa locatie" />
         </template>
       </Column>
       
-      <Column field="category" header="Categoria" :showFilterMenu="false">
+      <Column field="category" header="Categoria" :showFilterMenu="true">
         <template #body="slotProps">
           <Tag :value="slotProps.data.category" severity="info" rounded />
         </template>
