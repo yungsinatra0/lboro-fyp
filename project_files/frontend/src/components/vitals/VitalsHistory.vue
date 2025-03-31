@@ -176,8 +176,6 @@ const chartOptions = {
   }
 }
 
-// TODO: Add reference lines for normal range
-
 const chartData = computed(() => {
   if (!filteredVitalData.value.length) {
     return {}
