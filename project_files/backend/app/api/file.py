@@ -115,6 +115,7 @@ async def get_file_metadata(
         file_record = record.file
     
     return FileResponse(
+        id = file_record.id,
         name = file_record.name,
         file_type = file_record.file_type,
         file_path = file_record.file_path,

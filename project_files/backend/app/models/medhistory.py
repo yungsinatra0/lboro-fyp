@@ -1,7 +1,7 @@
 from sqlmodel import Field, SQLModel, Relationship
 from pydantic import field_serializer
 from datetime import date, datetime
-from typing import Any, Optional
+from typing import Any, Optional, List
 import uuid
 from .other import FileUpload
 
@@ -54,6 +54,7 @@ class LabSubcategory(SQLModel, table=True):
     name: str
     
     medicalhistory: list["MedicalHistory"] = Relationship(back_populates="labsubcategory")
+    labtests: list["LabTest"] = Relationship(back_populates="category")
 
 # Medical History response model
 class MedicalHistoryResponse(MedicalHistoryDates):
@@ -105,3 +106,56 @@ class MedicalSubcategoryResponse(SQLModel):
 class LabSubcategoryResponse(SQLModel):
     id: uuid.UUID
     name: str
+    
+class LabDates(SQLModel):
+    date_collection: date
+    date_added: datetime = Field(default_factory=datetime.now)
+    
+    @field_serializer('date_collection')
+    def serialize_date_collection(self, value: date) -> str:
+        return value.strftime("%d-%m-%Y")
+    
+class LabTest(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    name: str 
+    code: str | None = None
+    
+    category_id: uuid.UUID = Field(foreign_key="labsubcategory.id")
+    category: LabSubcategory = Relationship(back_populates="labtests")
+    results: List["LabResult"] = Relationship(back_populates="test")
+    
+class LabResult(LabDates, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    value: float
+    unit: str
+    reference_values: str | None = None 
+    method: str | None = None
+    
+    # Relationships
+    test_id: uuid.UUID = Field(foreign_key="labtest.id")
+    test: LabTest = Relationship(back_populates="results")
+    user_id: uuid.UUID = Field(foreign_key="user.id")
+    user: "User" = Relationship(back_populates="labresults")
+    file: Optional["FileUpload"] = Relationship(back_populates="labresult", cascade_delete=True)
+    
+class LabResultCreate(LabDates):
+    test_id: uuid.UUID
+    value: float
+    unit: str
+    reference_values: str | None = None 
+    method: str | None = None
+    
+class LabResultResponse(LabDates):
+    id: uuid.UUID
+    test: str
+    value: float
+    unit: str
+    reference_values: str | None = None 
+    method: str | None = None
+    file: Optional["FileUpload"] = None
+    
+class LabTestResponse(SQLModel):
+    id: uuid.UUID
+    name: str
+    code: str | None = None
+    category: str
