@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from .api import auth_router, user_router, file_router, vaccine_router, allergy_router, healthdata_router, medication_router, dashboard_router, medhistory_router
+from .api import auth_router, user_router, file_router, vaccine_router, allergy_router, healthdata_router, medication_router, dashboard_router, medhistory_router, labs_router
 from .utils import create_db_and_tables
 
 @asynccontextmanager
@@ -25,3 +25,4 @@ app.include_router(healthdata_router)
 app.include_router(medication_router)
 app.include_router(dashboard_router)
 app.include_router(medhistory_router)
+app.include_router(labs_router)

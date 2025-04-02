@@ -19,15 +19,21 @@ client = genai.Client(api_key=API_KEY)
 router = APIRouter()
 
 # Extract lab tests from uploaded file
-@router.post('/me/labtests/extract/{medicalhistory_id}')
+@router.post('/labtests/extract/{medicalhistory_id}')
 async def extract_lab_tests(medicalhistory_id: uuid.UUID, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    
+    print("-" * 20, "Extracting lab tests")
     
     # Get file from database
     record = await get_connected_record("medicalhistory", medicalhistory_id, user_id, session)
     
+    print("-" * 20, record)
+    
     uploaded_file = record.file
     if not uploaded_file:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File not found")
+    
+    print("-" * 20, record.file)
     
     # Read the encrypted file
     encrypted_file_content = await read_file(uploaded_file.file_path)
@@ -57,13 +63,27 @@ async def read_file(file_path: str):
     return content
     
 def extract_with_llm(file_content: bytes, file_type: str):
-    prompt = "You have been given a document that contains lab results that is written in the Romanian language. Your job is to extract all lab results from this document in JSON format with the following fields: test_name, value, unit, reference_range. The document is in Romanian, however the JSON keys should be in English. Only return the JSON object. Do not add any other text."
+    prompt = """
+    You have been given a document that contains lab results that is written in the Romanian language. Your job is to extract all lab results from this document in JSON format with the following fields: test_name, test_code, value, unit, reference_range. Sometimes the code of the test will be in the name itself, and it is your job to determine if the code is there, for example in brackets or separated by a comma, and separate the name and the code. The document is in Romanian, however the JSON keys should be in English.
+
+    EXTREMELY IMPORTANT FORMATTING INSTRUCTIONS:
+    1. Return ONLY the raw JSON array
+    2. DO NOT use code blocks, backticks, or markdown formatting
+    3. DO NOT include ```json or ``` anywhere in your response
+    4. DO NOT include any explanations or text before or after the JSON
+    5. Your response must start with the '[' character and end with the ']' character
+    6. The output should be valid JSON that can be parsed directly
+    7. Use period (.) as the decimal separator, not comma (,)
+
+    Example of how your output should look, starting from the very first character:
+    [{"test_name":"Hemoglobină","test_code":"HGB","value":"14.3","unit":"mg/dL","reference_range":"13.2-17.3"}]
+    """
     
     response = client.models.generate_content(
         model="gemini-2.0-flash",
         contents=[prompt,
                 types.Part.from_bytes(
-                file_content, 
+                data=file_content, 
                 mime_type=file_type
                 )
             ])

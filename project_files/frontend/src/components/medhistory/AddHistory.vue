@@ -11,159 +11,204 @@
         <span class="font-bold whitespace-nowrap text-2xl">Înregistrare medicală nouă</span>
       </div>
     </template>
-    <span class="text-surface-500 dark:text-surface-400 block mb-2"
-      >Adaugă informații pentru o nouă înregistrare medicală.</span
-    >
-    <span class="text-rose-600 text-sm block mb-8">* Câmpurile marcate sunt obligatorii</span>
-    <Form v-slot="$form" :initialValues="initialValues" @submit="onFormSubmit" :resolver="resolver">
-      <div class="flex items-center gap-4 mb-4">
-        <label for="name" class="font-semibold w-24">Descriere <span class="text-rose-600">*</span></label>
-        <InputText name="name" class="flex w-1/2" autocomplete="off" type="text" fluid />
-        <Message
-          v-if="$form.name?.invalid"
-          severity="error"
-          size="small"
-          variant="simple"
-          class="text-rose-600 text-sm"
-          >{{ $form.name.error.message }}</Message
-        >
-      </div>
-      <div class="flex items-center gap-4 mb-4">
-        <label for="doctor_name" class="font-semibold w-24">Numele doctorului <span class="text-rose-600">*</span></label>
-        <InputText name="doctor_name" class="flex w-1/2" autocomplete="off" type="text" fluid />
-        <Message
-          v-if="$form.doctor_name?.invalid"
-          severity="error"
-          size="small"
-          variant="simple"
-          class="text-rose-600 text-sm"
-          >{{ $form.doctor_name.error.message }}</Message
-        >
-      </div>
-      <div class="flex items-center gap-4 mb-4">
-        <label for="place" class="font-semibold w-24">Locație</label>
-        <InputText name="place" class="flex w-1/2" autocomplete="off" type="text" fluid />
-        <Message
-          v-if="$form.place?.invalid"
-          severity="error"
-          size="small"
-          variant="simple"
-          class="text-rose-600 text-sm"
-          >{{ $form.place.error.message }}</Message
-        >
-      </div>
-      <div class="flex items-center gap-4 mb-4">
-        <label for="category" class="font-semibold w-24">Categorie <span class="text-rose-600">*</span></label>
-        <Select
-          name="category"
-          :options="categories"
-          placeholder="Selectează categoria"
-          class="flex w-1/2"
-          fluid
-        />
-        <Message
-          v-if="$form.category?.invalid"
-          severity="error"
-          size="small"
-          variant="simple"
-          class="text-rose-600 text-sm"
-          >{{ $form.category.error.message }}</Message
-        >
-      </div>
-      <div class="flex items-center gap-4 mb-4" v-if="$form.category?.value === 'Consultație'">
-        <label for="subcategory" class="font-semibold w-24">Subcategorie consultație</label>
-        <Select
-          name="subcategory"
-          :options="subcategories"
-          placeholder="Selectează subcategoria"
-          class="flex w-1/2"
-          fluid
-        />
-        <Message
-          v-if="$form.subcategory?.invalid"
-          severity="error"
-          size="small"
-          variant="simple"
-          class="text-rose-600 text-sm"
-          >{{ $form.subcategory.error.message }}</Message
-        >
-      </div>
-      <div class="flex items-center gap-4 mb-4" v-if="$form.category?.value === 'Laborator'">
-        <label for="labsubcategory" class="font-semibold w-24">Subcategorie laborator</label>
-        <Select
-          name="labsubcategory"
-          :options="labsubcategories"
-          placeholder="Selectează subcategoria"
-          class="flex w-1/2"
-          fluid
-        />
-        <Message
-          v-if="$form.labsubcategory?.invalid"
-          severity="error"
-          size="small"
-          variant="simple"
-          class="text-rose-600 text-sm"
-          >{{ $form.labsubcategory.error.message }}</Message
-        >
-      </div>
-      <div class="flex items-center gap-4 mb-4">
-        <label for="date_consultation" class="font-semibold w-24">Data efectuării<span class="text-rose-600">*</span></label>
-        <DatePicker
-          name="date_consultation"
-          dateFormat="dd/mm/yy"
-          placeholder="Data"
-          showIcon
-          fluid
-          :maxDate="maxDate"
-        />
-        <Message
-          v-if="$form.date_consultation?.invalid"
-          severity="error"
-          size="small"
-          variant="simple"
-          class="text-rose-600 text-sm"
-          >{{ $form.date_consultation.error.message }}</Message
-        >
-      </div>
-      <div class="flex gap-4 mb-4">
-        <label for="notes" class="font-semibold">Notite</label>
-        <Textarea
-          name="notes"
-          class="w-full md:w-2/4"
-          autocomplete="off"
-          type="text"
-          fluid
-          rows="3"
-          placeholder="Adaugă note sau observații"
-        />
-      </div>
-      <FileUpload
-        name="file"
-        mode="basic"
-        @select="onSelect"
-        :multiple="false"
-        :custom-upload="true"
-        :maxFileSize="10000000"
-        :choose-label="`Alege documentul medical`"
-        :upload-label="`Încarcă`"
-        :cancel-label="`Anulează`"
+    <div v-if="!loadingState && !extractionResult">
+      <span class="text-surface-500 dark:text-surface-400 block mb-2"
+        >Adaugă informații pentru o nouă înregistrare medicală.</span
       >
-        <template #empty>
-          <span>Adaugă un document medical (opțional).</span>
-        </template>
-      </FileUpload>
-      <div class="shrink-0 pt-3 px-5 pb-2 flex justify-end gap-2">
-        <Button
-          label="Anulează"
-          outlined
-          severity="danger"
-          @click="emit('close')"
-          autofocus
-          type="button"
-        />
-        <Button label="Salvează" severity="success" autofocus type="submit" />
+      <span class="text-rose-600 text-sm block mb-8">* Câmpurile marcate sunt obligatorii</span>
+      <Form
+        v-slot="$form"
+        :initialValues="initialValues"
+        @submit="onFormSubmit"
+        :resolver="resolver"
+      >
+        <div class="flex items-center gap-4 mb-4">
+          <label for="name" class="font-semibold w-24"
+            >Descriere <span class="text-rose-600">*</span></label
+          >
+          <InputText name="name" class="flex w-1/2" autocomplete="off" type="text" fluid />
+          <Message
+            v-if="$form.name?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            class="text-rose-600 text-sm"
+            >{{ $form.name.error.message }}</Message
+          >
+        </div>
+        <div class="flex items-center gap-4 mb-4">
+          <label for="doctor_name" class="font-semibold w-24"
+            >Numele doctorului <span class="text-rose-600">*</span></label
+          >
+          <InputText name="doctor_name" class="flex w-1/2" autocomplete="off" type="text" fluid />
+          <Message
+            v-if="$form.doctor_name?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            class="text-rose-600 text-sm"
+            >{{ $form.doctor_name.error.message }}</Message
+          >
+        </div>
+        <div class="flex items-center gap-4 mb-4">
+          <label for="place" class="font-semibold w-24">Locație</label>
+          <InputText name="place" class="flex w-1/2" autocomplete="off" type="text" fluid />
+          <Message
+            v-if="$form.place?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            class="text-rose-600 text-sm"
+            >{{ $form.place.error.message }}</Message
+          >
+        </div>
+        <div class="flex items-center gap-4 mb-4">
+          <label for="category" class="font-semibold w-24"
+            >Categorie <span class="text-rose-600">*</span></label
+          >
+          <Select
+            name="category"
+            :options="categories"
+            placeholder="Selectează categoria"
+            class="flex w-1/2"
+            fluid
+          />
+          <Message
+            v-if="$form.category?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            class="text-rose-600 text-sm"
+            >{{ $form.category.error.message }}</Message
+          >
+        </div>
+        <div class="flex items-center gap-4 mb-4" v-if="$form.category?.value === 'Consultație'">
+          <label for="subcategory" class="font-semibold w-24">Subcategorie consultație</label>
+          <Select
+            name="subcategory"
+            :options="subcategories"
+            placeholder="Selectează subcategoria"
+            class="flex w-1/2"
+            fluid
+          />
+          <Message
+            v-if="$form.subcategory?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            class="text-rose-600 text-sm"
+            >{{ $form.subcategory.error.message }}</Message
+          >
+        </div>
+        <div class="flex items-center gap-4 mb-4" v-if="$form.category?.value === 'Laborator'">
+          <label for="labsubcategory" class="font-semibold w-24">Subcategorie laborator</label>
+          <Select
+            name="labsubcategory"
+            :options="labsubcategories"
+            placeholder="Selectează subcategoria"
+            class="flex w-1/2"
+            fluid
+          />
+          <Message
+            v-if="$form.labsubcategory?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            class="text-rose-600 text-sm"
+            >{{ $form.labsubcategory.error.message }}</Message
+          >
+        </div>
+        <div class="flex items-center gap-4 mb-4" v-if="$form.category?.value === 'Laborator'">
+          <label for="extract" class="font-semibold w-24">Extrage date laborator cu AI?</label>
+          <ToggleSwitch name="extract" />
+          <Message
+            v-if="$form.extract?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            class="text-rose-600 text-sm"
+            >{{ $form.extract.error.message }}</Message
+          >
+        </div>
+        <div class="flex items-center gap-4 mb-4">
+          <label for="date_consultation" class="font-semibold w-24"
+            >Data efectuării<span class="text-rose-600">*</span></label
+          >
+          <DatePicker
+            name="date_consultation"
+            dateFormat="dd/mm/yy"
+            placeholder="Data"
+            showIcon
+            fluid
+            :maxDate="maxDate"
+          />
+          <Message
+            v-if="$form.date_consultation?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            class="text-rose-600 text-sm"
+            >{{ $form.date_consultation.error.message }}</Message
+          >
+        </div>
+        <div class="flex gap-4 mb-4">
+          <label for="notes" class="font-semibold">Notite</label>
+          <Textarea
+            name="notes"
+            class="w-full md:w-2/4"
+            autocomplete="off"
+            type="text"
+            fluid
+            rows="3"
+            placeholder="Adaugă note sau observații"
+          />
+        </div>
+        <FileUpload
+          name="file"
+          mode="basic"
+          @select="onSelect"
+          :multiple="false"
+          :custom-upload="true"
+          :maxFileSize="10000000"
+          :choose-label="`Alege documentul medical`"
+          :upload-label="`Încarcă`"
+          :cancel-label="`Anulează`"
+        >
+          <template #empty>
+            <span>Adaugă un document medical (opțional).</span>
+          </template>
+        </FileUpload>
+        <div class="shrink-0 pt-3 px-5 pb-2 flex justify-end gap-2">
+          <Button
+            label="Anulează"
+            outlined
+            severity="danger"
+            @click="emit('close')"
+            autofocus
+            type="button"
+          />
+          <Button label="Salvează" severity="success" autofocus type="submit" />
+        </div>
+      </Form>
+    </div>
+    <div v-else>
+      <div class="flex flex-col items-center p-4" v-if="!extractionResult">
+        <ProgressSpinner />
+        <p class="mt-3">Se procesează documentul...</p>
       </div>
-    </Form>
+
+      <div v-else class="flex flex-col items-center p-4">
+        <p class="text-center text-lg font-semibold">Rezultatele extragerii:</p>
+        <p v-for="(item, index) in extractionResult" class="text-center mt-2" :key="index">
+            <span class="inline-block">
+              {{ item.test_name }} ({{ item.test_code }}) | Valoare: {{ item.value }} {{ item.unit }} | Interval de referință: {{ item.reference_range }}
+            </span>
+        </p>
+        <div class="shrink-0 pt-3 flex justify-end gap-2">
+          <Button label="Închide" severity="primary" @click="emit('close')" />
+        </div>
+      </div>
+    </div>
   </Dialog>
 </template>
 
@@ -177,6 +222,8 @@ import Button from 'primevue/button'
 import FileUpload from 'primevue/fileupload'
 import Select from 'primevue/select'
 import Textarea from 'primevue/textarea'
+import ToggleSwitch from 'primevue/toggleswitch'
+import ProgressSpinner from 'primevue/progressspinner'
 import { parse, format } from 'date-fns'
 import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
@@ -193,6 +240,8 @@ const props = defineProps({
 const emit = defineEmits(['add', 'close'])
 const maxDate = ref(new Date())
 const displayAddDialog = ref(props.displayDialog)
+const loadingState = ref(false)
+const extractionResult = ref(null)
 const uploadedFile = ref(null)
 
 const initialValues = ref({
@@ -204,6 +253,7 @@ const initialValues = ref({
   subcategory: [],
   labsubcategory: [],
   notes: '',
+  extract: false,
 })
 
 const resolver = zodResolver(
@@ -220,6 +270,7 @@ const resolver = zodResolver(
     subcategory: z.string().optional(),
     labsubcategory: z.string().optional(),
     notes: z.string().optional(),
+    extract: z.boolean().optional(),
   }),
 )
 
@@ -250,13 +301,40 @@ const addMedicalHistory = async (medicalHistoryDetails) => {
       hasFile = true
     }
 
-    emit('add', {
-      ...response.data.medicalhistory,
-      original_date_consultation: response.data.medicalhistory.date_consultation,
-      date_consultation: parse(response.data.medicalhistory.date_consultation, 'dd-MM-yyyy', new Date()),
-      file: hasFile,
-    })
-    emit('close')
+    if (medicalHistoryDetails.extract) {
+      emit('add', {
+        ...response.data.medicalhistory,
+        original_date_consultation: response.data.medicalhistory.date_consultation,
+        date_consultation: parse(
+          response.data.medicalhistory.date_consultation,
+          'dd-MM-yyyy',
+          new Date(),
+        ),
+        file: hasFile,
+      })
+
+      loadingState.value = true
+
+      const llm_response = await api.post(`/labtests/extract/${response.data.medicalhistory.id}`)
+
+      extractionResult.value = JSON.parse(llm_response.data)
+
+      console.log('Parsed LLM response:', extractionResult.value)
+      console.log('Parsed LLM response type:', typeof extractionResult.value)
+      loadingState.value = false
+    } else {
+      emit('add', {
+        ...response.data.medicalhistory,
+        original_date_consultation: response.data.medicalhistory.date_consultation,
+        date_consultation: parse(
+          response.data.medicalhistory.date_consultation,
+          'dd-MM-yyyy',
+          new Date(),
+        ),
+        file: hasFile,
+      })
+      emit('close')
+    }
   } catch (error) {
     console.error('Error in medical history operation:', error)
   }
@@ -264,7 +342,6 @@ const addMedicalHistory = async (medicalHistoryDetails) => {
 
 const onSelect = (event) => {
   uploadedFile.value = event.files[0]
-  console.log(uploadedFile.value)
 }
 
 const onFormSubmit = (e) => {
