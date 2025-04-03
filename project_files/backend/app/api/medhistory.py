@@ -45,7 +45,7 @@ def create_medicalhistory(medhistory: MedicalHistoryCreate, user_id: uuid.UUID =
     
     category = session.exec(select(MedicalCategory).where(MedicalCategory.name == medhistory.category)).first()
     subcategory = session.exec(select(MedicalSubcategory).where(MedicalSubcategory.name == medhistory.subcategory)).first()
-    labsubcategory = session.exec(select(MedicalSubcategory).where(MedicalSubcategory.name == medhistory.labsubcategory)).first()
+    labsubcategory = session.exec(select(LabSubcategory).where(LabSubcategory.name == medhistory.labsubcategory)).first()
     
     new_medicalhistory = MedicalHistory(
         name = medhistory.name,

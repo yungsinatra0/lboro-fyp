@@ -238,7 +238,21 @@
           />
         </DataTable>
         <div class="shrink-0 pt-3 flex justify-end gap-2">
-          <Button label="Închide" severity="primary" @click="emit('close')" />
+          <Button
+            label="Salvează"
+            severity="success"
+            @click="addExtractedLab()"
+            autofocus
+            type="button"
+          />
+          <Button
+            label="Anulează"
+            outlined
+            severity="danger"
+            @click="emit('close')"
+            autofocus
+            type="button"
+          />
         </div>
       </div>
     </div>
@@ -283,6 +297,7 @@ const loadingState = ref(false)
 const extractionResult = ref(null)
 const uploadedFile = ref(null)
 const editingRows = ref([])
+const labDetails = ref(null)
 const columns = ref([
     { field: 'test_name', header: 'Test' },
     { field: 'test_code', header: 'Cod' },
@@ -336,6 +351,7 @@ const addMedicalHistory = async (medicalHistoryDetails) => {
       date_consultation: formattedDate,
       category: medicalHistoryDetails.category,
       subcategory: medicalHistoryDetails.subcategory,
+      labsubcategory: medicalHistoryDetails.labsubcategory,
       notes: medicalHistoryDetails.notes || null,
     })
 
@@ -364,6 +380,12 @@ const addMedicalHistory = async (medicalHistoryDetails) => {
         file: hasFile,
       })
 
+      labDetails.value = {
+        medicalhistory_id: response.data.medicalhistory.id,
+        labsubcategory: medicalHistoryDetails.labsubcategory,
+        date_collection: formattedDate,
+      }
+
       loadingState.value = true
 
       const llm_response = await api.post(`/labtests/extract/${response.data.medicalhistory.id}`)
@@ -388,6 +410,26 @@ const addMedicalHistory = async (medicalHistoryDetails) => {
     }
   } catch (error) {
     console.error('Error in medical history operation:', error)
+  }
+}
+
+const addExtractedLab = async () => {
+  try {
+    await api.post('/me/labtests', {
+      medicalhistory_id: labDetails.value.medicalhistory_id,
+      labsubcategory: labDetails.value.labsubcategory,
+      date_collection: labDetails.value.date_collection,
+      lab_tests: extractionResult.value.map((item) => ({
+        name: item.test_name,
+        code: item.test_code,
+        value: item.value,
+        unit: item.unit,
+        reference_range: item.reference_range,
+      })),
+    })
+  }
+  catch (error) {
+    console.error('Error in adding extracted lab:', error)
   }
 }
 

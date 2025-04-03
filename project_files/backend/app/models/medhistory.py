@@ -56,7 +56,7 @@ class LabSubcategory(SQLModel, table=True):
     name: str
     
     medicalhistory: list["MedicalHistory"] = Relationship(back_populates="labsubcategory")
-    labtests: list["LabTest"] = Relationship(back_populates="category")
+    labtests: list["LabTest"] = Relationship(back_populates="labsubcategory")
 
 # Medical History response model
 class MedicalHistoryResponse(MedicalHistoryDates):
@@ -122,15 +122,20 @@ class LabTest(SQLModel, table=True):
     name: str 
     code: str | None = None
     
-    category_id: uuid.UUID = Field(foreign_key="labsubcategory.id")
-    category: LabSubcategory = Relationship(back_populates="labtests")
+    labsubcategory_id: uuid.UUID = Field(foreign_key="labsubcategory.id")
+    labsubcategory: LabSubcategory = Relationship(back_populates="labtests")
     results: List["LabResult"] = Relationship(back_populates="test")
+    
+class LabTestCreate(SQLModel):
+    name: str
+    code: str | None = None
+    labsubcategory: str
     
 class LabResult(LabDates, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    value: float
-    unit: str
-    reference_values: str | None = None 
+    value: str
+    unit: str | None = None
+    reference_range: str | None = None 
     method: str | None = None
     
     # Relationships
@@ -141,19 +146,31 @@ class LabResult(LabDates, table=True):
     medicalhistory_id: uuid.UUID = Field(foreign_key="medicalhistory.id")
     medicalhistory: MedicalHistory = Relationship(back_populates="labresults")
     
-class LabResultCreate(LabDates):
-    test_id: uuid.UUID
-    value: float
-    unit: str
-    reference_values: str | None = None 
+class LabResultCreate(SQLModel):
+    # Fields for labtest
+    name: str
+    code: str | None = None
+    
+    # Fields for labresult
+    value: str
+    unit: str | None = None
+    reference_range: str | None = None 
     method: str | None = None
+    
+class LabsCreate(SQLModel):
+    lab_tests: List[LabResultCreate]
+    
+    # Relationships
+    medicalhistory_id: uuid.UUID
+    labsubcategory: str
+    date_collection: date
     
 class LabResultResponse(LabDates):
     id: uuid.UUID
     test: str
-    value: float
-    unit: str
-    reference_values: str | None = None 
+    value: str
+    unit: str | None = None
+    reference_range: str | None = None 
     method: str | None = None
     file: Optional["FileUpload"] = None
     
@@ -161,16 +178,4 @@ class LabTestResponse(SQLModel):
     id: uuid.UUID
     name: str
     code: str | None = None
-    category: str
-    
-class LabTestCreate(SQLModel):
-    name: str
-    code: str | None = None
-    category: str
-    
-class LabResultCreate(LabDates):
-    test_id: uuid.UUID
-    value: float
-    unit: str
-    reference_values: str | None = None 
-    method: str | None = None
+    labsubcategory: str
