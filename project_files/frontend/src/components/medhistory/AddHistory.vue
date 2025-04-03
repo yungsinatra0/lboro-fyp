@@ -198,12 +198,45 @@
       </div>
 
       <div v-else class="flex flex-col items-center p-4">
-        <p class="text-center text-lg font-semibold">Rezultatele extragerii:</p>
-        <p v-for="(item, index) in extractionResult" class="text-center mt-2" :key="index">
-            <span class="inline-block">
-              {{ item.test_name }} ({{ item.test_code }}) | Valoare: {{ item.value }} {{ item.unit }} | Interval de referință: {{ item.reference_range }}
-            </span>
-        </p>
+        <DataTable
+          :value="extractionResult"
+          v-model:editingRows="editingRows"
+          class="w-full"
+          :rows="10"
+          editMode="row"
+          paginator
+          dataKey="test_name"
+          @row-edit-save="onRowEditSave"
+          v-model:filters="filters"
+          :globalFilterFields="['test_name', 'test_code']"
+        >
+          <template #header>
+            <h2 class="m-0">Analizati rezultatele extrase si schimbati daca sunt gresite</h2>
+            <div class="flex justify-end">
+              <IconField>
+                <InputIcon>
+                  <i class="pi pi-search" />
+                </InputIcon>
+                <InputText size="small" v-model="filters['global'].value" placeholder="Cauta..." />
+              </IconField>
+            </div>
+          </template>
+          <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header">
+            <template #editor="{ data, field }">
+              <template v-if="field !== 'value'">
+                <InputText v-model="data[field]" class="w-full" fluid />
+              </template>
+              <template v-else>
+                <InputNumber v-model="data[field]" class="w-full" :maxFractionDigits="2" fluid />
+              </template>
+            </template>
+          </Column>
+          <Column
+            :rowEditor="true"
+            style="width: 10%; min-width: 8rem"
+            bodyStyle="text-align:center"
+          />
+        </DataTable>
         <div class="shrink-0 pt-3 flex justify-end gap-2">
           <Button label="Închide" severity="primary" @click="emit('close')" />
         </div>
@@ -215,6 +248,7 @@
 <script setup>
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
+import InputNumber from 'primevue/inputnumber'
 import { Form } from '@primevue/forms'
 import DatePicker from 'primevue/datepicker'
 import Message from 'primevue/message'
@@ -224,6 +258,11 @@ import Select from 'primevue/select'
 import Textarea from 'primevue/textarea'
 import ToggleSwitch from 'primevue/toggleswitch'
 import ProgressSpinner from 'primevue/progressspinner'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import { FilterMatchMode } from '@primevue/core/api'
+import IconField from 'primevue/iconfield'
+import InputIcon from 'primevue/inputicon'
 import { parse, format } from 'date-fns'
 import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
@@ -243,6 +282,14 @@ const displayAddDialog = ref(props.displayDialog)
 const loadingState = ref(false)
 const extractionResult = ref(null)
 const uploadedFile = ref(null)
+const editingRows = ref([])
+const columns = ref([
+    { field: 'test_name', header: 'Test' },
+    { field: 'test_code', header: 'Cod' },
+    { field: 'value', header: 'Valoare' },
+    { field: 'unit', header: 'Unitate' },
+    { field: 'reference_range', header: 'Interval de referință' },
+]);
 
 const initialValues = ref({
   name: '',
@@ -254,6 +301,10 @@ const initialValues = ref({
   labsubcategory: [],
   notes: '',
   extract: false,
+})
+
+const filters = ref({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 })
 
 const resolver = zodResolver(
@@ -338,6 +389,12 @@ const addMedicalHistory = async (medicalHistoryDetails) => {
   } catch (error) {
     console.error('Error in medical history operation:', error)
   }
+}
+
+const onRowEditSave = (event) => {
+  let { newData, index } = event
+
+  extractionResult.value[index] = newData
 }
 
 const onSelect = (event) => {
