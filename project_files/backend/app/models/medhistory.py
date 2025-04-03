@@ -18,7 +18,7 @@ class MedicalHistoryDates(SQLModel):
     
 class MedicalHistory(MedicalHistoryDates, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    name: str
+    name: str = Field(unique=True)
     doctor_name: str
     place: str | None = None
     notes: str | None = None
@@ -31,6 +31,8 @@ class MedicalHistory(MedicalHistoryDates, table=True):
     
     labsubcategory_id: uuid.UUID | None = Field(default=None, foreign_key="labsubcategory.id")
     labsubcategory: Optional["LabSubcategory"] = Relationship(back_populates="medicalhistory")
+    
+    labresults: List["LabResult"] = Relationship(back_populates="medicalhistory", cascade_delete=True)
     
     user_id: uuid.UUID = Field(foreign_key="user.id")
     user: "User" = Relationship(back_populates="medicalhistory")
@@ -136,7 +138,8 @@ class LabResult(LabDates, table=True):
     test: LabTest = Relationship(back_populates="results")
     user_id: uuid.UUID = Field(foreign_key="user.id")
     user: "User" = Relationship(back_populates="labresults")
-    file: Optional["FileUpload"] = Relationship(back_populates="labresult", cascade_delete=True)
+    medicalhistory_id: uuid.UUID = Field(foreign_key="medicalhistory.id")
+    medicalhistory: MedicalHistory = Relationship(back_populates="labresults")
     
 class LabResultCreate(LabDates):
     test_id: uuid.UUID
@@ -159,3 +162,15 @@ class LabTestResponse(SQLModel):
     name: str
     code: str | None = None
     category: str
+    
+class LabTestCreate(SQLModel):
+    name: str
+    code: str | None = None
+    category: str
+    
+class LabResultCreate(LabDates):
+    test_id: uuid.UUID
+    value: float
+    unit: str
+    reference_values: str | None = None 
+    method: str | None = None
