@@ -16,6 +16,7 @@
         >Adaugă informații pentru o nouă înregistrare medicală.</span
       >
       <span class="text-rose-600 text-sm block mb-8">* Câmpurile marcate sunt obligatorii</span>
+      <span v-if="formError" class="text-rose-600 text-sm block mb-8">{{ formError }}</span>
       <Form
         v-slot="$form"
         :initialValues="initialValues"
@@ -198,58 +199,84 @@
       </div>
 
       <div v-else class="flex flex-col items-center p-4">
-        <DataTable
-          :value="extractionResult"
-          v-model:editingRows="editingRows"
-          class="w-full"
-          :rows="10"
-          editMode="row"
-          paginator
-          dataKey="test_name"
-          @row-edit-save="onRowEditSave"
-          v-model:filters="filters"
-          :globalFilterFields="['test_name', 'test_code']"
-        >
-          <template #header>
-            <h2 class="m-0">Analizati rezultatele extrase si schimbati daca sunt gresite</h2>
-            <div class="flex justify-end">
-              <IconField>
-                <InputIcon>
-                  <i class="pi pi-search" />
-                </InputIcon>
-                <InputText size="small" v-model="filters['global'].value" placeholder="Cauta..." />
-              </IconField>
-            </div>
-          </template>
-          <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header">
-            <template #editor="{ data, field }">
-              <template v-if="field !== 'value'">
-                <InputText v-model="data[field]" class="w-full" fluid />
-              </template>
-              <template v-else>
-                <InputNumber v-model="data[field]" class="w-full" :maxFractionDigits="2" fluid />
-              </template>
+        <div v-if="!extractSuccess">
+          <DataTable
+            :value="extractionResult"
+            v-model:editingRows="editingRows"
+            class="w-full"
+            :rows="10"
+            editMode="row"
+            paginator
+            dataKey="test_name"
+            @row-edit-save="onRowEditSave"
+            v-model:filters="filters"
+            :globalFilterFields="['test_name', 'test_code']"
+          >
+            <template #header>
+              <h2 class="m-0">Analizati rezultatele extrase si schimbati daca sunt gresite</h2>
+              <div class="flex justify-end">
+                <IconField>
+                  <InputIcon>
+                    <i class="pi pi-search" />
+                  </InputIcon>
+                  <InputText
+                    size="small"
+                    v-model="filters['global'].value"
+                    placeholder="Cauta..."
+                  />
+                </IconField>
+              </div>
             </template>
-          </Column>
-          <Column
-            :rowEditor="true"
-            style="width: 10%; min-width: 8rem"
-            bodyStyle="text-align:center"
-          />
-        </DataTable>
-        <div class="shrink-0 pt-3 flex justify-end gap-2">
+            <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header">
+              <template #editor="{ data, field }">
+                <template v-if="field !== 'value'">
+                  <InputText v-model="data[field]" class="w-full" fluid />
+                </template>
+                <template v-else>
+                  <InputNumber v-model="data[field]" class="w-full" :maxFractionDigits="2" fluid />
+                </template>
+              </template>
+            </Column>
+            <Column
+              :rowEditor="true"
+              style="width: 10%; min-width: 8rem"
+              bodyStyle="text-align:center"
+            />
+          </DataTable>
+          <div class="shrink-0 pt-3 flex justify-end gap-2">
+            <Button
+              label="Salvează"
+              severity="success"
+              @click="addExtractedLab()"
+              autofocus
+              type="button"
+            />
+            <Button
+              label="Anulează"
+              outlined
+              severity="danger"
+              @click="emit('close')"
+              autofocus
+              type="button"
+            />
+          </div>
+        </div>
+        <div v-else class="flex flex-col items-center p-8">
+          <i class="pi pi-check-circle text-6xl text-green-500 mb-4" />
+          <Message severity="success" class="mb-6 text-lg">
+            Rezultatele au fost extrase cu succes! Acestea sunt acum disponibile in sectiunea de
+            laborator.
+          </Message>
           <Button
-            label="Salvează"
+            label="Vezi rezultatele"
             severity="success"
-            @click="addExtractedLab()"
-            autofocus
-            type="button"
-          />
-          <Button
-            label="Anulează"
-            outlined
-            severity="danger"
-            @click="emit('close')"
+            class="px-6 py-3 text-lg"
+            @click="
+              () => {
+                router.push({ path: '/laborator' })
+                emit('close')
+              }
+            "
             autofocus
             type="button"
           />
@@ -282,6 +309,7 @@ import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import api from '@/services/api'
 import { ref } from 'vue'
+import router from '@/router'
 
 const props = defineProps({
   displayDialog: Boolean,
@@ -298,22 +326,24 @@ const extractionResult = ref(null)
 const uploadedFile = ref(null)
 const editingRows = ref([])
 const labDetails = ref(null)
+const formError = ref(null)
+const extractSuccess = ref(false)
 const columns = ref([
-    { field: 'test_name', header: 'Test' },
-    { field: 'test_code', header: 'Cod' },
-    { field: 'value', header: 'Valoare' },
-    { field: 'unit', header: 'Unitate' },
-    { field: 'reference_range', header: 'Interval de referință' },
-]);
+  { field: 'test_name', header: 'Test' },
+  { field: 'test_code', header: 'Cod' },
+  { field: 'value', header: 'Valoare' },
+  { field: 'unit', header: 'Unitate' },
+  { field: 'reference_range', header: 'Interval de referință' },
+])
 
 const initialValues = ref({
   name: '',
   doctor_name: '',
   place: '',
   date_consultation: null,
-  category: [],
-  subcategory: [],
-  labsubcategory: [],
+  category: '',
+  subcategory: '',
+  labsubcategory: '',
   notes: '',
   extract: false,
 })
@@ -350,8 +380,10 @@ const addMedicalHistory = async (medicalHistoryDetails) => {
       place: medicalHistoryDetails.place || null,
       date_consultation: formattedDate,
       category: medicalHistoryDetails.category,
-      subcategory: medicalHistoryDetails.subcategory,
-      labsubcategory: medicalHistoryDetails.labsubcategory,
+      subcategory:
+        medicalHistoryDetails.category == 'Consultație' ? medicalHistoryDetails.subcategory : null,
+      labsubcategory:
+        medicalHistoryDetails.category == 'Laborator' ? medicalHistoryDetails.labsubcategory : null,
       notes: medicalHistoryDetails.notes || null,
     })
 
@@ -410,12 +442,13 @@ const addMedicalHistory = async (medicalHistoryDetails) => {
     }
   } catch (error) {
     console.error('Error in medical history operation:', error)
+    formError.value = error.response.data.detail
   }
 }
 
 const addExtractedLab = async () => {
   try {
-    await api.post('/me/labtests', {
+    const response = await api.post('/me/labtests', {
       medicalhistory_id: labDetails.value.medicalhistory_id,
       labsubcategory: labDetails.value.labsubcategory,
       date_collection: labDetails.value.date_collection,
@@ -427,8 +460,11 @@ const addExtractedLab = async () => {
         reference_range: item.reference_range,
       })),
     })
-  }
-  catch (error) {
+
+    if (response.status === 200) {
+      extractSuccess.value = true
+    }
+  } catch (error) {
     console.error('Error in adding extracted lab:', error)
   }
 }

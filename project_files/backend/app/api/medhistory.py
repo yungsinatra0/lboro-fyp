@@ -47,6 +47,11 @@ def create_medicalhistory(medhistory: MedicalHistoryCreate, user_id: uuid.UUID =
     subcategory = session.exec(select(MedicalSubcategory).where(MedicalSubcategory.name == medhistory.subcategory)).first()
     labsubcategory = session.exec(select(LabSubcategory).where(LabSubcategory.name == medhistory.labsubcategory)).first()
     
+    medhistory_db = session.exec(select(MedicalHistory).where(MedicalHistory.name == medhistory.name)).first()
+    
+    if medhistory_db:
+        raise HTTPException(status_code=400, detail="Există deja un document medical cu acest nume, vă rugăm să folosiți un alt nume") 
+    
     new_medicalhistory = MedicalHistory(
         name = medhistory.name,
         doctor_name = medhistory.doctor_name,

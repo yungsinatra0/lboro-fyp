@@ -72,7 +72,7 @@ const items = ref([
       {
         label: 'Analize laborator',
         // icon: 'pi pi-chart-bar',
-        route: '/dashboard',
+        route: '/laborator',
       },
     ],
   },
