@@ -414,7 +414,6 @@ const addMedicalHistory = async (medicalHistoryDetails) => {
 
       labDetails.value = {
         medicalhistory_id: response.data.medicalhistory.id,
-        labsubcategory: medicalHistoryDetails.labsubcategory,
         date_collection: formattedDate,
       }
 
@@ -423,9 +422,7 @@ const addMedicalHistory = async (medicalHistoryDetails) => {
       const llm_response = await api.post(`/labtests/extract/${response.data.medicalhistory.id}`)
 
       extractionResult.value = JSON.parse(llm_response.data)
-
-      console.log('Parsed LLM response:', extractionResult.value)
-      console.log('Parsed LLM response type:', typeof extractionResult.value)
+      
       loadingState.value = false
     } else {
       emit('add', {
