@@ -7,10 +7,24 @@
       </h1>
     </div>
 
-    <DataTable v-model:expandedRows="expandedRows" :value="labTests" dataKey="id">
+    <DataTable
+      v-model:expandedRows="expandedRows"
+      :value="labTests"
+      dataKey="id"
+      :rows="11"
+      paginator
+      v-model:filters="filters"
+      :globalFilterFields="['name', 'code']"
+    >
       <template #header>
         <div class="flex justify-between align-items-center flex-wrap gap-2">
-          <h5 class="m-0">Analize laborator</h5>
+          <h1 class="m-0">Analize laborator</h1>
+          <IconField>
+            <InputIcon>
+              <i class="pi pi-search" />
+            </InputIcon>
+            <InputText size="small" v-model="filters['global'].value" placeholder="Cauta..." />
+          </IconField>
         </div>
       </template>
       <Column expander style="width: 5rem"> </Column>
@@ -24,12 +38,46 @@
             <Column field="value" header="Rezultat"></Column>
             <Column field="unit" header="Unitate"></Column>
             <Column field="reference_range" header="Interval de referinta"></Column>
-            <Column field="date_collection" header="Data recoltarii"> <template #body="slotProps"> {{ slotProps.data.original_date_collection}} </template></Column>
+            <Column field="date_collection" header="Data recoltarii">
+              <template #body="slotProps">
+                {{ slotProps.data.original_date_collection }}
+              </template>
+            </Column>
+            <Column class="w-24 !text-end" header="Optiuni">
+              <template #body="{ data }">
+                <div class="flex flex-row gap-2 justify-end">
+                  <Button
+                    icon="pi pi-eye"
+                    class="p-button-rounded p-button-text p-button-plain"
+                    @click="() => {
+                      displayFileDialog = true
+                      historyIdForFile = data.medicalhistory.id
+                    }"
+                    severity="secondary"
+                    v-if="data.medicalhistory.file"
+                  >
+                  </Button>
+                  <!-- <Button
+                    icon="pi pi-ellipsis-h"
+                    class="p-button-rounded p-button-text p-button-plain"
+                    @click="(event) => toggle(event, data.id)"
+                    severity="secondary"
+                  ></Button> -->
+                </div>
+              </template>
+            </Column>
             <!-- <Column field="method" header="Metoda"></Column> -->
           </DataTable>
         </div>
       </template>
     </DataTable>
+
+    <ShowFile
+      v-if="displayFileDialog"
+      :display-dialog="displayFileDialog"
+      @close="displayFileDialog = false"
+      :history-id="historyIdForFile"
+    />
   </div>
 </template>
 
@@ -37,12 +85,23 @@
 import NavBar from '@/components/NavBar.vue'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
+import InputText from 'primevue/inputtext'
+import IconField from 'primevue/iconfield'
+import InputIcon from 'primevue/inputicon'
+import Button from 'primevue/button'
+import ShowFile from '@/components/medhistory/ShowFile.vue'
+import { FilterMatchMode } from '@primevue/core/api'
 import { ref, onMounted } from 'vue'
 import api from '@/services/api'
 import { parse } from 'date-fns'
 
 const labTests = ref([])
 const expandedRows = ref({})
+const displayFileDialog = ref(false)
+const historyIdForFile = ref(null)
+const filters = ref({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+})
 
 onMounted(() => {
   fetchLabTests()
