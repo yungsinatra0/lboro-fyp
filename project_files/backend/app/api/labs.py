@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status, APIRouter
 from sqlmodel import Session, select
 import uuid
 
-from ..models import LabResult, LabTest, LabSubcategory, LabResultResponse, LabTestResponse, LabResultCreate, LabTestCreate, LabsCreate, MedicalHistory, User
+from ..models import LabResult, LabTest, LabsCreate, MedicalHistory, User, LabTestResponse, LabResultResponse, MedicalHistoryResponse
 from ..utils import validate_file, save_file, get_connected_record, decrypt_file, get_session, validate_session, read_file, extract_with_llm
 
 
@@ -51,11 +51,6 @@ async def create_lab_tests(extraction_result: LabsCreate, user_id: uuid.UUID = D
     if medhistory.user_id != user_id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to access this medical history")
     
-    labsubcategory = session.exec(select(LabSubcategory).where(LabSubcategory.name == extraction_result.labsubcategory)).first()
-    
-    if not labsubcategory:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lab subcategory not found")
-    
     for lab_item in extraction_result.lab_tests:
         lab_test = session.exec(select(LabTest).where(LabTest.name == lab_item.name)).first()
         
@@ -63,7 +58,6 @@ async def create_lab_tests(extraction_result: LabsCreate, user_id: uuid.UUID = D
             lab_test = LabTest(
                 name = lab_item.name,
                 code = lab_item.code,
-                labsubcategory = labsubcategory
             )
             session.add(lab_test)
             session.flush()
@@ -90,3 +84,50 @@ async def create_lab_tests(extraction_result: LabsCreate, user_id: uuid.UUID = D
         "status": status.HTTP_201_CREATED,
         "message": "Lab tests created successfully"
         }
+
+# Get all lab tests for the user    
+@router.get('/me/labtests/', response_model=list[LabTestResponse])
+async def get_lab_tests(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    user = session.get(User, user_id)
+    
+    # Get all lab tests of LabTest and their corresponding results of LabResult for the user
+    lab_tests = session.exec(select(LabTest).where(LabTest.results.any(user_id=user.id))).all()
+    
+    response = []
+    
+    for test in lab_tests:
+        lab_test = LabTestResponse(
+            id = test.id,
+            name = test.name,
+            code = test.code,
+            results = []
+        )
+        
+        for result in test.results:
+            lab_result = LabResultResponse(
+                id = result.id,
+                value = result.value,
+                unit = result.unit,
+                reference_range = result.reference_range,
+                date_collection = result.date_collection,
+                method = result.method,
+                medicalhistory = MedicalHistoryResponse(
+                    id = result.medicalhistory.id,
+                    name = result.medicalhistory.name,
+                    doctor_name = result.medicalhistory.doctor_name,
+                    place = result.medicalhistory.place,
+                    notes = result.medicalhistory.notes,
+                    category = result.medicalhistory.category.name,
+                    subcategory = result.medicalhistory.subcategory.name if result.medicalhistory.subcategory else None,
+                    labsubcategory = result.medicalhistory.labsubcategory.name if result.medicalhistory.labsubcategory else None,
+                    date_consultation = result.medicalhistory.date_consultation,
+                    date_added = result.medicalhistory.date_added
+                )
+            )
+            
+            lab_test.results.append(lab_result)
+        
+        response.append(lab_test)
+
+    return response
+    

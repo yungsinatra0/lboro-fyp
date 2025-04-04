@@ -158,14 +158,14 @@ class LabsCreate(SQLModel):
     
 class LabResultResponse(LabDates):
     id: uuid.UUID
-    test: str
     value: str
     unit: str | None = None
     reference_range: str | None = None 
     method: str | None = None
-    file: Optional["FileUpload"] = None
+    medicalhistory: MedicalHistoryResponse
     
 class LabTestResponse(SQLModel):
     id: uuid.UUID
     name: str
     code: str | None = None
+    results: List[LabResultResponse]    
