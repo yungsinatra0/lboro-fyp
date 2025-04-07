@@ -27,7 +27,7 @@ async def read_file(file_path: str):
     
 def extract_with_llm(file_content: bytes, file_type: str):
     prompt = """
-    You have been given a document that contains lab results that is written in the Romanian language. Your job is to extract all lab results from this document in JSON format with the following fields: test_name, test_code, value, unit, reference_range. Sometimes the code of the test will be in the name itself, and it is your job to determine if the code is there, for example in brackets or separated by a comma, and separate the name and the code. The document is in Romanian, however the JSON keys should be in English.
+    You have been given a document that contains lab results that is written in the Romanian language. Your job is to extract all lab results from this document in JSON format with the following fields: test_name, test_code, value, unit, reference_range, method. Sometimes the code of the test will be in the name itself, and it is your job to determine if the code is there, for example in brackets or separated by a comma, and separate the name and the code. Sometimes the lab result will not have a method specified, and in that case you return an empty string. The document is in Romanian, however the JSON keys should be in English.
 
     EXTREMELY IMPORTANT FORMATTING INSTRUCTIONS:
     1. Return ONLY the raw JSON array
@@ -39,7 +39,10 @@ def extract_with_llm(file_content: bytes, file_type: str):
     7. Use period (.) as the decimal separator, not comma (,)
 
     Example of how your output should look, starting from the very first character:
-    [{"test_name":"Hemoglobină","test_code":"HGB","value":"14.3","unit":"mg/dL","reference_range":"13.2-17.3"}]
+    [{"test_name":"Hemoglobină","test_code":"HGB","value":"14.3","unit":"mg/dL","reference_range":"13.2-17.3", "method":"Chemiluminiscență"}]
+    
+    if there is no method specified, return an empty string:
+    [{"test_name":"Hemoglobină","test_code":"HGB","value":"14.3","unit":"mg/dL","reference_range":"13.2-17.3", "method":""}]
     """
     
     response = client.models.generate_content(

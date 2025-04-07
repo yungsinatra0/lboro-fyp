@@ -69,8 +69,8 @@ async def create_lab_tests(extraction_result: LabsCreate, user_id: uuid.UUID = D
             date_collection = extraction_result.date_collection,
             test = lab_test,
             medicalhistory = medhistory,
-            user = user
-            # method = lab_item.method TODO: Add method and need to change the prompt for that
+            user = user,
+            method = lab_item.method
         )
         
         session.add(lab_result)

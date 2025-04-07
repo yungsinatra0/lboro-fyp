@@ -334,6 +334,7 @@ const columns = ref([
   { field: 'value', header: 'Valoare' },
   { field: 'unit', header: 'Unitate' },
   { field: 'reference_range', header: 'Interval de referință' },
+  {field: 'method', header: 'Metodă'}
 ])
 
 const initialValues = ref({
@@ -447,7 +448,6 @@ const addExtractedLab = async () => {
   try {
     const response = await api.post('/me/labtests', {
       medicalhistory_id: labDetails.value.medicalhistory_id,
-      labsubcategory: labDetails.value.labsubcategory,
       date_collection: labDetails.value.date_collection,
       lab_tests: extractionResult.value.map((item) => ({
         name: item.test_name,
@@ -455,6 +455,7 @@ const addExtractedLab = async () => {
         value: item.value,
         unit: item.unit,
         reference_range: item.reference_range,
+        method: item.method
       })),
     })
 

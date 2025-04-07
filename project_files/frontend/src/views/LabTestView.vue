@@ -17,8 +17,7 @@
       :globalFilterFields="['name', 'code']"
     >
       <template #header>
-        <div class="flex justify-between align-items-center flex-wrap gap-2">
-          <h1 class="m-0">Analize laborator</h1>
+        <div class="flex justify-end align-items-center flex-wrap gap-2">
           <IconField>
             <InputIcon>
               <i class="pi pi-search" />
@@ -38,6 +37,11 @@
             <Column field="value" header="Rezultat"></Column>
             <Column field="unit" header="Unitate"></Column>
             <Column field="reference_range" header="Interval de referinta"></Column>
+            <Column field="method" header="Metoda">
+            <template #body="slotProps">
+              <span v-if="!slotProps.data.method"> - </span>
+              <span v-else>{{ slotProps.data.method }}</span>
+            </template></Column>
             <Column field="date_collection" header="Data recoltarii">
               <template #body="slotProps">
                 {{ slotProps.data.original_date_collection }}
