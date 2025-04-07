@@ -29,6 +29,86 @@
       <Column expander style="width: 5rem"> </Column>
       <Column field="name" header="Nume"></Column>
       <Column field="code" header="Cod"></Column>
+      <!-- TODO: Check if recent result is actually recent or needs more processing -->
+      <Column header="Rezultatul recent">
+        <template #header>
+          <i
+            v-tooltip.top="
+              'Unitatea folosita poate fi diferita in functie de laboratorul care a efectual analiza.'
+            "
+            class="pi pi-info-circle"
+          />
+        </template>
+        <template #body="slotProps">
+          <span v-if="!slotProps.data.results[0].value"> - </span>
+          <span v-else
+            >{{ slotProps.data.results[0].value }} {{ slotProps.data.results[0].unit }}</span
+          >
+        </template>
+      </Column>
+      <Column header="Interval de referinta">
+        <template #header>
+          <i
+            v-tooltip.top="
+              'Intervalele de referinta pot fi diferite in functie de laboratorul care a efectuat analiza.'
+            "
+            class="pi pi-info-circle"
+          />
+        </template>
+        <template #body="slotProps">
+          <span v-if="!slotProps.data.results[0].reference_range"> - </span>
+          <span v-else
+            >{{ slotProps.data.results[0].reference_range }}
+            {{ slotProps.data.results[0].unit }}</span
+          >
+        </template>
+      </Column>
+      <Column header="Trend">
+        <template #body="slotProps">
+          <i
+            class="pi pi-arrow-up text-red-500"
+            v-if="
+              calculateTrend(
+                slotProps.data.results[0].value,
+                slotProps.data.results[0].reference_range,
+                slotProps.data.results[0].is_numeric,
+              ) === 'up'
+            "
+          ></i>
+          <i
+            class="pi pi-arrow-down text-red-500"
+            v-else-if="
+              calculateTrend(
+                slotProps.data.results[0].value,
+                slotProps.data.results[0].reference_range,
+                slotProps.data.results[0].is_numeric,
+              ) === 'down'
+            "
+          ></i>
+          <i
+            v-else-if="
+              calculateTrend(
+                slotProps.data.results[0].value,
+                slotProps.data.results[0].reference_range,
+                slotProps.data.results[0].is_numeric,
+              ) === 'normal'
+            "
+            class="pi pi-check text-green-500"
+          ></i>
+        </template>
+      </Column>
+      <Column header="Evolutia rezultatelor">
+        <template #body="slotProps">
+          <template v-if="slotProps.data.results.some((result) => result.is_numeric === true)">
+            <Line
+              :data="getChartData(slotProps.data.results)"
+              :options="chartOptions"
+              :width="100"
+              :height="50"
+            />
+          </template>
+        </template>
+      </Column>
       <!-- TODO: Add small graph for trend of lab results values as column -->
       <template #expansion="slotProps">
         <div class="p-4">
@@ -38,10 +118,11 @@
             <Column field="unit" header="Unitate"></Column>
             <Column field="reference_range" header="Interval de referinta"></Column>
             <Column field="method" header="Metoda">
-            <template #body="slotProps">
-              <span v-if="!slotProps.data.method"> - </span>
-              <span v-else>{{ slotProps.data.method }}</span>
-            </template></Column>
+              <template #body="slotProps">
+                <span v-if="!slotProps.data.method"> - </span>
+                <span v-else>{{ slotProps.data.method }}</span>
+              </template></Column
+            >
             <Column field="date_collection" header="Data recoltarii">
               <template #body="slotProps">
                 {{ slotProps.data.original_date_collection }}
@@ -53,10 +134,12 @@
                   <Button
                     icon="pi pi-eye"
                     class="p-button-rounded p-button-text p-button-plain"
-                    @click="() => {
-                      displayFileDialog = true
-                      historyIdForFile = data.medicalhistory.id
-                    }"
+                    @click="
+                      () => {
+                        displayFileDialog = true
+                        historyIdForFile = data.medicalhistory.id
+                      }
+                    "
                     severity="secondary"
                     v-if="data.medicalhistory.file"
                   >
@@ -98,6 +181,19 @@ import { FilterMatchMode } from '@primevue/core/api'
 import { ref, onMounted } from 'vue'
 import api from '@/services/api'
 import { parse } from 'date-fns'
+import { Line } from 'vue-chartjs'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js'
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
 const labTests = ref([])
 const expandedRows = ref({})
@@ -106,6 +202,42 @@ const historyIdForFile = ref(null)
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 })
+
+const chartOptions = {
+  responsive: false,
+  maintainAspectRatio: false,
+  scales: {
+    y: {
+      display: false,
+      grid: {
+        display: false,
+      },
+      title: {
+        display: false,
+      },
+    },
+    x: {
+      display: true,
+      grid: {
+        display: false,
+      },
+      title: {
+        display: false,
+      },
+      ticks: {
+        display: false,
+      },
+    },
+  },
+  plugins: {
+    legend: {
+      display: false,
+    },
+    tooltip: {
+      enabled: false,
+    },
+  },
+}
 
 onMounted(() => {
   fetchLabTests()
@@ -124,6 +256,56 @@ const fetchLabTests = async () => {
     }))
   } catch (error) {
     console.error('Error fetching lab tests:', error)
+  }
+}
+
+const calculateTrend = (value, reference_range, is_numeric) => {
+  if (!value || !reference_range) return null
+
+  if (is_numeric) {
+    value = parseFloat(value)
+    if (reference_range.includes('-')) {
+      const [min, max] = reference_range.split('-').map(Number)
+      if (value < min) return 'down'
+      if (value > max) return 'up'
+    } else if (reference_range.includes('>')) {
+      const min = parseFloat(reference_range.replace('>', ''))
+      if (value < min) return 'down'
+      return 'normal'
+    } else if (reference_range.includes('<')) {
+      const max = parseFloat(reference_range.replace('<', ''))
+      if (value > max) return 'up'
+      return 'normal'
+    }
+    else {
+      let reference = parseFloat(reference_range)
+      if (value < reference) return 'down'
+      if (value > reference) return 'up'
+      return 'normal'
+
+    }
+  } else if (is_numeric === false) {
+    // TODO: Handle non-numeric values (e.g., positive/negative, normal/abnormal)
+    return null
+  }
+  return 'normal'
+}
+
+const getChartData = (results) => {
+  const numericResults = results.filter((result) => result.is_numeric === true)
+  const labels = numericResults.map((result) => result.original_date_collection)
+  const data = numericResults.map((result) => parseFloat(result.value))
+
+  return {
+    labels,
+    datasets: [
+      {
+        data,
+        borderColor: 'rgba(54, 192, 44)',
+        borderWidth: 1,
+        pointRadius: 0.5,
+      },
+    ],
   }
 }
 </script>

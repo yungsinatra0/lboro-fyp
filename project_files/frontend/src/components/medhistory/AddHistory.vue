@@ -229,12 +229,7 @@
             </template>
             <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header">
               <template #editor="{ data, field }">
-                <template v-if="field !== 'value'">
-                  <InputText v-model="data[field]" class="w-full" fluid />
-                </template>
-                <template v-else>
-                  <InputNumber v-model="data[field]" class="w-full" :maxFractionDigits="2" fluid />
-                </template>
+                <InputText v-model="data[field]" class="w-full" fluid />
               </template>
             </Column>
             <Column
@@ -289,7 +284,6 @@
 <script setup>
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
-import InputNumber from 'primevue/inputnumber'
 import { Form } from '@primevue/forms'
 import DatePicker from 'primevue/datepicker'
 import Message from 'primevue/message'
@@ -334,7 +328,7 @@ const columns = ref([
   { field: 'value', header: 'Valoare' },
   { field: 'unit', header: 'Unitate' },
   { field: 'reference_range', header: 'Interval de referință' },
-  {field: 'method', header: 'Metodă'}
+  { field: 'method', header: 'Metodă' },
 ])
 
 const initialValues = ref({
@@ -423,7 +417,7 @@ const addMedicalHistory = async (medicalHistoryDetails) => {
       const llm_response = await api.post(`/labtests/extract/${response.data.medicalhistory.id}`)
 
       extractionResult.value = JSON.parse(llm_response.data)
-      
+
       loadingState.value = false
     } else {
       emit('add', {
@@ -455,7 +449,7 @@ const addExtractedLab = async () => {
         value: item.value,
         unit: item.unit,
         reference_range: item.reference_range,
-        method: item.method
+        method: item.method,
       })),
     })
 

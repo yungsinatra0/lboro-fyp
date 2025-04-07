@@ -3,7 +3,7 @@ from sqlmodel import Session, select
 import uuid
 
 from ..models import LabResult, LabTest, LabsCreate, MedicalHistory, User, LabTestResponse, LabResultResponse, MedicalHistoryResponse
-from ..utils import validate_file, save_file, get_connected_record, decrypt_file, get_session, validate_session, read_file, extract_with_llm
+from ..utils import get_connected_record, decrypt_file, get_session, validate_session, read_file, extract_with_llm, check_is_numeric
 
 
 router = APIRouter()
@@ -64,6 +64,7 @@ async def create_lab_tests(extraction_result: LabsCreate, user_id: uuid.UUID = D
         
         lab_result = LabResult(
             value = lab_item.value,
+            is_numeric = check_is_numeric(lab_item.value),
             unit = lab_item.unit,
             reference_range = lab_item.reference_range,
             date_collection = extraction_result.date_collection,
@@ -107,6 +108,7 @@ async def get_lab_tests(user_id: uuid.UUID = Depends(validate_session), session:
             lab_result = LabResultResponse(
                 id = result.id,
                 value = result.value,
+                is_numeric = result.is_numeric,
                 unit = result.unit,
                 reference_range = result.reference_range,
                 date_collection = result.date_collection,

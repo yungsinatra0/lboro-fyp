@@ -126,6 +126,7 @@ class LabTest(SQLModel, table=True):
 class LabResult(LabDates, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     value: str
+    is_numeric: bool
     unit: str | None = None
     reference_range: str | None = None 
     method: str | None = None
@@ -146,19 +147,21 @@ class LabResultCreate(SQLModel):
     # Fields for labresult
     value: str
     unit: str | None = None
+    is_numeric: bool | None = None
     reference_range: str | None = None 
     method: str | None = None
     
 class LabsCreate(SQLModel):
     lab_tests: List[LabResultCreate]
+    date_collection: date
     
     # Relationships
     medicalhistory_id: uuid.UUID
-    date_collection: date
     
 class LabResultResponse(LabDates):
     id: uuid.UUID
     value: str
+    is_numeric: bool
     unit: str | None = None
     reference_range: str | None = None 
     method: str | None = None

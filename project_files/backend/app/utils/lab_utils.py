@@ -55,3 +55,10 @@ def extract_with_llm(file_content: bytes, file_type: str):
             ])
     
     return response.text
+
+def check_is_numeric(value: str) -> bool:
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False

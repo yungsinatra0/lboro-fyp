@@ -1,7 +1,8 @@
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
-import ConfirmationService from 'primevue/confirmationservice';
+import ConfirmationService from 'primevue/confirmationservice'
 import Primevue from 'primevue/config'
+import Tooltip from 'primevue/tooltip'
 import App from './App.vue'
 import router from './router'
 import "./base.css";
@@ -16,4 +17,5 @@ app.use(Primevue, {
     ripple: true,
 });
 app.use(ConfirmationService);
+app.directive('tooltip', Tooltip);
 app.mount('#app')
