@@ -143,13 +143,14 @@ const options = ref(['table', 'graph'])
 const layout = ref('table')
 
 const filteredVitalData = computed(() => {
+  let filtered;
   if (selectedDates.value) {
     if (!selectedDates.value[1]) {
-      return props.vitals.filter((vital) => {
+      filtered = props.vitals.filter((vital) => {
         return vital.date_recorded >= selectedDates.value[0] && vital.name === vitalModel.value.name
       })
     } else if (selectedDates.value[0] && selectedDates.value[1]) {
-      return props.vitals.filter((vital) => {
+      filtered = props.vitals.filter((vital) => {
         return (
           vital.date_recorded >= selectedDates.value[0] &&
           vital.date_recorded <= selectedDates.value[1] &&
@@ -157,11 +158,13 @@ const filteredVitalData = computed(() => {
         )
       })
     }
+  } else {
+    filtered = vitalModel.value
+      ? props.vitals.filter((vital) => vital.name === vitalModel.value.name)
+      : []
   }
 
-  return vitalModel.value
-    ? props.vitals.filter((vital) => vital.name === vitalModel.value.name)
-    : []
+  return [...filtered].reverse()
 })
 
 const chartOptions = {
