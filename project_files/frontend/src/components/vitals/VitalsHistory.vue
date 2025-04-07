@@ -143,20 +143,20 @@ const options = ref(['table', 'graph'])
 const layout = ref('table')
 
 const filteredVitalData = computed(() => {
-  let filtered;
+  let filtered
   if (selectedDates.value) {
     if (!selectedDates.value[1]) {
-      filtered = props.vitals.filter((vital) => {
-        return vital.date_recorded >= selectedDates.value[0] && vital.name === vitalModel.value.name
-      })
+      filtered = props.vitals.filter(
+        (vital) =>
+          vital.date_recorded >= selectedDates.value[0] && vital.name === vitalModel.value.name,
+      )
     } else if (selectedDates.value[0] && selectedDates.value[1]) {
-      filtered = props.vitals.filter((vital) => {
-        return (
+      filtered = props.vitals.filter(
+        (vital) =>
           vital.date_recorded >= selectedDates.value[0] &&
           vital.date_recorded <= selectedDates.value[1] &&
-          vital.name === vitalModel.value.name
-        )
-      })
+          vital.name === vitalModel.value.name,
+      )
     }
   } else {
     filtered = vitalModel.value
@@ -170,13 +170,13 @@ const filteredVitalData = computed(() => {
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
-  plugins : {
-    legend : {
-      labels : {
-        filter: item => item.text !== 'none',
-      }
-    }
-  }
+  plugins: {
+    legend: {
+      labels: {
+        filter: (item) => item.text !== 'none',
+      },
+    },
+  },
 }
 
 const chartData = computed(() => {
@@ -204,48 +204,58 @@ const chartData = computed(() => {
           tension: 0.5,
           pointRadius: 5,
         },
-        ...(vitalModel.value.normal_range ? [
-          {
-            label: 'none',
-            showLine: true,
-            data: filteredVitalData.value.map(() => parseInt(vitalModel.value.normal_range.split('-')[0].split('/')[0])),
-            fill: false,
-            borderColor: 'rgba(75, 192, 192, 0.6)',
-            borderDash: [5, 5],
-            tension: 0.5,
-            pointRadius: 0,
-          },
-          {
-            label: 'none',
-            showLine: true,
-            data: filteredVitalData.value.map(() => parseInt(vitalModel.value.normal_range.split('-')[1].split('/')[0])),
-            fill: false,
-            borderColor: 'rgba(75, 192, 192, 0.6)',
-            borderDash: [5, 5],
-            tension: 0.5,
-            pointRadius: 0,
-          },
-          {
-            label: 'none',
-            showLine: true,
-            data: filteredVitalData.value.map(() => parseInt(vitalModel.value.normal_range.split('-')[0].split('/')[1])),
-            fill: false,
-            borderColor: 'rgba(192, 75, 75, 0.6)',
-            borderDash: [5, 5],
-            tension: 0.5,
-            pointRadius: 0,
-          },
-          {
-            label: 'none',
-            showLine: true,
-            data: filteredVitalData.value.map(() => parseInt(vitalModel.value.normal_range.split('-')[1].split('/')[1])),
-            fill: false,
-            borderColor: 'rgba(192, 75, 75, 0.6)',
-            borderDash: [5, 5],
-            tension: 0.5,
-            pointRadius: 0,
-          }
-        ] : [])
+        ...(vitalModel.value.normal_range
+          ? [
+              {
+                label: 'none',
+                showLine: true,
+                data: filteredVitalData.value.map(() =>
+                  parseInt(vitalModel.value.normal_range.split('-')[0].split('/')[0]),
+                ),
+                fill: false,
+                borderColor: 'rgba(75, 192, 192, 0.6)',
+                borderDash: [5, 5],
+                tension: 0.5,
+                pointRadius: 0,
+              },
+              {
+                label: 'none',
+                showLine: true,
+                data: filteredVitalData.value.map(() =>
+                  parseInt(vitalModel.value.normal_range.split('-')[1].split('/')[0]),
+                ),
+                fill: false,
+                borderColor: 'rgba(75, 192, 192, 0.6)',
+                borderDash: [5, 5],
+                tension: 0.5,
+                pointRadius: 0,
+              },
+              {
+                label: 'none',
+                showLine: true,
+                data: filteredVitalData.value.map(() =>
+                  parseInt(vitalModel.value.normal_range.split('-')[0].split('/')[1]),
+                ),
+                fill: false,
+                borderColor: 'rgba(192, 75, 75, 0.6)',
+                borderDash: [5, 5],
+                tension: 0.5,
+                pointRadius: 0,
+              },
+              {
+                label: 'none',
+                showLine: true,
+                data: filteredVitalData.value.map(() =>
+                  parseInt(vitalModel.value.normal_range.split('-')[1].split('/')[1]),
+                ),
+                fill: false,
+                borderColor: 'rgba(192, 75, 75, 0.6)',
+                borderDash: [5, 5],
+                tension: 0.5,
+                pointRadius: 0,
+              },
+            ]
+          : []),
       ],
     }
   }
@@ -261,28 +271,34 @@ const chartData = computed(() => {
         tension: 0.5,
         pointRadius: 5,
       },
-      ...(vitalModel.value.normal_range ? [
-        {
-          label: 'none',
-          showLine: true,
-          data: filteredVitalData.value.map(() => parseFloat(vitalModel.value.normal_range.split('-')[0])),
-          fill: false,
-          borderColor: 'rgba(128, 128, 128, 0.6)',
-          borderDash: [5, 5],
-          tension: 0.5,
-          pointRadius: 0,
-        },
-        {
-          label: 'none',
-          showLine: true,
-          data: filteredVitalData.value.map(() => parseFloat(vitalModel.value.normal_range.split('-')[1])),
-          fill: false,
-          borderColor: 'rgba(128, 128, 128, 0.6)',
-          borderDash: [5, 5],
-          tension: 0.5,
-          pointRadius: 0,
-        }
-      ] : [])
+      ...(vitalModel.value.normal_range
+        ? [
+            {
+              label: 'none',
+              showLine: true,
+              data: filteredVitalData.value.map(() =>
+                parseFloat(vitalModel.value.normal_range.split('-')[0]),
+              ),
+              fill: false,
+              borderColor: 'rgba(128, 128, 128, 0.6)',
+              borderDash: [5, 5],
+              tension: 0.5,
+              pointRadius: 0,
+            },
+            {
+              label: 'none',
+              showLine: true,
+              data: filteredVitalData.value.map(() =>
+                parseFloat(vitalModel.value.normal_range.split('-')[1]),
+              ),
+              fill: false,
+              borderColor: 'rgba(128, 128, 128, 0.6)',
+              borderDash: [5, 5],
+              tension: 0.5,
+              pointRadius: 0,
+            },
+          ]
+        : []),
     ],
   }
 })
