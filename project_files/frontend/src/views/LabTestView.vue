@@ -9,15 +9,25 @@
 
     <DataTable
       v-model:expandedRows="expandedRows"
-      :value="labTests"
+      :value="dateFilter"
       dataKey="id"
-      :rows="11"
+      :rows="8"
       paginator
       v-model:filters="filters"
       :globalFilterFields="['name', 'code']"
     >
       <template #header>
         <div class="flex justify-end align-items-center flex-wrap gap-2">
+          <DatePicker
+            v-model="selectedDates"
+            placeholder="Selecteaza datele"
+            selectionMode="range"
+            showIcon
+            dateFormat="dd/mm/yy"
+            class="text-base"
+            showButtonBar
+            size="small"
+          />
           <IconField>
             <InputIcon>
               <i class="pi pi-search" />
@@ -103,7 +113,7 @@
             <Line
               :data="getChartData(slotProps.data.results)"
               :options="chartOptions"
-              :width="100"
+              :width="150"
               :height="50"
             />
           </template>
@@ -116,7 +126,12 @@
           <DataTable :value="slotProps.data.results" dataKey="id">
             <Column field="value" header="Rezultat"></Column>
             <Column field="unit" header="Unitate"></Column>
-            <Column field="reference_range" header="Interval de referinta"></Column>
+            <Column field="reference_range" header="Interval de referinta">
+              <template #body="slotProps">
+                <span v-if="!slotProps.data.reference_range"> - </span>
+                <span v-else>{{ slotProps.data.reference_range }} {{ slotProps.data.unit }}</span>
+              </template></Column
+            >
             <Column field="method" header="Metoda">
               <template #body="slotProps">
                 <span v-if="!slotProps.data.method"> - </span>
@@ -153,7 +168,6 @@
                 </div>
               </template>
             </Column>
-            <!-- <Column field="method" header="Metoda"></Column> -->
           </DataTable>
         </div>
       </template>
@@ -176,9 +190,10 @@ import InputText from 'primevue/inputtext'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import Button from 'primevue/button'
+import DatePicker from 'primevue/datepicker'
 import ShowFile from '@/components/medhistory/ShowFile.vue'
 import { FilterMatchMode } from '@primevue/core/api'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import api from '@/services/api'
 import { parse } from 'date-fns'
 import { Line } from 'vue-chartjs'
@@ -202,42 +217,10 @@ const historyIdForFile = ref(null)
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 })
+const selectedDates = ref(null)
 
-const chartOptions = {
-  responsive: false,
-  maintainAspectRatio: false,
-  scales: {
-    y: {
-      display: false,
-      grid: {
-        display: false,
-      },
-      title: {
-        display: false,
-      },
-    },
-    x: {
-      display: true,
-      grid: {
-        display: false,
-      },
-      title: {
-        display: false,
-      },
-      ticks: {
-        display: false,
-      },
-    },
-  },
-  plugins: {
-    legend: {
-      display: false,
-    },
-    tooltip: {
-      enabled: false,
-    },
-  },
-}
+// TODO: Test chart with multiple datapoints and fix chart options to be a proper sparkline chart
+// TODO: Change pointer color to reflect trend (up/down/normal) and add small tooltip with value and date
 
 onMounted(() => {
   fetchLabTests()
@@ -259,6 +242,40 @@ const fetchLabTests = async () => {
   }
 }
 
+const dateFilter = computed(() => {
+  let filtered
+  if (selectedDates.value) {
+    if (!selectedDates.value[1]) {
+      filtered = labTests.value.map((test) => {
+        return {
+          ...test,
+          results: test.results.filter((result) => {
+            return result.date_collection >= selectedDates.value[0]
+          }),
+        }
+      })
+    } else {
+      filtered = labTests.value.map((test) => {
+        return {
+          ...test,
+          results: test.results.filter((result) => {
+            return (
+              result.date_collection >= selectedDates.value[0] &&
+              result.date_collection <= selectedDates.value[1]
+            )
+          }),
+        }
+      })
+    }
+  } else {
+    return labTests.value
+  }
+
+  return filtered.filter((test) => {
+    return test.results.length > 0
+  })
+})
+
 const calculateTrend = (value, reference_range, is_numeric) => {
   if (!value || !reference_range) return null
 
@@ -276,13 +293,11 @@ const calculateTrend = (value, reference_range, is_numeric) => {
       const max = parseFloat(reference_range.replace('<', ''))
       if (value > max) return 'up'
       return 'normal'
-    }
-    else {
+    } else {
       let reference = parseFloat(reference_range)
       if (value < reference) return 'down'
       if (value > reference) return 'up'
       return 'normal'
-
     }
   } else if (is_numeric === false) {
     // TODO: Handle non-numeric values (e.g., positive/negative, normal/abnormal)
@@ -291,19 +306,76 @@ const calculateTrend = (value, reference_range, is_numeric) => {
   return 'normal'
 }
 
+const chartOptions = {
+  responsive: false,
+  maintainAspectRatio: false,
+  scales: {
+    y: {
+      display: false,
+      grid: {
+        display: false,
+      },
+      beginAtZero: false,
+    },
+    x: {
+      display: true,
+      grid: {
+        display: false,
+      },
+      title: {
+        display: false,
+      },
+      ticks: {
+        display: false,
+      },
+    },
+  },
+  plugins: {
+    legend: {
+      display: false,
+    },
+    tooltip: {
+      enabled: true,
+      position: 'nearest',
+      yAlign: 'center',
+      xAlign: 'center',
+      callbacks: {
+        title: (tooltipItems) => {
+          return tooltipItems[0].label
+        },
+      },
+    },
+  },
+}
+
 const getChartData = (results) => {
-  const numericResults = results.filter((result) => result.is_numeric === true)
+  const numericResults = results.filter((result) => result.is_numeric === true).reverse()
   const labels = numericResults.map((result) => result.original_date_collection)
   const data = numericResults.map((result) => parseFloat(result.value))
+
+  const pointBackgroundColors = numericResults.map((result) => {
+    const trend = calculateTrend(result.value, result.reference_range, result.is_numeric)
+    if (trend === 'up' || trend === 'down') return '#dc3545'
+    return '#36c02c'
+  })
+
+  const pointBorderColors = numericResults.map((result) => {
+    const trend = calculateTrend(result.value, result.reference_range, result.is_numeric)
+    if (trend === 'up' || trend === 'down') return '#dc3545'
+    return '#36c02c'
+  })
 
   return {
     labels,
     datasets: [
       {
         data,
-        borderColor: 'rgba(54, 192, 44)',
+        borderColor: '#9e9e9e',
+        tension: 0.4,
         borderWidth: 1,
-        pointRadius: 0.5,
+        pointRadius: 2,
+        pointBackgroundColor: pointBackgroundColors,
+        pointBorderColor: pointBorderColors,
       },
     ],
   }
