@@ -62,3 +62,6 @@ def check_is_numeric(value: str) -> bool:
         return True
     except ValueError:
         return False
+    
+def sort_by_date(results: list):
+    return sorted(results, key=lambda x: x.date_collection, reverse=True)

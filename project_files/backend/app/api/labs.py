@@ -3,7 +3,7 @@ from sqlmodel import Session, select
 import uuid
 
 from ..models import LabResult, LabTest, LabsCreate, MedicalHistory, User, LabTestResponse, LabResultResponse, MedicalHistoryResponse
-from ..utils import get_connected_record, decrypt_file, get_session, validate_session, read_file, extract_with_llm, check_is_numeric
+from ..utils import get_connected_record, decrypt_file, get_session, validate_session, read_file, extract_with_llm, check_is_numeric, sort_by_date
 
 
 router = APIRouter()
@@ -130,6 +130,7 @@ async def get_lab_tests(user_id: uuid.UUID = Depends(validate_session), session:
             
             lab_test.results.append(lab_result)
         
+        lab_test.results = sort_by_date(lab_test.results)
         response.append(lab_test)
 
     return response
