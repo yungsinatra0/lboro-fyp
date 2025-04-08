@@ -15,6 +15,7 @@
       paginator
       v-model:filters="filters"
       :globalFilterFields="['name', 'code']"
+      removableSort
     >
       <template #header>
         <div class="flex justify-end align-items-center flex-wrap gap-2">
@@ -37,7 +38,7 @@
         </div>
       </template>
       <Column expander style="width: 5rem"> </Column>
-      <Column field="name" header="Nume"></Column>
+      <Column field="name" header="Nume" sortable></Column>
       <Column field="code" header="Cod"></Column>
       <!-- TODO: Check if recent result is actually recent or needs more processing -->
       <Column header="Rezultatul recent">
@@ -51,9 +52,9 @@
         </template>
         <template #body="slotProps">
           <span v-if="!slotProps.data.results[0].value"> - </span>
-          <span v-else
-            >{{ slotProps.data.results[0].value }} {{ slotProps.data.results[0].unit }}</span
-          >
+          <template v-else>
+            <span> {{ slotProps.data.results[0].value }} </span>
+          </template>
         </template>
       </Column>
       <Column header="Interval de referinta">
@@ -67,10 +68,10 @@
         </template>
         <template #body="slotProps">
           <span v-if="!slotProps.data.results[0].reference_range"> - </span>
-          <span v-else
-            >{{ slotProps.data.results[0].reference_range }}
-            {{ slotProps.data.results[0].unit }}</span
-          >
+          <template v-else>
+            <span> {{ slotProps.data.results[0].reference_range }} </span>
+            <div class="text-xs text-gray-400">{{ slotProps.data.results[0].unit }}</div>
+          </template>
         </template>
       </Column>
       <Column header="Trend">
@@ -129,7 +130,9 @@
             <Column field="reference_range" header="Interval de referinta">
               <template #body="slotProps">
                 <span v-if="!slotProps.data.reference_range"> - </span>
-                <span v-else>{{ slotProps.data.reference_range }} {{ slotProps.data.unit }}</span>
+                <template v-else>
+                  <span> {{ slotProps.data.reference_range }} </span> <span class="text-xs text-gray-400">{{ slotProps.data.unit }}</span>
+                </template>
               </template></Column
             >
             <Column field="method" header="Metoda">
