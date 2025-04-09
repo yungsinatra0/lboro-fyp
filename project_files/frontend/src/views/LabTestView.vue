@@ -153,30 +153,36 @@
           </template>
         </template>
       </Column>
-      
+
       <template #expansion="slotProps">
         <div class="p-2 md:p-4">
           <h5 class="text-lg font-medium mb-3">Rezultate pentru {{ slotProps.data.name }}</h5>
-          
+
           <!-- Chart visualization on mobile -->
-          <div class="block lg:hidden mb-4" v-if="slotProps.data.results.some((result) => result.is_numeric === true)">
+          <div
+            class="block lg:hidden mb-4"
+            v-if="slotProps.data.results.some((result) => result.is_numeric === true)"
+          >
             <Line
               :data="getChartData(slotProps.data.results)"
               :options="mobileChartOptions"
               :height="150"
             />
           </div>
-          
+
           <!-- Reference range info on mobile -->
           <div class="block md:hidden mb-4" v-if="slotProps.data.results[0].reference_range">
             <div class="p-3 bg-surface-50 dark:bg-surface-800 rounded">
               <div class="text-sm font-medium">Interval de referinta:</div>
-              <div>{{ slotProps.data.results[0].reference_range }} <span class="text-xs text-gray-400">{{ slotProps.data.results[0].unit }}</span></div>
+              <div>
+                {{ slotProps.data.results[0].reference_range }}
+                <span class="text-xs text-gray-400">{{ slotProps.data.results[0].unit }}</span>
+              </div>
             </div>
           </div>
-          
-          <DataTable 
-            :value="slotProps.data.results" 
+
+          <DataTable
+            :value="slotProps.data.results"
             dataKey="id"
             responsiveLayout="stack"
             breakpoint="768px"
@@ -191,11 +197,16 @@
               </template>
             </Column>
             <Column field="unit" header="Unitate" class="hidden md:table-cell"></Column>
-            <Column field="reference_range" header="Interval de referinta" class="hidden md:table-cell">
+            <Column
+              field="reference_range"
+              header="Interval de referinta"
+              class="hidden md:table-cell"
+            >
               <template #body="slotProps">
                 <span v-if="!slotProps.data.reference_range"> - </span>
                 <template v-else>
-                  <span> {{ slotProps.data.reference_range }} </span> <span class="text-xs text-gray-400">{{ slotProps.data.unit }}</span>
+                  <span> {{ slotProps.data.reference_range }} </span>
+                  <span class="text-xs text-gray-400">{{ slotProps.data.unit }}</span>
                 </template>
               </template>
             </Column>
@@ -232,7 +243,7 @@
           </DataTable>
         </div>
       </template>
-      
+
       <template #empty>
         <div class="p-4 text-center">
           <i class="pi pi-search text-3xl text-gray-300 dark:text-gray-600 mb-2"></i>
@@ -422,9 +433,9 @@ const mobileChartOptions = {
       },
       ticks: {
         font: {
-          size: 10
-        }
-      }
+          size: 10,
+        },
+      },
     },
     x: {
       display: true,
@@ -434,8 +445,8 @@ const mobileChartOptions = {
       ticks: {
         display: true,
         font: {
-          size: 10
-        }
+          size: 10,
+        },
       },
     },
   },
