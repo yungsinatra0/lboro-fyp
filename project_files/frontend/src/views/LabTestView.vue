@@ -30,7 +30,7 @@
       v-model:expandedRows="expandedRows"
       :value="dateFilter"
       dataKey="id"
-      :rows="8"
+      :rows="10"
       :rowsPerPageOptions="[5, 8, 10]"
       paginator
       paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
