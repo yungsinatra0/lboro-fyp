@@ -1,45 +1,52 @@
-<!-- TODO: Make more mobile-friendly -->
 <template>
-  <div class="h-full w-full px-4">
+  <div class="h-full w-full px-2 md:px-4">
     <DataTable
       v-model:filters="filters"
       :value="history"
-      :rows="10"
+      :rows="5"
+      :rowsPerPageOptions="[5, 10, 20]"
       paginator
+      paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
+      currentPageReportTemplate="{first}-{last} din {totalRecords}"
       dataKey="id"
       filterDisplay="menu"
       :loading="loading"
       :globalFilterFields="['name', 'doctor_name', 'place', 'category']"
       removableSort
-      responsiveLayout="stack"
-      breakpoint="960px"
+      breakpoint="0px"
+      scrollable
+      class="text-sm md:text-base"
     >
       <template #header>
-        <div class="flex justify-end">
-          <IconField>
-            <InputIcon>
-              <i class="pi pi-search" />
-            </InputIcon>
-            <InputText size="small" v-model="filters['global'].value" placeholder="Cauta..." />
-          </IconField>
+        <div class="flex justify-end mb-2">
+          <div class="w-full md:w-auto">
+            <IconField class="w-full">
+              <InputIcon>
+                <i class="pi pi-search" />
+              </InputIcon>
+              <InputText
+                class="w-full"
+                size="small"
+                v-model="filters['global'].value"
+                placeholder="Cauta..."
+              />
+            </IconField>
+          </div>
         </div>
       </template>
 
       <template #empty>
         <div class="p-4 text-center">
-          <i class="pi pi-search text-3xl text-gray-300 dark:text-gray-600 mb-2"></i>
+          <i class="pi pi-search text-2xl md:text-3xl text-gray-300 dark:text-gray-600 mb-2"></i>
           <p>Nu au fost gasite rezultate care sa corespunda criteriilor de cautare.</p>
         </div>
       </template>
       <template #loading> Se incarca datele. Va rugam asteptati. </template>
 
-      <Column field="date_consultation" header="Data efectuării" sortable>
-        <template #body="slotProps">
-          {{ slotProps.data.original_date_consultation }}
-        </template>
-      </Column>
-
       <Column field="name" header="Descriere" :showFilterMenu="true">
+        <template #body="slotProps">
+          <span class="block truncate max-w-[150px] md:max-w-none">{{ slotProps.data.name }}</span>
+        </template>
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -52,6 +59,11 @@
       </Column>
 
       <Column field="doctor_name" header="Numele Doctorului" :showFilterMenu="true">
+        <template #body="slotProps">
+          <span class="block truncate max-w-[150px] md:max-w-none">{{
+            slotProps.data.doctor_name
+          }}</span>
+        </template>
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
@@ -65,7 +77,9 @@
 
       <Column field="place" header="Locatia" :showFilterMenu="true">
         <template #body="slotProps">
-          {{ slotProps.data.place ? slotProps.data.place : '-' }}
+          <span class="block truncate max-w-[120px] md:max-w-none">{{
+            slotProps.data.place ? slotProps.data.place : '-'
+          }}</span>
         </template>
         <template #filter="{ filterModel, filterCallback }">
           <InputText
@@ -78,9 +92,14 @@
         </template>
       </Column>
 
-      <Column field="category" header="Categoria" :showFilterMenu="true">
+      <Column field="category" header="Categoria">
         <template #body="slotProps">
-          <Tag :value="slotProps.data.category" severity="info" rounded />
+          <Tag
+            :value="slotProps.data.category"
+            severity="info"
+            rounded
+            class="text-xs md:text-sm"
+          />
         </template>
         <template #filter="{ filterModel, filterCallback }">
           <Select
@@ -99,35 +118,45 @@
         </template>
       </Column>
 
-      <Column header="Subcategoria">
+      <Column header="Subcategoria" class="min-w-[100px]">
         <template #body="slotProps">
           <Tag
             v-if="slotProps.data.subcategory"
             :value="slotProps.data.subcategory"
             severity="info"
             rounded
+            class="text-xs md:text-sm"
           />
           <Tag
             v-else-if="slotProps.data.labsubcategory"
             :value="slotProps.data.labsubcategory"
             severity="info"
             rounded
+            class="text-xs md:text-sm"
           />
         </template>
       </Column>
 
       <Column field="notes" header="Notite">
         <template #body="slotProps">
-          {{ slotProps.data.notes ? slotProps.data.notes : '-' }}
+          <span class="text-sm md:text-base">{{ slotProps.data.notes ? slotProps.data.notes : '-' }}</span>
         </template>
       </Column>
 
-      <Column class="w-24 !text-end" header="Optiuni">
+      <Column field="date_consultation" header="Data efectuării" sortable>
+        <template #body="slotProps">
+          <span class="block truncate max-w-full">{{
+            slotProps.data.original_date_consultation
+          }}</span>
+        </template>
+      </Column>
+
+      <Column header="Optiuni" style="min-width: 80px">
         <template #body="{ data }">
-          <div class="flex flex-row gap-2 justify-end">
+          <div class="flex flex-row gap-1 md:gap-2 justify-end">
             <Button
               icon="pi pi-eye"
-              class="p-button-rounded p-button-text p-button-plain"
+              class="p-button-rounded p-button-text p-button-plain p-1 md:p-2"
               @click="(event) => emit('showFile', data.id)"
               severity="secondary"
               v-if="data.file"
@@ -135,7 +164,7 @@
             </Button>
             <Button
               icon="pi pi-ellipsis-h"
-              class="p-button-rounded p-button-text p-button-plain"
+              class="p-button-rounded p-button-text p-button-plain p-1 md:p-2"
               @click="(event) => toggle(event, data.id)"
               severity="secondary"
             ></Button>

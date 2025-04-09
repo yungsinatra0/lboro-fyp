@@ -1,163 +1,185 @@
-<!-- TODO: Make it more mobile friendly, especially the confirming of lab results part. -->
 <template>
   <Dialog
     v-model:visible="displayAddDialog"
     modal
     header="Adauga o înregistrare medicală"
-    class="w-full md:w-1/2"
+    class="w-[95vw] md:w-1/2"
     @hide="emit('close')"
   >
     <template #header>
       <div class="inline-flex items-center justify-center gap-2">
-        <span class="font-bold whitespace-nowrap text-2xl">Înregistrare medicală nouă</span>
+        <span class="font-bold text-xl md:text-2xl">Înregistrare medicală nouă</span>
       </div>
     </template>
     <div v-if="!loadingState && !extractionResult">
       <span class="text-surface-500 dark:text-surface-400 block mb-2"
         >Adaugă informații pentru o nouă înregistrare medicală.</span
       >
-      <span class="text-rose-600 text-sm block mb-8">* Câmpurile marcate sunt obligatorii</span>
-      <span v-if="formError" class="text-rose-600 text-sm block mb-8">{{ formError }}</span>
+      <div class="text-rose-600 text-sm mb-2 md:mb-4">* Câmpurile marcate sunt obligatorii</div>
+      <span v-if="formError" class="text-rose-600 text-sm block mb-4 md:mb-8">{{ formError }}</span>
       <Form
         v-slot="$form"
         :initialValues="initialValues"
         @submit="onFormSubmit"
         :resolver="resolver"
       >
-        <div class="flex items-center gap-4 mb-4">
-          <label for="name" class="font-semibold w-24"
+        <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4">
+          <label for="name" class="font-semibold w-full md:w-24"
             >Descriere <span class="text-rose-600">*</span></label
           >
-          <InputText name="name" class="flex w-1/2" autocomplete="off" type="text" fluid />
-          <Message
-            v-if="$form.name?.invalid"
-            severity="error"
-            size="small"
-            variant="simple"
-            class="text-rose-600 text-sm"
-            >{{ $form.name.error.message }}</Message
-          >
+          <div class="w-full md:w-1/2">
+            <InputText name="name" class="w-full" autocomplete="off" type="text" fluid />
+            <Message
+              v-if="$form.name?.invalid"
+              severity="error"
+              size="small"
+              variant="simple"
+              class="text-rose-600 text-sm mt-1"
+              >{{ $form.name.error.message }}</Message
+            >
+          </div>
         </div>
-        <div class="flex items-center gap-4 mb-4">
-          <label for="doctor_name" class="font-semibold w-24"
+        
+        <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4">
+          <label for="doctor_name" class="font-semibold w-full md:w-24"
             >Numele doctorului <span class="text-rose-600">*</span></label
           >
-          <InputText name="doctor_name" class="flex w-1/2" autocomplete="off" type="text" fluid />
-          <Message
-            v-if="$form.doctor_name?.invalid"
-            severity="error"
-            size="small"
-            variant="simple"
-            class="text-rose-600 text-sm"
-            >{{ $form.doctor_name.error.message }}</Message
-          >
+          <div class="w-full md:w-1/2">
+            <InputText name="doctor_name" class="w-full" autocomplete="off" type="text" fluid />
+            <Message
+              v-if="$form.doctor_name?.invalid"
+              severity="error"
+              size="small"
+              variant="simple"
+              class="text-rose-600 text-sm mt-1"
+              >{{ $form.doctor_name.error.message }}</Message
+            >
+          </div>
         </div>
-        <div class="flex items-center gap-4 mb-4">
-          <label for="place" class="font-semibold w-24">Locație</label>
-          <InputText name="place" class="flex w-1/2" autocomplete="off" type="text" fluid />
-          <Message
-            v-if="$form.place?.invalid"
-            severity="error"
-            size="small"
-            variant="simple"
-            class="text-rose-600 text-sm"
-            >{{ $form.place.error.message }}</Message
-          >
+        
+        <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4">
+          <label for="place" class="font-semibold w-full md:w-24">Locație</label>
+          <div class="w-full md:w-1/2">
+            <InputText name="place" class="w-full" autocomplete="off" type="text" fluid />
+            <Message
+              v-if="$form.place?.invalid"
+              severity="error"
+              size="small"
+              variant="simple"
+              class="text-rose-600 text-sm mt-1"
+              >{{ $form.place.error.message }}</Message
+            >
+          </div>
         </div>
-        <div class="flex items-center gap-4 mb-4">
-          <label for="category" class="font-semibold w-24"
+        
+        <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4">
+          <label for="category" class="font-semibold w-full md:w-24"
             >Categorie <span class="text-rose-600">*</span></label
           >
-          <Select
-            name="category"
-            :options="categories"
-            placeholder="Selectează categoria"
-            class="flex w-1/2"
-            fluid
-          />
-          <Message
-            v-if="$form.category?.invalid"
-            severity="error"
-            size="small"
-            variant="simple"
-            class="text-rose-600 text-sm"
-            >{{ $form.category.error.message }}</Message
-          >
+          <div class="w-full md:w-1/2">
+            <Select
+              name="category"
+              :options="categories"
+              placeholder="Selectează categoria"
+              class="w-full"
+              fluid
+            />
+            <Message
+              v-if="$form.category?.invalid"
+              severity="error"
+              size="small"
+              variant="simple"
+              class="text-rose-600 text-sm mt-1"
+              >{{ $form.category.error.message }}</Message
+            >
+          </div>
         </div>
-        <div class="flex items-center gap-4 mb-4" v-if="$form.category?.value === 'Consultație'">
-          <label for="subcategory" class="font-semibold w-24">Subcategorie consultație</label>
-          <Select
-            name="subcategory"
-            :options="subcategories"
-            placeholder="Selectează subcategoria"
-            class="flex w-1/2"
-            fluid
-          />
-          <Message
-            v-if="$form.subcategory?.invalid"
-            severity="error"
-            size="small"
-            variant="simple"
-            class="text-rose-600 text-sm"
-            >{{ $form.subcategory.error.message }}</Message
-          >
+        
+        <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4" v-if="$form.category?.value === 'Consultație'">
+          <label for="subcategory" class="font-semibold w-full md:w-24">Subcategorie consultație</label>
+          <div class="w-full md:w-1/2">
+            <Select
+              name="subcategory"
+              :options="subcategories"
+              placeholder="Selectează subcategoria"
+              class="w-full"
+              fluid
+            />
+            <Message
+              v-if="$form.subcategory?.invalid"
+              severity="error"
+              size="small"
+              variant="simple"
+              class="text-rose-600 text-sm mt-1"
+              >{{ $form.subcategory.error.message }}</Message
+            >
+          </div>
         </div>
-        <div class="flex items-center gap-4 mb-4" v-if="$form.category?.value === 'Laborator'">
-          <label for="labsubcategory" class="font-semibold w-24">Subcategorie laborator</label>
-          <Select
-            name="labsubcategory"
-            :options="labsubcategories"
-            placeholder="Selectează subcategoria"
-            class="flex w-1/2"
-            fluid
-          />
-          <Message
-            v-if="$form.labsubcategory?.invalid"
-            severity="error"
-            size="small"
-            variant="simple"
-            class="text-rose-600 text-sm"
-            >{{ $form.labsubcategory.error.message }}</Message
-          >
+        
+        <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4" v-if="$form.category?.value === 'Laborator'">
+          <label for="labsubcategory" class="font-semibold w-full md:w-24">Subcategorie laborator</label>
+          <div class="w-full md:w-1/2">
+            <Select
+              name="labsubcategory"
+              :options="labsubcategories"
+              placeholder="Selectează subcategoria"
+              class="w-full"
+              fluid
+            />
+            <Message
+              v-if="$form.labsubcategory?.invalid"
+              severity="error"
+              size="small"
+              variant="simple"
+              class="text-rose-600 text-sm mt-1"
+              >{{ $form.labsubcategory.error.message }}</Message
+            >
+          </div>
         </div>
-        <div class="flex items-center gap-4 mb-4" v-if="$form.category?.value === 'Laborator'">
-          <label for="extract" class="font-semibold w-24">Extrage date laborator cu AI?</label>
+        
+        <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4" v-if="$form.category?.value === 'Laborator'">
+          <label for="extract" class="font-semibold w-full md:w-24">Extrage date laborator cu AI?</label>
           <ToggleSwitch name="extract" />
           <Message
             v-if="$form.extract?.invalid"
             severity="error"
             size="small"
             variant="simple"
-            class="text-rose-600 text-sm"
+            class="text-rose-600 text-sm mt-1"
             >{{ $form.extract.error.message }}</Message
           >
         </div>
-        <div class="flex items-center gap-4 mb-4">
-          <label for="date_consultation" class="font-semibold w-24"
+        
+        <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4">
+          <label for="date_consultation" class="font-semibold w-full md:w-24"
             >Data efectuării<span class="text-rose-600">*</span></label
           >
-          <DatePicker
-            name="date_consultation"
-            dateFormat="dd/mm/yy"
-            placeholder="Data"
-            showIcon
-            fluid
-            :maxDate="maxDate"
-          />
-          <Message
-            v-if="$form.date_consultation?.invalid"
-            severity="error"
-            size="small"
-            variant="simple"
-            class="text-rose-600 text-sm"
-            >{{ $form.date_consultation.error.message }}</Message
-          >
+          <div class="w-full md:w-1/2">
+            <DatePicker
+              name="date_consultation"
+              dateFormat="dd/mm/yy"
+              placeholder="Data"
+              showIcon
+              fluid
+              class="w-full"
+              :maxDate="maxDate"
+            />
+            <Message
+              v-if="$form.date_consultation?.invalid"
+              severity="error"
+              size="small"
+              variant="simple"
+              class="text-rose-600 text-sm mt-1"
+              >{{ $form.date_consultation.error.message }}</Message
+            >
+          </div>
         </div>
-        <div class="flex gap-4 mb-4">
-          <label for="notes" class="font-semibold">Notite</label>
+        
+        <div class="flex flex-col md:flex-row gap-2 md:gap-4 mb-4">
+          <label for="notes" class="font-semibold w-full md:w-24">Notite</label>
           <Textarea
             name="notes"
-            class="w-full md:w-2/4"
+            class="w-full md:w-1/2"
             autocomplete="off"
             type="text"
             fluid
@@ -165,22 +187,22 @@
             placeholder="Adaugă note sau observații"
           />
         </div>
-        <FileUpload
-          name="file"
-          mode="basic"
-          @select="onSelect"
-          :multiple="false"
-          :custom-upload="true"
-          :maxFileSize="10000000"
-          :choose-label="`Alege documentul medical`"
-          :upload-label="`Încarcă`"
-          :cancel-label="`Anulează`"
-        >
-          <template #empty>
-            <span>Adaugă un document medical (opțional).</span>
-          </template>
-        </FileUpload>
-        <div class="shrink-0 pt-3 px-5 pb-2 flex justify-end gap-2">
+        
+        <div class="my-4">
+          <FileUpload
+            name="file"
+            mode="basic"
+            @select="onSelect"
+            :multiple="false"
+            :custom-upload="true"
+            :maxFileSize="10000000"
+            choose-label="Adauga documentul medical"
+            class="w-full md:w-1/3"
+          >
+          </FileUpload>
+        </div>
+        
+        <div class="shrink-0 pt-3 flex justify-end gap-2">
           <Button
             label="Anulează"
             outlined
@@ -188,8 +210,15 @@
             @click="emit('close')"
             autofocus
             type="button"
+            class="text-sm md:text-base px-2 md:px-4"
           />
-          <Button label="Salvează" severity="success" autofocus type="submit" />
+          <Button 
+            label="Salvează" 
+            severity="success" 
+            autofocus 
+            type="submit" 
+            class="text-sm md:text-base px-2 md:px-4"
+          />
         </div>
       </Form>
     </div>
@@ -200,46 +229,59 @@
       </div>
 
       <div v-else class="flex flex-col items-center p-4">
-        <div v-if="!extractSuccess">
-          <DataTable
-            :value="extractionResult"
-            v-model:editingRows="editingRows"
-            class="w-full"
-            :rows="10"
-            editMode="row"
-            paginator
-            dataKey="test_name"
-            @row-edit-save="onRowEditSave"
-            v-model:filters="filters"
-            :globalFilterFields="['test_name', 'test_code']"
-          >
-            <template #header>
-              <h2 class="m-0">Analizati rezultatele extrase si schimbati daca sunt gresite</h2>
-              <div class="flex justify-end">
-                <IconField>
-                  <InputIcon>
-                    <i class="pi pi-search" />
-                  </InputIcon>
-                  <InputText
-                    size="small"
-                    v-model="filters['global'].value"
-                    placeholder="Cauta..."
-                  />
-                </IconField>
-              </div>
-            </template>
-            <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header">
-              <template #editor="{ data, field }">
-                <InputText v-model="data[field]" class="w-full" fluid />
-              </template>
-            </Column>
-            <!-- TODO: Add a way to add/remove additional lab results if they weren't properly extracted by LLM -->
-            <Column
-              :rowEditor="true"
-              style="width: 10%; min-width: 8rem"
-              bodyStyle="text-align:center"
-            />
-          </DataTable>
+        <div v-if="!extractSuccess" class="w-full">
+          <h2 class="text-lg md:text-xl font-medium mb-4">Analizati rezultatele extrase si schimbati daca sunt gresite</h2>
+          
+          <div class="mb-4">
+            <IconField class="w-full">
+              <InputIcon>
+                <i class="pi pi-search" />
+              </InputIcon>
+              <InputText
+                class="w-full"
+                size="small"
+                v-model="filters['global'].value"
+                placeholder="Cauta..."
+              />
+            </IconField>
+          </div>
+
+          <div class="w-full overflow-x-auto">
+            <DataTable
+              :value="extractionResult"
+              v-model:editingRows="editingRows"
+              class="w-full"
+              :rows="5"
+              :rowsPerPageOptions="[5, 10, 20]"
+              editMode="row"
+              paginator
+              paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
+              currentPageReportTemplate="{first}-{last}"
+              dataKey="test_name"
+              @row-edit-save="onRowEditSave"
+              v-model:filters="filters"
+              :globalFilterFields="['test_name', 'test_code']"
+              breakpoint="0px"
+              scrollable
+              scrollHeight="flex"
+            >
+              <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header">
+                <template #editor="{ data, field }">
+                  <InputText v-model="data[field]" class="w-full" fluid />
+                </template>
+                <template #body="{ data, field }">
+                  <span v-if="field != 'test_name'" class="block truncate max-w-[120px] text-sm md:text-base md:max-w-none">{{ data[field] }}</span>
+                  <span v-else class="font-semibold text-sm">{{ data[field] }}</span>
+                </template>
+              </Column>
+              <Column
+                :rowEditor="true"
+                style="width: 10%; min-width: 6rem"
+                bodyStyle="text-align:center"
+              />
+            </DataTable>
+          </div>
+          
           <div class="shrink-0 pt-3 flex justify-end gap-2">
             <Button
               label="Salvează"
@@ -247,6 +289,7 @@
               @click="addExtractedLab()"
               autofocus
               type="button"
+              class="text-sm md:text-base px-3 py-2 md:px-4"
             />
             <Button
               label="Anulează"
@@ -255,19 +298,20 @@
               @click="emit('close')"
               autofocus
               type="button"
+              class="text-sm md:text-base px-3 py-2 md:px-4"
             />
           </div>
         </div>
-        <div v-else class="flex flex-col items-center p-8">
-          <i class="pi pi-check-circle text-6xl text-green-500 mb-4" />
-          <Message severity="success" class="mb-6 text-lg">
+        <div v-else class="flex flex-col items-center p-4 md:p-8">
+          <i class="pi pi-check-circle text-4xl md:text-6xl text-green-500 mb-4" />
+          <Message severity="success" class="mb-6 text-base md:text-lg">
             Rezultatele au fost extrase cu succes! Acestea sunt acum disponibile in sectiunea de
             laborator.
           </Message>
           <Button
             label="Vezi rezultatele"
             severity="success"
-            class="px-6 py-3 text-lg"
+            class="px-4 py-2 md:px-6 md:py-3 text-base md:text-lg"
             @click="
               () => {
                 router.push({ path: '/laborator' })

@@ -38,7 +38,6 @@
       v-model:filters="filters"
       :globalFilterFields="['name', 'code']"
       removableSort
-      responsiveLayout="stack"
       breakpoint="768px"
       class="p-datatable-sm"
     >
@@ -158,7 +157,6 @@
         <div class="p-2 md:p-4">
           <h5 class="text-lg font-medium mb-3">Rezultate pentru {{ slotProps.data.name }}</h5>
 
-          <!-- Chart visualization on mobile -->
           <div
             class="block lg:hidden mb-4"
             v-if="slotProps.data.results.some((result) => result.is_numeric === true)"
@@ -169,8 +167,6 @@
               :height="150"
             />
           </div>
-
-          <!-- Reference range info on mobile -->
           <div class="block md:hidden mb-4" v-if="slotProps.data.results[0].reference_range">
             <div class="p-3 bg-surface-50 dark:bg-surface-800 rounded">
               <div class="text-sm font-medium">Interval de referinta:</div>
