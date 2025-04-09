@@ -7,18 +7,44 @@
       </h1>
     </div>
 
+    <!-- Mobile filter section - only visible on small screens -->
+    <div class="md:hidden p-3 flex flex-col gap-3">
+      <DatePicker
+        v-model="selectedDates"
+        placeholder="Selecteaza datele"
+        selectionMode="range"
+        showIcon
+        dateFormat="dd/mm/yy"
+        class="w-full text-base"
+        showButtonBar
+      />
+      <IconField class="w-full">
+        <InputIcon>
+          <i class="pi pi-search" />
+        </InputIcon>
+        <InputText class="w-full" v-model="filters['global'].value" placeholder="Cauta..." />
+      </IconField>
+    </div>
+
     <DataTable
       v-model:expandedRows="expandedRows"
       :value="dateFilter"
       dataKey="id"
       :rows="8"
+      :rowsPerPageOptions="[5, 8, 10]"
       paginator
+      paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
+      currentPageReportTemplate="{first}-{last} din {totalRecords}"
       v-model:filters="filters"
       :globalFilterFields="['name', 'code']"
       removableSort
+      responsiveLayout="stack"
+      breakpoint="768px"
+      class="p-datatable-sm"
     >
       <template #header>
-        <div class="flex justify-end align-items-center flex-wrap gap-2">
+        <!-- Desktop filter section - only visible on larger screens -->
+        <div class="hidden md:flex justify-end align-items-center flex-wrap gap-2 mb-2">
           <DatePicker
             v-model="selectedDates"
             placeholder="Selecteaza datele"
@@ -37,34 +63,38 @@
           </IconField>
         </div>
       </template>
-      <Column expander style="width: 5rem"> </Column>
+      <Column expander style="width: 3rem"> </Column>
       <Column field="name" header="Nume" sortable></Column>
-      <Column field="code" header="Cod"></Column>
-      <!-- TODO: Check if recent result is actually recent or needs more processing -->
+      <Column field="code" header="Cod" class="hidden sm:table-cell"></Column>
       <Column header="Rezultatul recent">
         <template #header>
-          <i
-            v-tooltip.top="
-              'Unitatea folosita poate fi diferita in functie de laboratorul care a efectual analiza.'
-            "
-            class="pi pi-info-circle"
-          />
+          <div class="flex items-center gap-1">
+            <i
+              v-tooltip.top="
+                'Unitatea folosita poate fi diferita in functie de laboratorul care a efectual analiza.'
+              "
+              class="pi pi-info-circle text-sm"
+            />
+          </div>
         </template>
         <template #body="slotProps">
           <span v-if="!slotProps.data.results[0].value"> - </span>
           <template v-else>
             <span> {{ slotProps.data.results[0].value }} </span>
+            <div class="text-xs text-gray-400">{{ slotProps.data.results[0].unit }}</div>
           </template>
         </template>
       </Column>
-      <Column header="Interval de referinta">
+      <Column header="Interval de referinta" class="hidden md:table-cell">
         <template #header>
-          <i
-            v-tooltip.top="
-              'Intervalele de referinta pot fi diferite in functie de laboratorul care a efectuat analiza.'
-            "
-            class="pi pi-info-circle"
-          />
+          <div class="flex items-center gap-1">
+            <i
+              v-tooltip.top="
+                'Intervalele de referinta pot fi diferite in functie de laboratorul care a efectuat analiza.'
+              "
+              class="pi pi-info-circle text-sm"
+            />
+          </div>
         </template>
         <template #body="slotProps">
           <span v-if="!slotProps.data.results[0].reference_range"> - </span>
@@ -85,6 +115,7 @@
                 slotProps.data.results[0].is_numeric,
               ) === 'up'
             "
+            v-tooltip="'Peste limita normala'"
           ></i>
           <i
             class="pi pi-arrow-down text-red-500"
@@ -95,6 +126,7 @@
                 slotProps.data.results[0].is_numeric,
               ) === 'down'
             "
+            v-tooltip="'Sub limita normala'"
           ></i>
           <i
             v-else-if="
@@ -105,10 +137,11 @@
               ) === 'normal'
             "
             class="pi pi-check text-green-500"
+            v-tooltip="'In limitele normale'"
           ></i>
         </template>
       </Column>
-      <Column header="Evolutia rezultatelor">
+      <Column header="Evolutia rezultatelor" class="hidden lg:table-cell">
         <template #body="slotProps">
           <template v-if="slotProps.data.results.some((result) => result.is_numeric === true)">
             <Line
@@ -120,35 +153,66 @@
           </template>
         </template>
       </Column>
-      <!-- TODO: Add small graph for trend of lab results values as column -->
+      
       <template #expansion="slotProps">
-        <div class="p-4">
-          <h5 class="m-0">Rezultate pentru {{ slotProps.data.name }}</h5>
-          <DataTable :value="slotProps.data.results" dataKey="id">
-            <Column field="value" header="Rezultat"></Column>
-            <Column field="unit" header="Unitate"></Column>
-            <Column field="reference_range" header="Interval de referinta">
+        <div class="p-2 md:p-4">
+          <h5 class="text-lg font-medium mb-3">Rezultate pentru {{ slotProps.data.name }}</h5>
+          
+          <!-- Chart visualization on mobile -->
+          <div class="block lg:hidden mb-4" v-if="slotProps.data.results.some((result) => result.is_numeric === true)">
+            <Line
+              :data="getChartData(slotProps.data.results)"
+              :options="mobileChartOptions"
+              :height="150"
+            />
+          </div>
+          
+          <!-- Reference range info on mobile -->
+          <div class="block md:hidden mb-4" v-if="slotProps.data.results[0].reference_range">
+            <div class="p-3 bg-surface-50 dark:bg-surface-800 rounded">
+              <div class="text-sm font-medium">Interval de referinta:</div>
+              <div>{{ slotProps.data.results[0].reference_range }} <span class="text-xs text-gray-400">{{ slotProps.data.results[0].unit }}</span></div>
+            </div>
+          </div>
+          
+          <DataTable 
+            :value="slotProps.data.results" 
+            dataKey="id"
+            responsiveLayout="stack"
+            breakpoint="768px"
+            class="p-datatable-sm"
+            scrollable
+            scrollHeight="400px"
+          >
+            <Column field="value" header="Rezultat">
+              <template #body="slotProps">
+                <span>{{ slotProps.data.value }}</span>
+                <span class="text-xs text-gray-400 ml-1">{{ slotProps.data.unit }}</span>
+              </template>
+            </Column>
+            <Column field="unit" header="Unitate" class="hidden md:table-cell"></Column>
+            <Column field="reference_range" header="Interval de referinta" class="hidden md:table-cell">
               <template #body="slotProps">
                 <span v-if="!slotProps.data.reference_range"> - </span>
                 <template v-else>
                   <span> {{ slotProps.data.reference_range }} </span> <span class="text-xs text-gray-400">{{ slotProps.data.unit }}</span>
                 </template>
-              </template></Column
-            >
-            <Column field="method" header="Metoda">
+              </template>
+            </Column>
+            <Column field="method" header="Metoda" class="hidden md:table-cell">
               <template #body="slotProps">
                 <span v-if="!slotProps.data.method"> - </span>
                 <span v-else>{{ slotProps.data.method }}</span>
-              </template></Column
-            >
+              </template>
+            </Column>
             <Column field="date_collection" header="Data recoltarii">
               <template #body="slotProps">
                 {{ slotProps.data.original_date_collection }}
               </template>
             </Column>
-            <Column class="w-24 !text-end" header="Optiuni">
+            <Column header="Optiuni">
               <template #body="{ data }">
-                <div class="flex flex-row gap-2 justify-end">
+                <div class="flex flex-row gap-2 justify-start md:justify-end">
                   <Button
                     icon="pi pi-eye"
                     class="p-button-rounded p-button-text p-button-plain"
@@ -162,16 +226,17 @@
                     v-if="data.medicalhistory.file"
                   >
                   </Button>
-                  <!-- <Button
-                    icon="pi pi-ellipsis-h"
-                    class="p-button-rounded p-button-text p-button-plain"
-                    @click="(event) => toggle(event, data.id)"
-                    severity="secondary"
-                  ></Button> -->
                 </div>
               </template>
             </Column>
           </DataTable>
+        </div>
+      </template>
+      
+      <template #empty>
+        <div class="p-4 text-center">
+          <i class="pi pi-search text-3xl text-gray-300 dark:text-gray-600 mb-2"></i>
+          <p>Nu au fost gasite rezultate care sa corespunda criteriilor de cautare.</p>
         </div>
       </template>
     </DataTable>
@@ -221,9 +286,6 @@ const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 })
 const selectedDates = ref(null)
-
-// TODO: Test chart with multiple datapoints and fix chart options to be a proper sparkline chart
-// TODO: Change pointer color to reflect trend (up/down/normal) and add small tooltip with value and date
 
 onMounted(() => {
   fetchLabTests()
@@ -303,7 +365,7 @@ const calculateTrend = (value, reference_range, is_numeric) => {
       return 'normal'
     }
   } else if (is_numeric === false) {
-    // TODO: Handle non-numeric values (e.g., positive/negative, normal/abnormal)
+    // Handle non-numeric values (e.g., positive/negative, normal/abnormal)
     return null
   }
   return 'normal'
@@ -342,11 +404,43 @@ const chartOptions = {
       position: 'nearest',
       yAlign: 'center',
       xAlign: 'center',
-      callbacks: {
-        title: (tooltipItems) => {
-          return tooltipItems[0].label
-        },
+    },
+  },
+}
+
+// Enhanced options for mobile chart
+const mobileChartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  scales: {
+    y: {
+      display: true,
+      grid: {
+        display: true,
+        color: '#c8c8c833',
       },
+      ticks: {
+        font: {
+          size: 10
+        }
+      }
+    },
+    x: {
+      display: true,
+      grid: {
+        display: false,
+      },
+      ticks: {
+        display: true,
+        font: {
+          size: 10
+        }
+      },
+    },
+  },
+  plugins: {
+    legend: {
+      display: false,
     },
   },
 }
@@ -376,7 +470,7 @@ const getChartData = (results) => {
         borderColor: '#9e9e9e',
         tension: 0.4,
         borderWidth: 1,
-        pointRadius: 2,
+        pointRadius: 3,
         pointBackgroundColor: pointBackgroundColors,
         pointBorderColor: pointBorderColors,
       },
