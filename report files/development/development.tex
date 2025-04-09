@@ -858,4 +858,252 @@ The main challenge encountered in this sprint was actually not related to the pr
 
 \section{Sprint \#5}
 
+The fifth sprint of the project was focused on adding the ability to add lab tests and extract the lab result values from those documents. The lab results would've been extracted by using a multimodal LLM, which would allow the system to precisely collect the lab results alongside other information such as units, reference ranges, etc without any additional human or system intervention. Using a MLLM would also simplify the extraction as the model would be able to export the results in an easily parseable response, such as JSON, which could be then used to display the information on the frontend or be processed in the backend. This feature was probably one of the most important ones in the whole system, as it represented an innovative way of automating the collection and storage of lab results for patients.  
+
+This feature was a continuation of the work done in the previous sprint, as the lab tests were also part of the health records feature. As such, some of the initial work was done on top of existing components, which made development easier and faster. The feature was developed as per the initially agreed requirements and wireframes, with some changes to how the lab results were displayed on the frontend.
+
+\subsection{Lab Tests Extraction}
+
+As lab tests were previously added in sprint \#4 as a health record, it was decided to use the existing `Add Health Record' component to allow the user to choose whether they'd like to extract the lab results besides uploading the file to the system. The decision was made to streamline the user experience of adding new health records, as the user would not have to go through multiple steps to add a lab test, but also because it would speed up development time as an existing component could be reused and made more feature-rich. Finally, this also closely matched the initial wireframe design for the `New Document' dialog, which can be seen in figure~\ref{fig:newDoc_wireframe}.
+
+The updated dialog can be seen below in figure~\ref{fig:labs_addDoc}. The main change that can be seen is the addition of a toggle switch, which is displayed only when the user selects a lab test as the document type. If used, the toggle would still send the lab file to the backend and save it as a health record, but in addition to this, it would also send it to the MLLM API to be processed. 
+
+\begin{figure}[ht]
+  \centering
+  \subfloat[Desktop version]{%
+      \includegraphics[width=0.7\textwidth]{Desktop_AddDoc_Labs.png}%
+  }
+  \\[\baselineskip]
+  \subfloat[Mobile version]{%
+      \includegraphics[width=0.3\textwidth]{Mobile_AddDoc_Labs.png}%
+  }
+  \caption{Desktop and Mobile version of the new Add Document dialog}\label{fig:labs_addDoc}
+\end{figure}
+
+\FloatBarrier{}
+
+After the record is created and file is uploaded, the backend would find the file and send it the MLLM API\@. This was done to avoid uploading the file twice and to ensure the file would be successfully uploaded to the system before sending to the API\@.
+
+The MLLM chosen for this project was Google's Gemini 2.0 Flash, which, as of writing this section, is part of the newly released family of Gemini models \parencite{gemini2}\@. The choice was made based on the list of available MLLMs that can be accessed via APIs with a free tier from table~\ref{tab:llm_apis}. Besides Google's AI Studio, none of the API providers allowed the uploading and processing of files, which made Gemini 2.0 Flash the most suitable choice for the project. It was noted that a local MLLM could've also been used for the project, a point which will be discussed in more detail in section~\ref{sec:future_work}.
+
+Because an API was used, most of the work with the MLLM involved using Prompt Engineering techniques to ensure the model would process and return the data in the desired format. Prompting techniques from previous section~\ref{sec:prompt} were used to write the following prompt that was used to extract the lab results from the file:
+
+\begin{lstlisting}[language=Python, caption=Prompt for Lab Results Extraction]
+
+def extract_with_llm(file_content: bytes, file_type: str):
+  prompt = """
+  You have been given a document that contains lab results that is written in the Romanian language. Your job is to extract all lab results from this document in JSON format with the following fields: test_name, test_code, value, unit, reference_range, method. Sometimes the code of the test will be in the name itself, and it is your job to determine if the code is there, for example in brackets or separated by a comma, and separate the name and the code. Sometimes the lab result will not have a method specified, and in that case you return an empty string. The document is in Romanian, however the JSON keys should be in English.
+
+  EXTREMELY IMPORTANT FORMATTING INSTRUCTIONS:
+  1. Return ONLY the raw JSON array
+  2. DO NOT use code blocks, backticks, or markdown formatting
+  3. DO NOT include ```json or ``` anywhere in your response
+  4. DO NOT include any explanations or text before or after the JSON
+  5. Your response must start with the '[' character and end with the ']' character
+  6. The output should be valid JSON that can be parsed directly
+  7. Use period (.) as the decimal separator, not comma (,)
+
+  Example of how your output should look, starting from the very first character:
+  [{"test_name":"Hemoglobina","test_code":"HGB","value":"14.3","unit":"mg/dL","reference_range":"13.2-17.3", "method":"Chemiluminiscenta"}]
+  
+  if there is no method specified, return an empty string:
+  [{"test_name":"Hemoglobina","test_code":"HGB","value":"14.3","unit":"mg/dL","reference_range":"13.2-17.3", "method":" "}]
+  """
+  
+  response = client.models.generate_content(
+      model="gemini-2.0-flash",
+      contents=[prompt,
+              types.Part.from_bytes(
+              data=file_content, 
+              mime_type=file_type
+              )
+          ])
+  
+  return response.text
+  
+\end{lstlisting}
+
+The response from the API would be a JSON array containing all the lab results extracted from the document. Before saving, it is important to make sure the results and their values are correct. As such, it was decided to display all the extracted results back to the user in a PrimeVue DataTable component, which allowed for easy filtering of the results, but also for row-based editing. This way, the user could easily edit the values or remove any unwanted results before saving them to the system. An example of how the extracted lab results dialog looks can be seen below in figure~\ref{fig:labs_extracted}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{Desktop_Validate_Labs.png}
+  \caption{Desktop dialog validation of extracted lab results}\label{fig:labs_extracted}
+\end{figure}
+
+A benefit of using PrimeVue's DataTables was not only its row editing feature or its filtering options, but also its ability to dynamically create columns based on the data received. This was perfect for the lab results, as it is not possible to know beforehand how many results will be extracted from a document. A code snippet of the DataTable can be seen below:
+
+\begin{lstlisting}[language=HTML, caption=Dynamic DataTable for Lab Results]
+  <DataTable
+    :value="extractionResult"
+    v-model:editingRows="editingRows"
+    class="w-full"
+    :rows="10"
+    editMode="row"
+    paginator
+    dataKey="test_name"
+    @row-edit-save="onRowEditSave"
+    v-model:filters="filters"
+    :globalFilterFields="['test_name', 'test_code']"
+  >
+    <template #header>
+      <h2 class="m-0">Analizati rezultatele extrase si schimbati daca sunt gresite</h2>
+      <div class="flex justify-end">
+        <IconField>
+          <InputIcon>
+            <i class="pi pi-search" />
+          </InputIcon>
+          <InputText
+            size="small"
+            v-model="filters['global'].value"
+            placeholder="Cauta..."
+          />
+        </IconField>
+      </div>
+    </template>
+    <Column 
+      v-for="col of columns" 
+      :key="col.field" 
+      :field="col.field" 
+      :header="col.header"
+    >
+      <template #editor="{ data, field }">
+        <InputText v-model="data[field]" class="w-full" fluid />
+      </template>
+    </Column>
+    <Column
+      :rowEditor="true"
+      style="width: 10%; min-width: 8rem"
+      bodyStyle="text-align:center"
+    />
+  </DataTable>
+\end{lstlisting}
+
+After confirming the extracted test results, they are processed and saved to the backend. The next subsection will discuss in more detail how the backend was changed to accommodate the new lab tests and their results.
+
+\subsubsection{Backend changes}
+
+To supporrt the processing and addition to database for the newly extracted lab results, two new tables were created in the database: LabTest and LabResult. The decision to use 2 tables was made to avoid duplication of data for fields like name and code of the lab test, as these would be common for all the lab results, regardless of their method or machinery used. This would also prove beneficial as multiple results could be assigned to one test, making the tracking and display of the historical results much easier. Finally, by having 2 separate tables, LabTests could be dynamically populated with new tests straight from uploaded documents, without the need for manual addition or creation of test types. The updated database schema can be seen below in figure~\ref{fig:erd_s5}.
+
+\noindent\begin{minipage}{\textwidth}
+  \begin{center}
+      \rotatebox[origin=c]{270}{
+          \includegraphics[width=0.95\textheight,keepaspectratio]{ERD_updatedS5.png}
+      }
+      \captionof{figure}{Updated Entity Relationship Diagram \- Sprint \#5}\label{fig:erd_s5}
+  \end{center}
+\end{minipage}
+
+\FloatBarrier{}
+
+As can be seen by the diagram above, there might seem to be a redundant relationship between the Patient and LabResult tables, as LabResult is already related to MedicalHistory, which in turn is related to a Patient. However, the decision was made to introduce the relationship as it would allow for easier querying when getting all the lab results for a patient, in the case of the dashboard view or even in the next sprint when the share functionality is added.
+
+Similarly, a code snippet of the endpoint that handles the creation of lab results can be seen below:
+
+\begin{lstlisting}[language=Python, caption=Lab Results Endpoint]
+  # Create the lab test records in the database
+@router.post('/me/labtests/')
+async def create_lab_tests(extraction_result: LabsCreate, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+    medhistory = session.get(MedicalHistory, extraction_result.medicalhistory_id)
+    user = session.get(User, user_id)
+    
+    if not medhistory:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Medical history not found")
+    
+    if medhistory.user_id != user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to access this medical history")
+    
+    for lab_item in extraction_result.lab_tests:
+        lab_test = session.exec(select(LabTest).where(LabTest.name == lab_item.name)).first()
+        
+        if not lab_test:
+            lab_test = LabTest(
+                name = lab_item.name,
+                code = lab_item.code,
+            )
+            session.add(lab_test)
+            session.flush()
+        
+        lab_result = LabResult(
+            value = lab_item.value,
+            is_numeric = check_is_numeric(lab_item.value),
+            unit = lab_item.unit,
+            reference_range = lab_item.reference_range,
+            date_collection = extraction_result.date_collection,
+            test = lab_test,
+            medicalhistory = medhistory,
+            user = user,
+            method = lab_item.method
+        )
+        
+        session.add(lab_result)
+        session.flush()
+        
+        # TODO: Maybe later have an array to store the lab results and return them all at once
+        
+    session.commit()
+    
+    return {
+        "status": status.HTTP_201_CREATED,
+        "message": "Lab tests created successfully"
+        }
+\end{lstlisting}
+
+\subsection{Lab Results Display}
+
+The final part of the work on the lab extraction feature was the display of said results within their own page in the system. The initial idea was to reuse the existing design from the vitals page, which can be seen in figures~\ref{fig:vitalspage},~\ref{fig:vitalspagegraph} and~\ref{fig:vitalchanges}. This would've also followed the initially agreed wireframes and design. 
+
+However, upon discussing with stakeholders, an idea and request to change the design was floated in the meeting: instead of using the design from vitals page, the idea was to display everything in a tabular format where rows could be expanded to show the historical resutls from that specific test. This is where the division into 2 tables in the database played an important role: LabTest could be used as the `parent' element in the table, which could be sorted and filtered, while the LabResult elements would only be shown if the row would be expanded in the table. 
+
+This idea was eventually accepted, as it would allow for a more compact view of the lab results, easier filtering/sorting and it enabled for a way to display the most recent results for each test as a separate column without being intrusive. The results were sorted by date in the backend already, which allowed for the most recent results to be easily selected and displayed. Finally, instead of using a big graph that might take up a lot of space on the page, it was decided to use a small graph, also known as a sparkline, which would only show the trend of the results over time, based on their reference range and collection date. Colors such as red and green were used to indicate whether the results were within the normal range or outside of it. An example of how the new lab results page looks can be seen below in figure~\ref{fig:labs_page} and~\ref{fig:labs_page_mobile}.
+
+\begin{figure}[ht]
+  \centering
+  \subfloat[Desktop version]{%
+      \includegraphics[width=0.9\textwidth]{Desktop_LabView.png}%
+  }
+  \\[\baselineskip]
+  \subfloat[Desktop version \#2]{%
+      \includegraphics[width=0.9\textwidth]{Desktop_LabView2.png}%
+  }
+  \caption{Desktop version of the new Lab View page}\label{fig:labs_page}
+\end{figure}
+
+\FloatBarrier{}
+
+\begin{figure}[ht]
+  \centering
+  \subfloat[Mobile version]{%
+      \includegraphics[width=0.4\textwidth]{Mobile_LabView.png}%
+  }
+  \hfill
+  \subfloat[Mobile version \#2]{%
+      \includegraphics[width=0.4\textwidth]{Mobile_LabView2.png}%
+  }
+  \caption{Mobile version of the new Lab View page}\label{fig:labs_page_mobile}
+\end{figure}
+
+\FloatBarrier{}
+
+% TODO: Add screenshots and talk about the dashboard component, which I actually forgot to make
+
+\subsection{Challenges encountered}
+
+This sprint encountered less challenges than the previous ones, meaning that the work was able to be done faster than it was initially planned. However, there were still some challenges that were encountered during the development of the lab tests extraction feature.
+
+One of the biggest challenges was the change in design for the lab results page. Even though the initial design was agreed upon before the development begun, the stakeholders insisted on the change in design, which added a slight overhead in the form of additional design and research on how to implement the new idea. However, it must be noted that the new design also allowed for an easier development experience as a lot of the work was done by PrimeVue's DataTable component, which ultimately sped up the completion of the feature. Ultimately, the agility of the development process allowed for the change to be made without any major issues, an idea which will be further discussed in section~\ref{sec:future_work}.
+
+The other challenge was the time pressure, as the student was nearing the deadline of the project. This meant that the focus was on implementing only the most necessary and basic features, without any space for creative or innovative ideas.
+
+\subsection{Requirements completed}
+
+\begin{itemize}
+  \item The system must provide an overview of the patient history through 3 main sections: personal information, lab tests, and doctor consultations.
+  \item The system must allow the doctor to view blood tests in a graphical format.
+  \item The system must allow the doctor to view blood tests in a numerical, tabular format.
+  \item The system must allow the doctor to view the patient's history in a chronological order.
+  \item For blood test results, the system should display the normal range values for each test.
+  \item The system could allow the patient to switch between viewing the lab tests in the document format or in a tabular, numerical format.
+\end{itemize}
+
 \section{Sprint \#6}
