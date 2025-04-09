@@ -1,11 +1,12 @@
+<!-- TODO: Make more mobile-friendly -->
 <template>
   <div class="h-full w-full px-4">
-    <DataTable 
-      v-model:filters="filters" 
-      :value="history" 
-      :rows="10" 
-      paginator 
-      dataKey="id" 
+    <DataTable
+      v-model:filters="filters"
+      :value="history"
+      :rows="10"
+      paginator
+      dataKey="id"
       filterDisplay="menu"
       :loading="loading"
       :globalFilterFields="['name', 'doctor_name', 'place', 'category']"
@@ -23,67 +24,108 @@
           </IconField>
         </div>
       </template>
-      
-      <template #empty> Nu s-au gasit inregistrari medicale. </template>
+
+      <template #empty>
+        <div class="p-4 text-center">
+          <i class="pi pi-search text-3xl text-gray-300 dark:text-gray-600 mb-2"></i>
+          <p>Nu au fost gasite rezultate care sa corespunda criteriilor de cautare.</p>
+        </div>
+      </template>
       <template #loading> Se incarca datele. Va rugam asteptati. </template>
-      
+
       <Column field="date_consultation" header="Data efectuării" sortable>
         <template #body="slotProps">
           {{ slotProps.data.original_date_consultation }}
         </template>
       </Column>
-      
+
       <Column field="name" header="Descriere" :showFilterMenu="true">
         <template #filter="{ filterModel, filterCallback }">
-          <InputText v-model="filterModel.value" type="text" class="w-full" @input="filterCallback()" placeholder="Cauta dupa descriere" />
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            class="w-full"
+            @input="filterCallback()"
+            placeholder="Cauta dupa descriere"
+          />
         </template>
       </Column>
-      
+
       <Column field="doctor_name" header="Numele Doctorului" :showFilterMenu="true">
         <template #filter="{ filterModel, filterCallback }">
-          <InputText v-model="filterModel.value" type="text" class="w-full" @input="filterCallback()" placeholder="Cauta dupa doctor" />
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            class="w-full"
+            @input="filterCallback()"
+            placeholder="Cauta dupa doctor"
+          />
         </template>
       </Column>
-      
+
       <Column field="place" header="Locatia" :showFilterMenu="true">
         <template #body="slotProps">
           {{ slotProps.data.place ? slotProps.data.place : '-' }}
         </template>
         <template #filter="{ filterModel, filterCallback }">
-          <InputText v-model="filterModel.value" type="text" class="w-full" @input="filterCallback()" placeholder="Cauta dupa locatie" />
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            class="w-full"
+            @input="filterCallback()"
+            placeholder="Cauta dupa locatie"
+          />
         </template>
       </Column>
-      
+
       <Column field="category" header="Categoria" :showFilterMenu="true">
         <template #body="slotProps">
           <Tag :value="slotProps.data.category" severity="info" rounded />
         </template>
         <template #filter="{ filterModel, filterCallback }">
-          <Select v-model="filterModel.value" @change="filterCallback()" :options="categories" placeholder="Selecteaza" class="w-full" :showClear="true" size="small">
+          <Select
+            v-model="filterModel.value"
+            @change="filterCallback()"
+            :options="categories"
+            placeholder="Selecteaza"
+            class="w-full"
+            :showClear="true"
+            size="small"
+          >
             <template #option="slotProps">
               <Tag :value="slotProps.option" severity="info" rounded />
             </template>
           </Select>
         </template>
       </Column>
-      
+
       <Column header="Subcategoria">
         <template #body="slotProps">
-          <Tag v-if="slotProps.data.subcategory" :value="slotProps.data.subcategory" severity="info" rounded />
-          <Tag v-else-if="slotProps.data.labsubcategory" :value="slotProps.data.labsubcategory" severity="info" rounded />
+          <Tag
+            v-if="slotProps.data.subcategory"
+            :value="slotProps.data.subcategory"
+            severity="info"
+            rounded
+          />
+          <Tag
+            v-else-if="slotProps.data.labsubcategory"
+            :value="slotProps.data.labsubcategory"
+            severity="info"
+            rounded
+          />
         </template>
       </Column>
-      
+
       <Column field="notes" header="Notite">
         <template #body="slotProps">
           {{ slotProps.data.notes ? slotProps.data.notes : '-' }}
         </template>
       </Column>
-      
+
       <Column class="w-24 !text-end" header="Optiuni">
         <template #body="{ data }">
           <div class="flex flex-row gap-2 justify-end">
-            <Button 
+            <Button
               icon="pi pi-eye"
               class="p-button-rounded p-button-text p-button-plain"
               @click="(event) => emit('showFile', data.id)"
@@ -108,32 +150,32 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { FilterMatchMode } from '@primevue/core/api';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import Button from 'primevue/button';
-import Menu from 'primevue/menu';
-import Tag from 'primevue/tag';
-import InputText from 'primevue/inputtext';
-import IconField from 'primevue/iconfield';
-import InputIcon from 'primevue/inputicon';
-import Select from 'primevue/dropdown';
-import { useConfirm } from 'primevue/useconfirm';
-import ConfirmDialog from 'primevue/confirmdialog';
-import api from '@/services/api';
+import { ref } from 'vue'
+import { FilterMatchMode } from '@primevue/core/api'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import Button from 'primevue/button'
+import Menu from 'primevue/menu'
+import Tag from 'primevue/tag'
+import InputText from 'primevue/inputtext'
+import IconField from 'primevue/iconfield'
+import InputIcon from 'primevue/inputicon'
+import Select from 'primevue/dropdown'
+import { useConfirm } from 'primevue/useconfirm'
+import ConfirmDialog from 'primevue/confirmdialog'
+import api from '@/services/api'
 
 // eslint-disable-next-line no-unused-vars
 const props = defineProps({
   history: Array,
   categories: Array,
-});
+})
 
-const selectedHistoryId = ref(null);
-const menu = ref(null);
-const confirm = useConfirm();
-const emit = defineEmits(['delete', 'openEdit', 'showFile']);
-const loading = ref(false);
+const selectedHistoryId = ref(null)
+const menu = ref(null)
+const confirm = useConfirm()
+const emit = defineEmits(['delete', 'openEdit', 'showFile'])
+const loading = ref(false)
 
 // Initialize filters
 const filters = ref({
@@ -141,13 +183,13 @@ const filters = ref({
   name: { value: null, matchMode: FilterMatchMode.CONTAINS },
   doctor_name: { value: null, matchMode: FilterMatchMode.CONTAINS },
   place: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  category: { value: null, matchMode: FilterMatchMode.EQUALS }
-});
+  category: { value: null, matchMode: FilterMatchMode.EQUALS },
+})
 
 const toggle = (event, id) => {
-  selectedHistoryId.value = id;
-  menu.value.toggle(event);
-};
+  selectedHistoryId.value = id
+  menu.value.toggle(event)
+}
 
 const menuItems = ref([
   {
@@ -158,7 +200,7 @@ const menuItems = ref([
         icon: 'pi pi-pencil',
         command: () => {
           if (selectedHistoryId.value) {
-            emit('openEdit', selectedHistoryId.value);
+            emit('openEdit', selectedHistoryId.value)
           }
         },
       },
@@ -167,13 +209,13 @@ const menuItems = ref([
         icon: 'pi pi-trash',
         command: (event) => {
           if (selectedHistoryId.value) {
-            confirmDelete(event, selectedHistoryId.value);
+            confirmDelete(event, selectedHistoryId.value)
           }
         },
       },
     ],
   },
-]);
+])
 
 const confirmDelete = (event, id) => {
   confirm.require({
@@ -192,13 +234,13 @@ const confirmDelete = (event, id) => {
     },
     accept: async () => {
       try {
-        await api.delete(`/me/medicalhistory/${id}`);
-        emit('delete', id);
+        await api.delete(`/me/medicalhistory/${id}`)
+        emit('delete', id)
       } catch (error) {
-        console.error(error);
+        console.error(error)
       }
     },
     reject: () => {},
-  });
-};
+  })
+}
 </script>

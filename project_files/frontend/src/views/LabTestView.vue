@@ -239,6 +239,7 @@
           <p>Nu au fost gasite rezultate care sa corespunda criteriilor de cautare.</p>
         </div>
       </template>
+      <template #loading> Se incarca datele. Va rugam asteptati. </template>
     </DataTable>
 
     <ShowFile

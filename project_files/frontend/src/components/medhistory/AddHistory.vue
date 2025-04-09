@@ -1,3 +1,4 @@
+<!-- TODO: Make it more mobile friendly, especially the confirming of lab results part. -->
 <template>
   <Dialog
     v-model:visible="displayAddDialog"
@@ -232,6 +233,7 @@
                 <InputText v-model="data[field]" class="w-full" fluid />
               </template>
             </Column>
+            <!-- TODO: Add a way to add/remove additional lab results if they weren't properly extracted by LLM -->
             <Column
               :rowEditor="true"
               style="width: 10%; min-width: 8rem"
