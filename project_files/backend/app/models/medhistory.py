@@ -171,4 +171,17 @@ class LabTestResponse(SQLModel):
     id: uuid.UUID
     name: str
     code: str | None = None
-    results: List[LabResultResponse]    
+    results: List[LabResultResponse]
+    
+class LabResultResponseDashboard(LabDates):
+    id: uuid.UUID
+    value: str
+    is_numeric: bool
+    unit: str | None = None
+    reference_range: str | None = None 
+    method: str | None = None
+    medicalhistory: MedicalHistoryResponse
+    
+    # Taken from LabTest to show the name of the test
+    name: str
+    code: str | None = None    

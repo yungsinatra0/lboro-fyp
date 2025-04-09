@@ -6,7 +6,7 @@ from .vaccine import Vaccine, VaccineResponse
 from .allergy import Allergy, AllergyResponse
 from .medication import Medication, MedicationResponse
 from .healthdata import HealthData, HealthDataResponse
-from .medhistory import MedicalHistory, MedicalHistoryResponse, LabResult
+from .medhistory import MedicalHistory, MedicalHistoryResponse, LabResult, LabResultResponseDashboard
 
 # Base model that contains the field serializer for date formatting to dd-mm-yyyy and the date field itself
 class DateFormattingModel(SQLModel):
@@ -53,6 +53,7 @@ class UserDashboard(SQLModel):
     medications: list["MedicationResponse"]
     vitals: list["HealthDataResponse"]
     medicalhistory: list["MedicalHistoryResponse"]
+    labresults: list["LabResultResponseDashboard"]
 
 # User Data model used for login and registration  
 class UserAuth(DateFormattingModel):

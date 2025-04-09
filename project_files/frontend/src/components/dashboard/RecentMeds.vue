@@ -8,16 +8,6 @@
         <Column field="name" header="Numele" sortable> </Column>
         <Column field="dosage" header="Doza" sortable> </Column>
         <Column field="frequency" header="Frecventa" sortable> </Column>
-        <!-- <Column field="form" header="Forma" sortable>
-          <template #body="slotProps">
-            <Tag
-              :value="slotProps.data.form"
-              rounded
-              severity="info"
-              class="text-sm self-start md:self-auto"
-            ></Tag>
-          </template>
-        </Column> -->
         <Column field="date_prescribed" header="Prescris" sortable>
           <template #body="slotProps">
             <span> {{ slotProps.data.original_date_prescribed }} </span>

@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status, Response, Request, APIRouter
 from sqlmodel import Session, select, col
 import uuid
 
-from ..models import User, Vaccine, VaccineResponse, Allergy, AllergyResponse, HealthData, HealthDataResponse, Medication, MedicationResponse, UserDashboard, MedicalHistory, MedicalHistoryResponse
+from ..models import User, Vaccine, VaccineResponse, Allergy, AllergyResponse, HealthData, HealthDataResponse, Medication, MedicationResponse, UserDashboard, MedicalHistory, MedicalHistoryResponse, LabResultResponseDashboard, LabResult
 from ..utils import get_session, validate_session
 
 router = APIRouter()
@@ -20,6 +20,7 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
     newest_healthdata = session.exec(select(HealthData).where(HealthData.user_id == user_id).order_by(col(HealthData.date_added))).all()
     newest_medications = session.exec(select(Medication).where(Medication.user_id == user_id).order_by(col(Medication.date_added).desc()).limit(5)).all()
     newest_medicalhistory = session.exec(select(MedicalHistory).where(MedicalHistory.user_id == user_id).order_by(col(MedicalHistory.date_added).desc()).limit(5)).all()
+    newest_labresults = session.exec(select(LabResult).where(LabResult.user_id == user_id).order_by(col(LabResult.date_added).desc()).limit(5)).all()
     
     vaccines_response = []
     for vaccine in newest_vaccines:
@@ -118,6 +119,33 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
                 date_consultation = history.date_consultation,
                 date_added = history.date_added
             ))
+        
+    labresults_response = []
+    for labresult in newest_labresults:
+        labresults_response.append(
+            LabResultResponseDashboard(
+                id = labresult.id,
+                value = labresult.value,
+                is_numeric = labresult.is_numeric,
+                unit = labresult.unit,
+                reference_range = labresult.reference_range,
+                date_collection = labresult.date_collection,
+                method = labresult.method,
+                name = labresult.test.name,
+                code = labresult.test.code,
+                medicalhistory = MedicalHistoryResponse(
+                    id = labresult.medicalhistory.id,
+                    name = labresult.medicalhistory.name,
+                    doctor_name = labresult.medicalhistory.doctor_name,
+                    place = labresult.medicalhistory.place,
+                    notes = labresult.medicalhistory.notes,
+                    category = labresult.medicalhistory.category.name,
+                    subcategory = labresult.medicalhistory.subcategory.name if labresult.medicalhistory.subcategory else None,
+                    labsubcategory = labresult.medicalhistory.labsubcategory.name if labresult.medicalhistory.labsubcategory else None,
+                    date_consultation = labresult.medicalhistory.date_consultation,
+                    date_added = labresult.medicalhistory.date_added,
+                    file = labresult.medicalhistory.file
+            )))
     
     user_dashboard = UserDashboard(
         id = user.id,
@@ -126,7 +154,8 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
         allergies = allergies_response,
         vitals = healthdata_response,
         medications = medications_response,
-        medicalhistory = medicalhistory_response
+        medicalhistory = medicalhistory_response,
+        labresults = labresults_response,
     )
     
     return user_dashboard
