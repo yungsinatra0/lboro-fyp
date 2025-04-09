@@ -862,6 +862,14 @@ The fifth sprint of the project was focused on adding the ability to add lab tes
 
 This feature was a continuation of the work done in the previous sprint, as the lab tests were also part of the health records feature. As such, some of the initial work was done on top of existing components, which made development easier and faster. The feature was developed as per the initially agreed requirements and wireframes, with some changes to how the lab results were displayed on the frontend.
 
+The sequence diagram for the lab tests extraction can be seen below in figure~. The diagram shows how the user interacts with the system to upload a lab test, how the system processes the file and sends it to the MLLM API, and how the response is then displayed to the user.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{Sequence_lab.png}
+  \caption{UML Sequence Diagram --- Extracting Lab Results}\label{fig:sequence_lab}
+\end{figure}
+
 \subsection{Lab Tests Extraction}
 
 As lab tests were previously added in sprint \#4 as a health record, it was decided to use the existing `Add Health Record' component to allow the user to choose whether they'd like to extract the lab results besides uploading the file to the system. The decision was made to streamline the user experience of adding new health records, as the user would not have to go through multiple steps to add a lab test, but also because it would speed up development time as an existing component could be reused and made more feature-rich. Finally, this also closely matched the initial wireframe design for the `New Document' dialog, which can be seen in figure~\ref{fig:newDoc_wireframe}.
