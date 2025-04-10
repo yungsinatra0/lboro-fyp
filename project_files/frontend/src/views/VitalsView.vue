@@ -141,6 +141,8 @@ const addVital = (vital) => {
   vitals.value.push(vital)
 }
 
+// TODO: Remove vitals trend and use trend from the backend
+
 const vitalsTrends = computed(() => {
   const result = {}
 
