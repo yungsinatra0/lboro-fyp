@@ -13,8 +13,24 @@ router = APIRouter()
 @router.get("/me/vaccines", response_model=list[VaccineResponse])
 def get_vaccines(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     user = session.get(User, user_id)
-    return user.vaccines
-
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if not user.vaccines:
+        raise HTTPException(status_code=404, detail="No vaccines found")
+    
+    vaccine_responses = []
+    
+    for vaccine in user.vaccines:
+        vaccine_response = VaccineResponse(
+            **vaccine.model_dump(exclude={"user", "certificate", "date_received"}),
+            certificate=True if vaccine.certificate else False,
+            date_received=vaccine.date_received
+        )
+        vaccine_responses.append(vaccine_response)
+        
+    return vaccine_responses
 # Add a vaccine
 @router.post("/me/vaccines")
 def add_vaccine(vaccine: VaccineCreate, user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
@@ -35,7 +51,7 @@ def add_vaccine(vaccine: VaccineCreate, user_id: uuid.UUID = Depends(validate_se
         name = new_vaccine.name,
         provider = new_vaccine.provider,
         date_received = new_vaccine.date_received,
-        certificate = new_vaccine.certificate,
+        certificate = True if new_vaccine.certificate else False,
     )
     
     return {

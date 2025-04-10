@@ -30,7 +30,7 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
                 name = vaccine.name,
                 provider = vaccine.provider,
                 date_received = vaccine.date_received,
-                certificate = vaccine.certificate,
+                certificate = True if vaccine.certificate else False,
                 date_added = vaccine.date_added 
             ))
     
@@ -104,7 +104,7 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
                 category = category,
                 subcategory = subcategory,
                 labsubcategory= labsubcategory,
-                file = history.file,
+                file = True if history.file else False,
                 date_consultation = history.date_consultation,
                 date_added = history.date_added
             ))
@@ -133,7 +133,7 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
                     labsubcategory = labresult.medicalhistory.labsubcategory.name if labresult.medicalhistory.labsubcategory else None,
                     date_consultation = labresult.medicalhistory.date_consultation,
                     date_added = labresult.medicalhistory.date_added,
-                    file = labresult.medicalhistory.file
+                    file = True if labresult.medicalhistory.file else False,
             )))
     
     user_dashboard = UserDashboard(

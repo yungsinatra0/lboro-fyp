@@ -67,7 +67,7 @@ class MedicalHistoryResponse(MedicalHistoryDates):
     category: str
     subcategory: str | None = None
     labsubcategory: str | None = None
-    file: Optional["FileUpload"] = None
+    file: bool | None = None
     
 # Medical History create model
 class MedicalHistoryCreate(MedicalHistoryDates):
@@ -157,6 +157,10 @@ class LabsCreate(SQLModel):
     
     # Relationships
     medicalhistory_id: uuid.UUID
+    
+class LabResultMedicalHistory(SQLModel):
+    id: uuid.UUID
+    file: bool
     
 class LabResultResponse(LabDates):
     id: uuid.UUID

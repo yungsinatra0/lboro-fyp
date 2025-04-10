@@ -32,7 +32,7 @@ class VaccineResponse(VaccineDates):
     id: uuid.UUID
     name: str
     provider: str
-    certificate: Optional["FileUpload"]
+    certificate: bool | None = None
 
 # Vaccine create model
 class VaccineCreate(VaccineDates):

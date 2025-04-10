@@ -14,29 +14,26 @@ router = APIRouter()
 def get_medicalhistory(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
     user = session.get(User, user_id)
     
-    result = []
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if not user.medicalhistory:
+        raise HTTPException(status_code=404, detail="No medical history records found")
+    
+    response = []
     
     for history in user.medicalhistory:
-        item = {
-            "id": history.id,
-            "name": history.name,
-            "doctor_name": history.doctor_name,
-            "place": history.place,
-            "notes": history.notes,
-            "category": history.category.name,
-            "file": history.file,
-            "date_consultation": history.date_consultation,
-            "date_added": history.date_added
-        }
-        
-        if history.subcategory:
-            item["subcategory"] = history.subcategory.name
-        if history.labsubcategory:
-            item["labsubcategory"] = history.labsubcategory.name
-        
-        result.append(item)          
+        medhistory_response = MedicalHistoryResponse(
+            **history.model_dump(exclude={"user", "labresults", "file", "category", "subcategory", "labsubcategory", "date_consultation"}),
+            category = history.category.name,
+            subcategory = history.subcategory.name if history.subcategory else None,
+            labsubcategory = history.labsubcategory.name if history.labsubcategory else None,
+            file = True if history.file else False,
+            date_consultation = history.date_consultation,
+        )
+        response.append(medhistory_response)          
             
-    return result
+    return response
 
 # Add a medical history record
 @router.post("/me/medicalhistory")
@@ -76,7 +73,7 @@ def create_medicalhistory(medhistory: MedicalHistoryCreate, user_id: uuid.UUID =
         category = new_medicalhistory.category.name,
         subcategory = new_medicalhistory.subcategory.name if new_medicalhistory.subcategory else None,
         labsubcategory = new_medicalhistory.labsubcategory.name if new_medicalhistory.labsubcategory else None,
-        file = new_medicalhistory.file,
+        file = True if new_medicalhistory.file else False,
         date_consultation = new_medicalhistory.date_consultation,
     )
     
