@@ -3,7 +3,7 @@ from sqlmodel import Session, select, col
 import uuid
 
 from ..models import User, Vaccine, VaccineResponse, Allergy, AllergyResponse, HealthData, HealthDataResponse, Medication, MedicationResponse, UserDashboard, MedicalHistory, MedicalHistoryResponse, LabResultResponseDashboard, LabResult
-from ..utils import get_session, validate_session
+from ..utils import get_session, validate_session, group_compare_healthdata
 
 router = APIRouter()
 
@@ -75,29 +75,18 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
     healthdata_response = []
     for data in grouped_healthdata:
         healthdata = data["healthdata"]
-        response = None
-        if healthdata.type.name == "Tensiune arterială":
-            response = HealthDataResponse(
-                id = healthdata.id,
-                name = healthdata.type.name,
-                unit = healthdata.type.unit,
-                value_systolic = healthdata.value_systolic,
-                value_diastolic = healthdata.value_diastolic,
-                date_recorded = healthdata.date_recorded,
-                notes = healthdata.notes,
-                date_added = healthdata.date_added
-            )
-        else:
-            response = HealthDataResponse(
-                id = healthdata.id,
-                name = healthdata.type.name,
-                unit = healthdata.type.unit,
-                value = healthdata.value,
-                date_recorded = healthdata.date_recorded,
-                notes = healthdata.notes,
-                date_added = healthdata.date_added
-            )
-        response.trend = data["trend"]
+        response = HealthDataResponse(
+            id = healthdata.id,
+            name = healthdata.type.name,
+            unit = healthdata.type.unit,
+            value = None if healthdata.type.name == "Tensiune arterială" else healthdata.value,
+            value_systolic = healthdata.value_systolic if healthdata.type.name == "Tensiune arterială" else None,
+            value_diastolic = healthdata.value_diastolic if healthdata.type.name == "Tensiune arterială" else None,
+            date_recorded = healthdata.date_recorded,
+            notes = healthdata.notes,
+            date_added = healthdata.date_added,
+            trend = data["trend"]
+        )
         healthdata_response.append(response)
         
     medicalhistory_response = []
@@ -159,55 +148,3 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
     )
     
     return user_dashboard
-
-def group_compare_healthdata(healthdata: list[HealthData]):
-    grouped_data = {}
-    
-    for data in healthdata:
-        if data.type.name not in grouped_data:
-            grouped_data[data.type.name] = []
-        grouped_data[data.type.name].append(data)
-        
-    data_trends = []        
-    for key, values in grouped_data.items():
-        if not values:
-            continue
-        
-        latest = values[0]
-        trend = "stable"
-        
-        if latest.type.name in ["Înălțime", "Greutate"]:
-            trend = "stable"
-
-        elif latest.type.name == "Tensiune arterială":
-            range_str = latest.type.normal_range
-            if range_str:
-                low, high = range_str.split(" - ")
-                low_sys = float(low.split("/")[0].strip())
-                high_sys = float(high.split(' ')[0].split("/")[0].strip())
-                
-                if latest.value_systolic > high_sys:
-                    trend = "up"
-                elif latest.value_systolic < low_sys:
-                    trend = "down"
-        
-        elif latest.type.normal_range:
-            range_str = latest.type.normal_range
-            try:
-                low, high = range_str.split(" - ")
-                range_min = float(low.strip())
-                range_max = float(high.split(" ")[0].strip())                
-                
-                if latest.value > range_max:
-                    trend = "up"
-                elif latest.value < range_min:
-                    trend = "down"
-            except (ValueError, AttributeError):
-                trend = "stable"
-            
-        data_trends.append({
-            "healthdata": latest,
-            "trend": trend,
-        })
-          
-    return data_trends
