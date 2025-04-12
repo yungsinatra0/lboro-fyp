@@ -46,7 +46,7 @@ class CreateShareItem(SQLModel):
     item_id: uuid.UUID
 
 class CreateShareToken(SQLModel):
-    expiration_time: datetime
+    token_length: int
     pin: str
     shared_items: List[CreateShareItem]
    

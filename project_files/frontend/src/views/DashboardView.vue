@@ -31,6 +31,8 @@
       <RecentAllergies :allergies="user_data?.data?.allergies" class="mb-4 md:mb-0 md:h-full" />
     </div>
   </div>
+
+  <CreateShareLink v-if="displayShareDialog" @close="displayShareDialog = false" :display-dialog="displayShareDialog"/>
 </template>
 
 <script setup>
@@ -44,9 +46,11 @@ import RecentMeds from '@/components/dashboard/RecentMeds.vue'
 import RecentHealthData from '@/components/dashboard/RecentHealthData.vue'
 import RecentMedicalHistory from '@/components/dashboard/RecentMedicalHistory.vue'
 import RecentLabResults from '@/components/dashboard/RecentLabResults.vue'
+import CreateShareLink from '@/components/dashboard/CreateShareLink.vue'
 import { parse } from 'date-fns'
 
 const user_data = ref()
+const displayShareDialog = ref(false)
 
 onMounted(async () => {
   try {
@@ -88,4 +92,8 @@ onMounted(async () => {
     console.error(error)
   }
 })
+
+const showShareDialog = () => {
+  displayShareDialog.value = true
+}
 </script>

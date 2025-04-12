@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status, Response, Request, APIRouter
 from fastapi.responses import StreamingResponse
 from sqlmodel import Session, select
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from ..models import User, ShareToken, SharedItem, CreateShareToken, CreateShareItem, ShareTokenResponse, ShareItemsResponse
 from ..utils import get_session, validate_session, create_hash, verify_hash, get_item_data, get_connected_record, decrypt_file
@@ -23,7 +23,7 @@ async def create_share_token(
     
     try:
         share_token = ShareToken(
-            expiration_time=share_data.expiration_time,
+            expiration_time=datetime.now() + timedelta(minutes=share_data.token_length),
             hashed_pin=hashed_pin,
             user = user
         )
