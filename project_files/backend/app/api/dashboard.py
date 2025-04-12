@@ -15,12 +15,12 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
     if user_id != user.id:
         raise HTTPException(status_code=403, detail="You do not have permission to access this endpoint!")   
     
-    newest_vaccines = session.exec(select(Vaccine).where(Vaccine.user_id == user_id).order_by(col(Vaccine.date_added).desc()).limit(5)).all()
-    newest_allergies = session.exec(select(Allergy).where(Allergy.user_id == user_id).order_by(col(Allergy.date_added).desc()).limit(5)).all()
-    newest_healthdata = session.exec(select(HealthData).where(HealthData.user_id == user_id).order_by(col(HealthData.date_added))).all()
-    newest_medications = session.exec(select(Medication).where(Medication.user_id == user_id).order_by(col(Medication.date_added).desc()).limit(5)).all()
-    newest_medicalhistory = session.exec(select(MedicalHistory).where(MedicalHistory.user_id == user_id).order_by(col(MedicalHistory.date_added).desc()).limit(5)).all()
-    newest_labresults = session.exec(select(LabResult).where(LabResult.user_id == user_id).order_by(col(LabResult.date_added).desc()).limit(5)).all()
+    newest_vaccines = session.exec(select(Vaccine).where(Vaccine.user_id == user_id).order_by(col(Vaccine.date_added).desc())).all()
+    newest_allergies = session.exec(select(Allergy).where(Allergy.user_id == user_id).order_by(col(Allergy.date_added).desc())).all()
+    newest_healthdata = session.exec(select(HealthData).where(HealthData.user_id == user_id).order_by(col(HealthData.date_recorded).desc())).all()
+    newest_medications = session.exec(select(Medication).where(Medication.user_id == user_id).order_by(col(Medication.date_added).desc())).all()
+    newest_medicalhistory = session.exec(select(MedicalHistory).where(MedicalHistory.user_id == user_id).order_by(col(MedicalHistory.date_added).desc())).all()
+    newest_labresults = session.exec(select(LabResult).where(LabResult.user_id == user_id).order_by(col(LabResult.date_added).desc())).all()
     
     vaccines_response = []
     for vaccine in newest_vaccines:
@@ -70,24 +70,19 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
                 date_added=medication.date_added               
         ))
     
-    grouped_healthdata = group_compare_healthdata(newest_healthdata)
-        
     healthdata_response = []
-    for data in grouped_healthdata:
-        healthdata = data["healthdata"]
-        response = HealthDataResponse(
-            id = healthdata.id,
-            name = healthdata.type.name,
-            unit = healthdata.type.unit,
-            value = None if healthdata.type.name == "Tensiune arterială" else healthdata.value,
-            value_systolic = healthdata.value_systolic if healthdata.type.name == "Tensiune arterială" else None,
-            value_diastolic = healthdata.value_diastolic if healthdata.type.name == "Tensiune arterială" else None,
-            date_recorded = healthdata.date_recorded,
-            notes = healthdata.notes,
-            date_added = healthdata.date_added,
-            trend = data["trend"]
-        )
-        healthdata_response.append(response)
+    for data in newest_healthdata:
+        healthdata_response.append(HealthDataResponse(
+            id = data.id,
+            name = data.type.name,
+            unit = data.type.unit,
+            value = None if data.type.name == "Tensiune arterială" else data.value,
+            value_systolic = data.value_systolic if data.type.name == "Tensiune arterială" else None,
+            value_diastolic = data.value_diastolic if data.type.name == "Tensiune arterială" else None,
+            date_recorded = data.date_recorded,
+            notes = data.notes,
+            date_added = data.date_added
+        ))
         
     medicalhistory_response = []
     for history in newest_medicalhistory:

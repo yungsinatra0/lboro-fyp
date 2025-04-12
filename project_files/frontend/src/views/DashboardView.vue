@@ -17,22 +17,38 @@
 
     <div class="grid grid-cols-1 md:grid-cols-[5fr_3fr_3fr] gap-4 mx-5">
       <RecentMedicalHistory
-        :medhistory="user_data?.data?.medhistory"
+        :medhistory="user_data?.data?.medhistory.slice(0, 5)"
         class="mb-4 md:mb-0 md:h-full"
       />
-      <RecentHealthData :vitals="user_data?.data?.vitals" class="mb-4 md:mb-0 md:h-full" />
+      <RecentHealthData :vitals="groupedVitals" class="mb-4 md:mb-0 md:h-full" />
 
-      <RecentMeds :medications="user_data?.data?.medications" class="mb-4 md:mb-0 md:h-full" />
+      <RecentMeds
+        :medications="user_data?.data?.medications.slice(0, 5)"
+        class="mb-4 md:mb-0 md:h-full"
+      />
 
-      <RecentLabResults :labresults="user_data?.data?.labresults" class="mb-4 md:mb-0 md:h-full" />
+      <RecentLabResults
+        :labresults="user_data?.data?.labresults.slice(0, 5)"
+        class="mb-4 md:mb-0 md:h-full"
+      />
 
-      <RecentVaccines :vaccines="user_data?.data?.vaccines" class="mb-4 md:mb-0 md:h-full" />
+      <RecentVaccines
+        :vaccines="user_data?.data?.vaccines.slice(0, 5)"
+        class="mb-4 md:mb-0 md:h-full"
+      />
 
-      <RecentAllergies :allergies="user_data?.data?.allergies" class="mb-4 md:mb-0 md:h-full" />
+      <RecentAllergies
+        :allergies="user_data?.data?.allergies.slice(0, 5)"
+        class="mb-4 md:mb-0 md:h-full"
+      />
     </div>
   </div>
 
-  <CreateShareLink v-if="displayShareDialog" @close="displayShareDialog = false" :display-dialog="displayShareDialog"/>
+  <CreateShareLink
+    v-if="displayShareDialog"
+    @close="displayShareDialog = false"
+    :display-dialog="displayShareDialog"
+  />
 </template>
 
 <script setup>
@@ -48,14 +64,15 @@ import RecentMedicalHistory from '@/components/dashboard/RecentMedicalHistory.vu
 import RecentLabResults from '@/components/dashboard/RecentLabResults.vue'
 import CreateShareLink from '@/components/dashboard/CreateShareLink.vue'
 import { parse } from 'date-fns'
+import { groupCompareHealthdata } from '@/utils/vitalsTrends'
 
 const user_data = ref()
+const groupedVitals = ref([])
 const displayShareDialog = ref(false)
 
 onMounted(async () => {
   try {
     const response = await api.get('/dashboard')
-    console.log(response.data)
     user_data.value = {
       data: {
         id: response.data.id,
@@ -88,6 +105,7 @@ onMounted(async () => {
         })),
       },
     }
+    groupedVitals.value = groupCompareHealthdata(user_data.value.data.vitals)
   } catch (error) {
     console.error(error)
   }
