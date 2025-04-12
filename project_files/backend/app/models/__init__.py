@@ -7,5 +7,6 @@ from .allergy import *
 
 from .medhistory import *
 from .other import *
+from .share import *
 
 from .user import *

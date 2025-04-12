@@ -7,6 +7,7 @@ from .allergy import Allergy, AllergyResponse
 from .medication import Medication, MedicationResponse
 from .healthdata import HealthData, HealthDataResponse
 from .medhistory import MedicalHistory, MedicalHistoryResponse, LabResult, LabResultResponseDashboard
+from .share import ShareToken
 
 # Base model that contains the field serializer for date formatting to dd-mm-yyyy and the date field itself
 class DateFormattingModel(SQLModel):
@@ -38,6 +39,7 @@ class User(DateFormattingModel, table=True):
     healthdata: list["HealthData"] = Relationship(back_populates="user", cascade_delete=True)
     medicalhistory: list["MedicalHistory"] = Relationship(back_populates="user", cascade_delete=True)
     labresults: list["LabResult"] = Relationship(back_populates="user", cascade_delete=True)
+    share_tokens: list["ShareToken"] = Relationship(back_populates="user", cascade_delete=True)
 
 class UserResponse(DateFormattingModel):
     id: uuid.UUID
@@ -75,3 +77,6 @@ class UserUpdate(DateFormattingModel):
     name: str | None = None
     email: EmailStr | None = None
     password: str | None = None
+    
+class UserShare(DateFormattingModel):
+    name: str
