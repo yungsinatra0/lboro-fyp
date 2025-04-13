@@ -52,7 +52,8 @@ async def create_share_token(
         
     except Exception as e:
         session.rollback()
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error creating share token")
+        print(f"Share token creation error: {str(e)}")  # Or use a proper logger
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error creating share token: {str(e)}")
         
     
 @router.post("/share/{share_code}/verify", status_code=status.HTTP_200_OK, response_model=ShareItemsResponse)

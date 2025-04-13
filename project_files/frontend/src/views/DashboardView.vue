@@ -17,28 +17,28 @@
 
     <div class="grid grid-cols-1 md:grid-cols-[5fr_3fr_3fr] gap-4 mx-5">
       <RecentMedicalHistory
-        :medhistory="user_data?.data?.medhistory.slice(0, 5)"
+        :medhistory="user_data?.data?.records?.medhistory.slice(0, 5)"
         class="mb-4 md:mb-0 md:h-full"
       />
       <RecentHealthData :vitals="groupedVitals" class="mb-4 md:mb-0 md:h-full" />
 
       <RecentMeds
-        :medications="user_data?.data?.medications.slice(0, 5)"
+        :medications="user_data?.data?.records?.medications.slice(0, 5)"
         class="mb-4 md:mb-0 md:h-full"
       />
 
       <RecentLabResults
-        :labresults="user_data?.data?.labresults.slice(0, 5)"
+        :labresults="user_data?.data?.records?.labresults.slice(0, 5)"
         class="mb-4 md:mb-0 md:h-full"
       />
 
       <RecentVaccines
-        :vaccines="user_data?.data?.vaccines.slice(0, 5)"
+        :vaccines="user_data?.data?.records?.vaccines.slice(0, 5)"
         class="mb-4 md:mb-0 md:h-full"
       />
 
       <RecentAllergies
-        :allergies="user_data?.data?.allergies.slice(0, 5)"
+        :allergies="user_data?.data?.records?.allergies.slice(0, 5)"
         class="mb-4 md:mb-0 md:h-full"
       />
     </div>
@@ -48,6 +48,7 @@
     v-if="displayShareDialog"
     @close="displayShareDialog = false"
     :display-dialog="displayShareDialog"
+    :records="user_data?.data?.records"
   />
 </template>
 
@@ -77,35 +78,41 @@ onMounted(async () => {
       data: {
         id: response.data.id,
         name: response.data.name,
-        vitals: response.data.vitals.map((vital) => ({
-          ...vital,
-          original_date_recorded: vital.date_recorded,
-          date_recorded: parse(vital.date_recorded, 'dd-MM-yyyy', new Date()),
-        })),
-        medications: response.data.medications.map((med) => ({
-          ...med,
-          original_date_prescribed: med.date_prescribed,
-          date_prescribed: parse(med.date_prescribed, 'dd-MM-yyyy', new Date()),
-        })),
-        vaccines: response.data.vaccines.map((vaccine) => ({
-          ...vaccine,
-          original_date_received: vaccine.date_received,
-          date_received: parse(vaccine.date_received, 'dd-MM-yyyy', new Date()),
-        })),
-        allergies: response.data.allergies,
-        medhistory: response.data.medicalhistory.map((history) => ({
-          ...history,
-          original_date_consultation: history.date_consultation,
-          date_consultation: parse(history.date_consultation, 'dd-MM-yyyy', new Date()),
-        })),
-        labresults: response.data.labresults.map((labresult) => ({
-          ...labresult,
-          original_date_collection: labresult.date_collection,
-          date_collection: parse(labresult.date_collection, 'dd-MM-yyyy', new Date()),
-        })),
+        records: {
+          vitals: response.data.vitals.map((vital) => ({
+            ...vital,
+            original_date_recorded: vital.date_recorded,
+            date_recorded: parse(vital.date_recorded, 'dd-MM-yyyy', new Date()),
+          })),
+          medications: response.data.medications.map((med) => ({
+            ...med,
+            original_date_prescribed: med.date_prescribed,
+            date_prescribed: parse(med.date_prescribed, 'dd-MM-yyyy', new Date()),
+          })),
+          vaccines: response.data.vaccines.map((vaccine) => ({
+            ...vaccine,
+            original_date_received: vaccine.date_received,
+            date_received: parse(vaccine.date_received, 'dd-MM-yyyy', new Date()),
+          })),
+          allergies: response.data.allergies.map((allergy) => ({
+            ...allergy,
+            original_date_diagnosed: allergy.date_diagnosed,
+            date_diagnosed: parse(allergy.date_diagnosed, 'dd-MM-yyyy', new Date()),
+          })),
+          medhistory: response.data.medicalhistory.map((history) => ({
+            ...history,
+            original_date_consultation: history.date_consultation,
+            date_consultation: parse(history.date_consultation, 'dd-MM-yyyy', new Date()),
+          })),
+          labresults: response.data.labresults.map((labresult) => ({
+            ...labresult,
+            original_date_collection: labresult.date_collection,
+            date_collection: parse(labresult.date_collection, 'dd-MM-yyyy', new Date()),
+          })),
+        },
       },
     }
-    groupedVitals.value = groupCompareHealthdata(user_data.value.data.vitals)
+    groupedVitals.value = groupCompareHealthdata(user_data.value.data.records?.vitals)
   } catch (error) {
     console.error(error)
   }

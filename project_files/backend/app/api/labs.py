@@ -124,7 +124,7 @@ async def get_lab_tests(user_id: uuid.UUID = Depends(validate_session), session:
                     labsubcategory = result.medicalhistory.labsubcategory.name if result.medicalhistory.labsubcategory else None,
                     date_consultation = result.medicalhistory.date_consultation,
                     date_added = result.medicalhistory.date_added,
-                    file = result.medicalhistory.file,
+                    file = True if result.medicalhistory.file else False,
                 )
             )
             

@@ -16,7 +16,10 @@
           <StepPanel v-slot="{ activateCallback }" value="1">
             <div class="flex flex-col items-center justify-center gap-4">
               <h1 class="font-bold">Alege un PIN pentru link-ul de partajare</h1>
-              <InputOtp v-model="pin" :length="6" />
+              <InputOtp v-model="pin" :length="6" :invalid="pinValidation.error ? true : false" />
+              <Message v-if="pinValidation.error" severity="error" variant="simple" size="small">{{
+                pinValidation.error
+              }}</Message>
 
               <p class="text-sm text-surface-500 dark:text-surface-400">
                 Acest PIN va fi folosit pentru a accesa link-ul de partajare.
@@ -61,40 +64,48 @@
                 label="Next"
                 icon="pi pi-arrow-right"
                 iconPos="right"
-                @click="activateCallback('2')"
+                @click="
+                  () => {
+                    if (pinValidation.success) {
+                      activateCallback('2')
+                    } else {
+                      // Will add something here later
+                    }
+                  }
+                "
               />
             </div>
           </StepPanel>
           <StepPanel v-slot="{ activateCallback }" value="2">
             <div class="flex flex-col">
-              <div
-                class="border-2 border-dashed border-surface-200 dark:border-surface-700 rounded bg-surface-50 dark:bg-surface-950 flex-auto flex justify-center items-center font-medium"
-              >
-                Content II
-              </div>
-            </div>
-            <div class="flex pt-6 justify-between">
-              <Button
-                label="Back"
-                severity="secondary"
-                icon="pi pi-arrow-left"
-                @click="activateCallback('1')"
-              />
-              <Button
-                label="Next"
-                icon="pi pi-arrow-right"
-                iconPos="right"
-                @click="activateCallback('3')"
+              <RecordsTable
+                :records="props.records"
+                @back="activateCallback('1')"
+                @next="
+                  async (selectedParentRows, selectedChildRows) => {
+                    const result = await createShareLink(selectedParentRows, selectedChildRows);
+                    if (result) {
+                      activateCallback('3')
+                    } else {
+                      // Will add something here later
+                    }
+                  }
+                "
               />
             </div>
           </StepPanel>
           <StepPanel v-slot="{ activateCallback }" value="3">
             <div class="flex flex-col">
-              <div
-                class="border-2 border-dashed border-surface-200 dark:border-surface-700 rounded bg-surface-50 dark:bg-surface-950 flex-auto flex justify-center items-center font-medium"
-              >
-                Content III
-              </div>
+              <h1 class="font-bold">Link-ul de partajare a fost creat cu succes!</h1>
+              <p class="text-sm text-surface-500 dark:text-surface-400">
+                Link-ul de partajare este: <strong> http://localhost:5173/share/{{ linkData?.code }}</strong>
+              </p>
+              <p class="text-sm text-surface-500 dark:text-surface-400">
+                PIN-ul este: <strong>{{ pin }}</strong>
+              </p>
+              <p class="text-sm text-surface-500 dark:text-surface-400">
+                Acest link va expira la {{ linkData?.expiration_time ? format(linkData.expiration_time, "HH:mm:ss") : '' }}
+              </p>
             </div>
             <div class="pt-6">
               <Button
@@ -122,17 +133,79 @@ import Step from 'primevue/step'
 import StepPanel from 'primevue/steppanel'
 import InputOtp from 'primevue/inputotp'
 import Button from 'primevue/button'
-import { ref } from 'vue'
+import Message from 'primevue/message'
+import RecordsTable from '../share/RecordsTable.vue'
+import api from '@/services/api'
+import { computed, ref } from 'vue'
+import { z } from 'zod'
+import { format } from 'date-fns'
 
 const props = defineProps({
   displayDialog: Boolean,
+  records: Object,
 })
 
 const emit = defineEmits(['close'])
 
 const displayShareDialog = ref(props.displayDialog)
-const pin = ref(null)
+const pin = ref('')
 const time = ref(1)
 const options = ref(['Ore', 'Minute'])
 const selectedOption = ref('Ore')
+const linkData = ref()
+
+const pinValidation = computed(() => {
+  const pinSchema = z.string().length(6, { message: 'PIN-ul trebuie sa contina 6 caractere' })
+  const result = pinSchema.safeParse(pin.value)
+
+  return {
+    success: result.success,
+    error: result.success ? null : result.error.format()._errors[0],
+  }
+})
+
+const createShareLink = async (selectedParentRows, selectedChildRows) => {
+  console.log('Received Parent Rows:', selectedParentRows)
+  console.log('Received Child Rows:', selectedChildRows)
+
+  const sharedItems = processSharedItems(selectedParentRows, selectedChildRows)
+  console.log('Shared Items:', sharedItems)
+
+  const timeInMinutes = selectedOption.value === 'Ore' ? time.value * 60 : time.value
+
+  try {
+    const response = await api.post('/share/create', {
+      token_length: timeInMinutes,
+      pin: pin.value,
+      shared_items: sharedItems,
+    })
+
+    linkData.value = response.data
+
+    return true
+  } catch (error) {
+    console.error('Error creating share link:', error)
+    return false
+  }
+}
+
+const processSharedItems = (selectedParentRows, selectedChildRows) => {
+  const sharedItems = []
+
+  selectedParentRows.forEach((parentRow) => {
+    for (const item of parentRow.items) {
+      const itemId = item.id
+      // check the records in parentRow object versus the ones selected in the selectedChildRows
+      const selectedChildRow = selectedChildRows.some((childRow) => childRow.id === itemId)
+      if (selectedChildRow) {
+        sharedItems.push({
+          item_type: parentRow.type,
+          item_id: itemId,
+        })
+      }
+    }
+  })
+
+  return sharedItems
+}
 </script>
