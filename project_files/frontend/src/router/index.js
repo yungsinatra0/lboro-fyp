@@ -11,6 +11,7 @@ import ProfileView from '@/views/ProfileView.vue'
 import VitalsView from '@/views/VitalsView.vue'
 import MedHistoryView from '@/views/MedHistoryView.vue'
 import LabTestView from '@/views/LabTestView.vue'
+import ShareView from '@/views/ShareView.vue'
 
 const router = createRouter({
   history: createWebHistory(), // Will need to change base URL if not using root
@@ -80,7 +81,13 @@ const router = createRouter({
       name: 'Test Laborator',
       component: LabTestView,
       meta: { requiresAuth: true },
-    }
+    },
+    {
+      path: '/share/:code',
+      name: 'Share',
+      component: ShareView,
+      meta: { requiresAuth: false },
+    },
   ],
 })
 
@@ -88,16 +95,14 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   const authStore = useAuthStore()
 
+  await authStore.checkAuth() // Check authentication status before each route change
+
   if (to.meta.requiresAuth) {
-    await authStore.checkAuth() // Check if user is authenticated for protected routes
-    if (!authStore.isAuthenticated) {
+    if (!authStore.isAuthenticated && to.path !== '/login' && to.path !== '/register') {
       return { name: 'Login' } // Redirect to login if not authenticated
     }
-  } else if (to.path === '/login' || to.path === '/register') {
-    await authStore.checkAuth()
-    if (authStore.isAuthenticated) {
-      return { name: 'Dashboard' } // Redirect to dashboard if authenticated and going to login or register
-    }
+  } else if (authStore.isAuthenticated) {
+    return { name: 'Dashboard' } // Redirect to dashboard if authenticated and going to login or register
   }
 
   return true // Continue to requested route if no conditions are met (I think the documentation says to return true)
