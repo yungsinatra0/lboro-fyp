@@ -32,12 +32,6 @@
 </template>
 
 <script setup>
-import Card from 'primevue/card'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import Tag from 'primevue/tag'
-// import ColumnGroup from 'primevue/columngroup' // optional
-// import Row from 'primevue/row' // optional
 
 const props = defineProps({
   medhistory: Array,

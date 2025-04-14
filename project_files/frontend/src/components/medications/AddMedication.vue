@@ -293,19 +293,6 @@
 </template>
 
 <script setup>
-import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import { Form } from '@primevue/forms'
-import DatePicker from 'primevue/datepicker'
-import Message from 'primevue/message'
-import Button from 'primevue/button'
-import Select from 'primevue/select'
-import InputNumber from 'primevue/inputnumber'
-import Textarea from 'primevue/textarea'
-import IftaLabel from 'primevue/iftalabel'
-import RadioButton from 'primevue/radiobutton'
-import RadioButtonGroup from 'primevue/radiobuttongroup'
-
 import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import api from '@/services/api'

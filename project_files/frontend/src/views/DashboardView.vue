@@ -54,7 +54,6 @@
 
 <script setup>
 import NavBar from '@/components/NavBar.vue'
-import Button from 'primevue/button'
 import { onMounted, ref } from 'vue'
 import api from '@/services/api'
 import RecentVaccines from '@/components/dashboard/RecentVaccines.vue'
@@ -64,8 +63,7 @@ import RecentHealthData from '@/components/dashboard/RecentHealthData.vue'
 import RecentMedicalHistory from '@/components/dashboard/RecentMedicalHistory.vue'
 import RecentLabResults from '@/components/dashboard/RecentLabResults.vue'
 import CreateShareLink from '@/components/dashboard/CreateShareLink.vue'
-import { parse } from 'date-fns'
-import { groupCompareHealthdata } from '@/utils/vitalsTrends'
+import { parseDates, groupCompareHealthdata } from '@/utils'
 
 const user_data = ref()
 const groupedVitals = ref([])
@@ -79,36 +77,12 @@ onMounted(async () => {
         id: response.data.id,
         name: response.data.name,
         records: {
-          vitals: response.data.vitals.map((vital) => ({
-            ...vital,
-            original_date_recorded: vital.date_recorded,
-            date_recorded: parse(vital.date_recorded, 'dd-MM-yyyy', new Date()),
-          })),
-          medications: response.data.medications.map((med) => ({
-            ...med,
-            original_date_prescribed: med.date_prescribed,
-            date_prescribed: parse(med.date_prescribed, 'dd-MM-yyyy', new Date()),
-          })),
-          vaccines: response.data.vaccines.map((vaccine) => ({
-            ...vaccine,
-            original_date_received: vaccine.date_received,
-            date_received: parse(vaccine.date_received, 'dd-MM-yyyy', new Date()),
-          })),
-          allergies: response.data.allergies.map((allergy) => ({
-            ...allergy,
-            original_date_diagnosed: allergy.date_diagnosed,
-            date_diagnosed: parse(allergy.date_diagnosed, 'dd-MM-yyyy', new Date()),
-          })),
-          medhistory: response.data.medicalhistory.map((history) => ({
-            ...history,
-            original_date_consultation: history.date_consultation,
-            date_consultation: parse(history.date_consultation, 'dd-MM-yyyy', new Date()),
-          })),
-          labresults: response.data.labresults.map((labresult) => ({
-            ...labresult,
-            original_date_collection: labresult.date_collection,
-            date_collection: parse(labresult.date_collection, 'dd-MM-yyyy', new Date()),
-          })),
+          vitals: parseDates(response.data.vitals, 'date_recorded'),
+          medications: parseDates(response.data.medications, 'date_prescribed'),
+          vaccines: parseDates(response.data.vaccines, 'date_received'),
+          allergies: parseDates(response.data.allergies, 'date_diagnosed'),
+          medhistory: parseDates(response.data.medicalhistory, 'date_consultation'),
+          labresults: parseDates(response.data.labresults, 'date_collection'),
         },
       },
     }

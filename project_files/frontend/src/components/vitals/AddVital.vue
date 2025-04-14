@@ -144,15 +144,6 @@
 </template>
 
 <script setup>
-import Dialog from 'primevue/dialog'
-import InputNumber from 'primevue/inputnumber'
-import { Form } from '@primevue/forms'
-import DatePicker from 'primevue/datepicker'
-import Message from 'primevue/message'
-import Button from 'primevue/button'
-import Select from 'primevue/select'
-import Textarea from 'primevue/textarea'
-
 import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import api from '@/services/api'

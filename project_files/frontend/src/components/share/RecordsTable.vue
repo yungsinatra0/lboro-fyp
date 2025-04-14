@@ -131,13 +131,6 @@
 </template>
 
 <script setup>
-import Button from 'primevue/button'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import DatePicker from 'primevue/datepicker'
-import InputText from 'primevue/inputtext'
-import IconField from 'primevue/iconfield'
-import InputIcon from 'primevue/inputicon'
 import { FilterMatchMode } from '@primevue/core/api'
 import { ref, computed } from 'vue'
 

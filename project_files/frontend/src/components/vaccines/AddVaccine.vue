@@ -89,14 +89,6 @@
 </template>
 
 <script setup>
-import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import { Form } from '@primevue/forms'
-import DatePicker from 'primevue/datepicker'
-import Message from 'primevue/message'
-import Button from 'primevue/button'
-import FileUpload from 'primevue/fileupload'
-
 import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import api from '@/services/api'

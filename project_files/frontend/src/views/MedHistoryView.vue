@@ -54,7 +54,6 @@
 
 <script setup>
 import NavBar from '@/components/NavBar.vue'
-import Button from 'primevue/button'
 import { ref, onMounted } from 'vue'
 import HistoryTableView from '@/components/medhistory/HistoryTableView.vue'
 import AddHistory from '@/components/medhistory/AddHistory.vue'

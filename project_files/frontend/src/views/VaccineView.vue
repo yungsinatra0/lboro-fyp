@@ -58,10 +58,8 @@
 
 <script setup>
 import NavBar from '@/components/NavBar.vue'
-import Button from 'primevue/button'
 import { onMounted, ref } from 'vue'
 import api from '@/services/api'
-import ProgressSpinner from 'primevue/progressspinner'
 import AddVaccine from '@/components/vaccines/AddVaccine.vue'
 import EditVaccine from '@/components/vaccines/EditVaccine.vue'
 import ShowCertificate from '@/components/vaccines/ShowCertificate.vue'

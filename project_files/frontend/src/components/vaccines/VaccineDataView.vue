@@ -127,16 +127,8 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import DataView from 'primevue/dataview'
-import Button from 'primevue/button'
-import SelectButton from 'primevue/selectbutton'
-import Select from 'primevue/select'
-import Menu from 'primevue/menu'
 import { useConfirm } from 'primevue/useconfirm'
 import api from '@/services/api'
-import ToggleButton from 'primevue/togglebutton'
-import InputText from 'primevue/inputtext'
-import ConfirmDialog from 'primevue/confirmdialog'
 
 const props = defineProps({
   vaccines: Object,

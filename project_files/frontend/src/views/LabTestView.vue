@@ -260,14 +260,7 @@
 
 <script setup>
 import NavBar from '@/components/NavBar.vue'
-import { calculateTrend } from '@/utils/labTrends'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import InputText from 'primevue/inputtext'
-import IconField from 'primevue/iconfield'
-import InputIcon from 'primevue/inputicon'
-import Button from 'primevue/button'
-import DatePicker from 'primevue/datepicker'
+import { calculateTrend } from '@/utils'
 import ShowFile from '@/components/medhistory/ShowFile.vue'
 import { FilterMatchMode } from '@primevue/core/api'
 import { ref, onMounted, computed } from 'vue'

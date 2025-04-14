@@ -88,17 +88,8 @@
 </template>
 
 <script setup>
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import Card from 'primevue/card'
-import SelectButton from 'primevue/selectbutton'
-import Select from 'primevue/select'
-import Menu from 'primevue/menu'
 import { useConfirm } from 'primevue/useconfirm'
 import api from '@/services/api'
-import Button from 'primevue/button'
-import ConfirmDialog from 'primevue/confirmdialog'
-import DatePicker from 'primevue/datepicker'
 import { ref, computed, watch } from 'vue'
 import { Line } from 'vue-chartjs'
 import {

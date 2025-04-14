@@ -34,8 +34,6 @@
   </Dialog>
 </template>
 <script setup>
-import Dialog from 'primevue/dialog'
-import Image from 'primevue/image'
 import { ref, onMounted } from 'vue'
 import api from '@/services/api'
 

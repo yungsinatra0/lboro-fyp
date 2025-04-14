@@ -107,13 +107,9 @@
 import NavBar from '../components/NavBar.vue'
 import { ref, onMounted } from 'vue'
 import api from '../services/api'
-import Card from 'primevue/card'
-import Button from 'primevue/button'
 import { Form } from '@primevue/forms'
 import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
-import Password from 'primevue/password'
-import Message from 'primevue/message'
 import router from '../router'
 
 const userValue = ref(null)

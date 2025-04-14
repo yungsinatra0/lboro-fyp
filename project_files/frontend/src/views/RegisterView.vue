@@ -117,13 +117,9 @@
 
 <script setup>
 import { Form } from '@primevue/forms'
-import Button from 'primevue/button'
-import InputText from 'primevue/inputtext'
-import Password from 'primevue/password'
 import api from '../services/api'
 import { ref } from 'vue'
 import router from '@/router'
-import { DatePicker } from 'primevue'
 import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 

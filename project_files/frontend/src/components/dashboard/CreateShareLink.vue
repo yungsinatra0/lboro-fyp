@@ -181,17 +181,6 @@
 </template>
 
 <script setup>
-import Dialog from 'primevue/dialog'
-import Stepper from 'primevue/stepper'
-import StepList from 'primevue/steplist'
-import StepPanels from 'primevue/steppanels'
-import SelectButton from 'primevue/selectbutton'
-import Slider from 'primevue/slider'
-import Step from 'primevue/step'
-import StepPanel from 'primevue/steppanel'
-import InputOtp from 'primevue/inputotp'
-import Button from 'primevue/button'
-import Message from 'primevue/message'
 import RecordsTable from '../share/RecordsTable.vue'
 import api from '@/services/api'
 import { computed, ref } from 'vue'

@@ -57,10 +57,8 @@
 
 <script setup>
 import NavBar from '@/components/NavBar.vue'
-import Button from 'primevue/button'
 import EditMedication from '@/components/medications/EditMedication.vue'
 import AddMedication from '@/components/medications/AddMedication.vue'
-import ProgressSpinner from 'primevue/progressspinner'
 import api from '../services/api'
 import { onMounted, ref } from 'vue'
 import MedicationDataView from '@/components/medications/MedicationDataView.vue'

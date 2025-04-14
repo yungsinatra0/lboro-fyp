@@ -84,13 +84,7 @@
 </template>
 
 <script setup>
-import Card from 'primevue/card'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import { RouterLink } from 'vue-router'
-import { calculateTrend } from '@/utils/labTrends'
-// import ColumnGroup from 'primevue/columngroup' // optional
-// import Row from 'primevue/row' // optional
+import { calculateTrend } from '@/utils'
 
 const props = defineProps({
   labresults: Array,

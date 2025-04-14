@@ -60,13 +60,11 @@
 
 <script setup>
 import NavBar from '@/components/NavBar.vue'
-import Button from 'primevue/button'
-import ProgressSpinner from 'primevue/progressspinner'
+import AllergyDataView from '@/components/allergies/AllergyDataView.vue'
 import AddAllergy from '@/components/allergies/AddAllergy.vue'
 import EditAllergy from '@/components/allergies/EditAllergy.vue'
 import { onMounted, ref } from 'vue'
 import api from '@/services/api'
-import AllergyDataView from '@/components/allergies/AllergyDataView.vue'
 
 const allergies = ref([])
 const allergyReactions = ref([])
