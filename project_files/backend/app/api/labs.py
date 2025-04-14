@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status, APIRouter
 from sqlmodel import Session, select
 import uuid
 
-from ..models import LabResult, LabTest, LabsCreate, MedicalHistory, User, LabTestResponse, LabResultResponse, MedicalHistoryResponse
+from ..models import LabResult, LabTest, LabsCreate, MedicalHistory, User, LabTestResponse, LabResultResponse, MedicalHistoryResponseLab
 from ..utils import get_connected_record, decrypt_file, get_session, validate_session, read_file, extract_with_llm, check_is_numeric, sort_by_date
 
 
@@ -113,17 +113,8 @@ async def get_lab_tests(user_id: uuid.UUID = Depends(validate_session), session:
                 reference_range = result.reference_range,
                 date_collection = result.date_collection,
                 method = result.method,
-                medicalhistory = MedicalHistoryResponse(
+                medicalhistory = MedicalHistoryResponseLab(
                     id = result.medicalhistory.id,
-                    name = result.medicalhistory.name,
-                    doctor_name = result.medicalhistory.doctor_name,
-                    place = result.medicalhistory.place,
-                    notes = result.medicalhistory.notes,
-                    category = result.medicalhistory.category.name,
-                    subcategory = result.medicalhistory.subcategory.name if result.medicalhistory.subcategory else None,
-                    labsubcategory = result.medicalhistory.labsubcategory.name if result.medicalhistory.labsubcategory else None,
-                    date_consultation = result.medicalhistory.date_consultation,
-                    date_added = result.medicalhistory.date_added,
                     file = True if result.medicalhistory.file else False,
                 )
             )

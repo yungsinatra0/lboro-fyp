@@ -69,6 +69,10 @@ class MedicalHistoryResponse(MedicalHistoryDates):
     labsubcategory: str | None = None
     file: bool | None = None
     
+class MedicalHistoryResponseLab(SQLModel):
+    id: uuid.UUID
+    file: bool | None = None
+    
 # Medical History create model
 class MedicalHistoryCreate(MedicalHistoryDates):
     name: str
@@ -169,7 +173,7 @@ class LabResultResponse(LabDates):
     unit: str | None = None
     reference_range: str | None = None 
     method: str | None = None
-    medicalhistory: MedicalHistoryResponse
+    medicalhistory: MedicalHistoryResponseLab
     
 class LabTestResponse(SQLModel):
     id: uuid.UUID

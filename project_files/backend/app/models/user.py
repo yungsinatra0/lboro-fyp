@@ -78,5 +78,6 @@ class UserUpdate(DateFormattingModel):
     email: EmailStr | None = None
     password: str | None = None
     
-class UserShare(DateFormattingModel):
+class UserShare(SQLModel):
     name: str
+    dob: str

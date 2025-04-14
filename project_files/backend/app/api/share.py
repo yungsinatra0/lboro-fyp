@@ -1,10 +1,11 @@
-from fastapi import Depends, HTTPException, status, Response, Request, APIRouter
+from fastapi import Depends, HTTPException, status, APIRouter, Body
 from fastapi.responses import StreamingResponse
 from sqlmodel import Session, select
 import uuid
 from datetime import datetime, timedelta
+from typing import Annotated
 
-from ..models import User, ShareToken, SharedItem, CreateShareToken, CreateShareItem, ShareTokenResponse, ShareItemsResponse
+from ..models import User, ShareToken, SharedItem, CreateShareToken, ShareTokenResponse, ShareItemsResponse
 from ..utils import get_session, validate_session, create_hash, verify_hash, get_item_data, get_connected_record, decrypt_file
 
 router = APIRouter()
@@ -56,10 +57,10 @@ async def create_share_token(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error creating share token: {str(e)}")
         
     
-@router.post("/share/{share_code}/verify", status_code=status.HTTP_200_OK, response_model=ShareItemsResponse)
+@router.post("/share/{share_code}/verify", status_code=status.HTTP_200_OK)
 async def verify_share_token(
     share_code: str,
-    pin: str,
+    pin: Annotated[str, Body(embed=True)],
     session: Session = Depends(get_session)
 ):
     share_token = session.exec(select(ShareToken).where(ShareToken.share_code == share_code)).first()
@@ -75,6 +76,11 @@ async def verify_share_token(
     
     user = session.exec(select(User).where(User.id == share_token.user_id)).first()
     
+    user_data = {
+        "name": user.name,
+        "dob": user.dob.strftime("%d-%m-%Y") if user.dob else None,
+    }
+    
     shared_items = session.exec(
         select(SharedItem).where(SharedItem.share_token_id == share_token.id)
     ).all()
@@ -89,7 +95,7 @@ async def verify_share_token(
     
     return {
         "expiration_time": share_token.expiration_time,
-        "patient": user,
+        "patient": user_data,
         "items": items_data
     }
     

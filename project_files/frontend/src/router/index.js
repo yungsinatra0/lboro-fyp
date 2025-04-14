@@ -101,7 +101,7 @@ router.beforeEach(async (to) => {
     if (!authStore.isAuthenticated && to.path !== '/login' && to.path !== '/register') {
       return { name: 'Login' } // Redirect to login if not authenticated
     }
-  } else if (authStore.isAuthenticated) {
+  } else if (authStore.isAuthenticated && to.name !== 'Share') {
     return { name: 'Dashboard' } // Redirect to dashboard if authenticated and going to login or register
   }
 
