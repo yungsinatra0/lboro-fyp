@@ -83,7 +83,7 @@
                 @back="activateCallback('1')"
                 @next="
                   async (selectedParentRows, selectedChildRows) => {
-                    const result = await createShareLink(selectedParentRows, selectedChildRows);
+                    const result = await createShareLink(selectedParentRows, selectedChildRows)
                     if (result) {
                       activateCallback('3')
                     } else {
@@ -95,17 +95,75 @@
             </div>
           </StepPanel>
           <StepPanel v-slot="{ activateCallback }" value="3">
-            <div class="flex flex-col">
-              <h1 class="font-bold">Link-ul de partajare a fost creat cu succes!</h1>
-              <p class="text-sm text-surface-500 dark:text-surface-400">
-                Link-ul de partajare este: <strong> http://localhost:5173/share/{{ linkData?.code }}</strong>
-              </p>
-              <p class="text-sm text-surface-500 dark:text-surface-400">
-                PIN-ul este: <strong>{{ pin }}</strong>
-              </p>
-              <p class="text-sm text-surface-500 dark:text-surface-400">
-                Acest link va expira la {{ linkData?.expiration_time ? format(linkData.expiration_time, "HH:mm:ss") : '' }}
-              </p>
+            <div class="flex flex-col items-center justify-center gap-5 p-2">
+              <div class="text-center">
+                <i class="pi pi-check-circle text-5xl text-green-500 mb-3"></i>
+                <h1 class="text-2xl font-bold mb-2">
+                  Link-ul de partajare a fost creat cu succes!
+                </h1>
+                <p class="text-sm text-surface-500 dark:text-surface-400">
+                  Poți transmite aceste informații doctorului tău pentru a accesa datele tale
+                  medicale
+                </p>
+              </div>
+
+              <div class="w-full p-2">
+                <div class="flex flex-col mb-4 justify-center items-center">
+                  <span class="font-bold mb-1 text-2xl">Link de acces:</span>
+                  <div>
+                    <Button
+                      icon="pi pi-copy"
+                      variant="text"
+                      aria-label="copy"
+                      severity="secondary"
+                      @click="copyContent()"
+                    />
+                    <span class="text-xl text-surface-500 dark:text-surface-400">
+                      http://localhost:5173/share/{{ linkData?.code }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="flex flex-col mb-4 justify-center items-center">
+                  <span class="font-bold text-2xl mb-1">PIN de acces:</span>
+                  <div class="flex gap-2 items-center">
+                    <div
+                      class="flex gap-1 p-2 bg-surface-100 dark:bg-surface-800 rounded-md w-full justify-center"
+                    >
+                      <span
+                        v-for="(digit, index) in pin"
+                        :key="index"
+                        class="inline-flex items-center justify-center w-10 h-10 rounded-md bg-surface-0 dark:bg-surface-900 border-1 font-bold"
+                      >
+                        {{ digit }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mb-4 flex justify-center items-center">
+                  <Message
+                    severity="warn"
+                    :closable="false"
+                    class="flex items-center w-1/2"
+                    icon="pi pi-info-circle"
+                  >
+                    <span class="font-bold">
+                      Link-ul va expira la:
+                      {{
+                        linkData?.expiration_time
+                          ? format(new Date(linkData.expiration_time), 'dd MMM yyyy - HH:mm')
+                          : ''
+                      }}
+                    </span>
+                  </Message>
+                </div>
+              </div>
+
+              <div class="flex gap-3 mt-3">
+                <Button icon="pi pi-envelope" label="Trimite pe email" class="p-button-outlined" />
+                <Button icon="pi pi-qrcode" label="Genereaza QR code" class="p-button-outlined" />
+              </div>
             </div>
             <div class="pt-6">
               <Button
@@ -207,5 +265,13 @@ const processSharedItems = (selectedParentRows, selectedChildRows) => {
   })
 
   return sharedItems
+}
+
+const copyContent = async () => {
+  try {
+    await navigator.clipboard.writeText(`http://localhost:5173/share/${linkData.value.code}`)
+  } catch (err) {
+    console.error('Failed to copy: ', err)
+  }
 }
 </script>
