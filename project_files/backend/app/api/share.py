@@ -56,6 +56,22 @@ async def create_share_token(
         print(f"Share token creation error: {str(e)}")  # Or use a proper logger
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error creating share token: {str(e)}")
         
+@router.get("/share/{share_code}", status_code=status.HTTP_200_OK)
+async def check_share_token(
+    share_code: str,
+    session: Session = Depends(get_session)
+):
+    share_token = session.exec(select(ShareToken).where(ShareToken.share_code == share_code)).first()
+    
+    if not share_token:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Share token not found")
+    
+    if share_token.expiration_time < datetime.now():
+        raise HTTPException(status_code=status.HTTP_410_GONE, detail="Share token has expired")
+    
+    return {
+        "valid": True
+    }
     
 @router.post("/share/{share_code}/verify", status_code=status.HTTP_200_OK)
 async def verify_share_token(
@@ -67,9 +83,6 @@ async def verify_share_token(
     
     if not share_token:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Share token not found")
-    
-    if share_token.expiration_time < datetime.now():
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Share token has expired")
     
     if not verify_hash(pin, share_token.hashed_pin):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid PIN")
