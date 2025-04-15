@@ -151,7 +151,7 @@ const parentName = (key) => {
     case 'vaccines':
       return 'Vaccine'
     case 'allergies':
-      return 'Allergii'
+      return 'Alergii'
     case 'medhistory':
       return 'Istoric medical'
   }
@@ -205,7 +205,7 @@ const filteredArrangedRecords = computed(() => {
             return item.date_collection
           case 'Vaccine':
             return item.date_received
-          case 'Allergii':
+          case 'Alergii':
             return item.date_diagnosed
           case 'Istoric medical':
             return item.date_consultation
