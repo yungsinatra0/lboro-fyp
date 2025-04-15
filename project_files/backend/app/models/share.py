@@ -1,21 +1,19 @@
 from sqlmodel import Field, SQLModel, Relationship
 from pydantic import field_serializer
 from datetime import date, datetime, timedelta
-from typing import Any, Optional, List, Dict, ForwardRef
+from typing import List, TYPE_CHECKING
 import uuid
 import string
 import secrets
-from typing import TYPE_CHECKING
+from .vaccine import VaccineResponse
+from .allergy import AllergyResponse
+from .medication import MedicationResponse
+from .healthdata import HealthDataResponse
+from .medhistory import MedicalHistoryResponse, LabTestResponse
+from .share_user import UserShare
 
 if TYPE_CHECKING:
-    # These imports are only used by Pylance/mypy for type checking
-    # They don't cause circular imports at runtime
-    from .vaccine import VaccineResponse
-    from .allergy import AllergyResponse
-    from .medication import MedicationResponse
-    from .healthdata import HealthDataResponse
-    from .medhistory import MedicalHistoryResponse, LabResultResponse, LabTestResponse
-    from .user import UserShare, User
+    from .user import User  # Avoid circular import issues
 
 # moved here to avoid circular import issues
 def generate_random_string(length: int) -> str:
@@ -56,14 +54,14 @@ class ShareTokenResponse(SQLModel):
     code: str
 
 class ShareCategories(SQLModel):
-    vaccines: List["VaccineResponse"] = []
-    allergies: List["AllergyResponse"] = []
-    medications: List["MedicationResponse"] = []
-    healthdata: List["HealthDataResponse"] = []
-    medicalhistory: List["MedicalHistoryResponse"] = []
-    labtests: List["LabTestResponse"] = []
+    vaccines: List[VaccineResponse] = []
+    allergies: List[AllergyResponse] = []
+    medications: List[MedicationResponse] = []
+    healthdata: List[HealthDataResponse] = []
+    medicalhistory: List[MedicalHistoryResponse] = []
+    labtests: List[LabTestResponse] = []
    
 class ShareItemsResponse(SQLModel):
     expiration_time: datetime
-    patient: "UserShare"
-    items: "ShareCategories"
+    patient: UserShare
+    items: ShareCategories

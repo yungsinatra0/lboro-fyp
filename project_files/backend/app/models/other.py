@@ -2,12 +2,13 @@ from sqlmodel import Field, SQLModel, Relationship
 from pydantic import field_serializer
 from datetime import datetime
 import uuid
-from typing import Optional, Any
+from typing import Optional, TYPE_CHECKING
 
-Vaccine = Any # Using this to avoid Pylance errors
-MedicalHistory = Any # Using this to avoid Pylance errors
-LabResult = Any # Using this to avoid Pylance errors
-
+if TYPE_CHECKING:
+    from .user import User  # Avoid circular import issues
+    from .vaccine import Vaccine  # Avoid circular import issues
+    from .medhistory import MedicalHistory, LabResult
+    
 # API Response model
 class APIResponse(SQLModel):
     status: int

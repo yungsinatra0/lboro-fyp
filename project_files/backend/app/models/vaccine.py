@@ -2,10 +2,11 @@ from sqlmodel import Field, SQLModel, Relationship
 from pydantic import field_serializer
 from datetime import date, datetime
 import uuid
-from typing import Optional, Any
+from typing import Optional, TYPE_CHECKING
 from .other import FileUpload
 
-User = Any # Using this to avoid Pylance errors
+if TYPE_CHECKING:
+    from .user import User  # Avoid circular import issues
 
 # Vaccine model containing dates and serializers
 class VaccineDates(SQLModel):

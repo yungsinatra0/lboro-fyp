@@ -2,9 +2,10 @@ from sqlmodel import Field, SQLModel, Relationship
 from pydantic import field_serializer
 from datetime import date, datetime
 import uuid
-from typing import Any
+from typing import TYPE_CHECKING
 
-User = Any # Using this to avoid Pylance errors
+if TYPE_CHECKING:
+    from .user import User  # Avoid circular import issues
 
 # Health data Table models used for table creation
 class HealthDataDates(SQLModel):

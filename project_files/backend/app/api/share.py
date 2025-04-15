@@ -73,7 +73,7 @@ async def check_share_token(
         "valid": True
     }
     
-@router.post("/share/{share_code}/verify", status_code=status.HTTP_200_OK)
+@router.post("/share/{share_code}/verify", status_code=status.HTTP_200_OK, response_model=ShareItemsResponse)
 async def verify_share_token(
     share_code: str,
     pin: Annotated[str, Body(embed=True)],

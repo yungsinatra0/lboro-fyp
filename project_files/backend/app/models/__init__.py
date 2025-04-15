@@ -9,4 +9,5 @@ from .medhistory import *
 from .other import *
 from .share import *
 
-from .user import *
+from sqlmodel import SQLModel
+SQLModel.model_rebuild()

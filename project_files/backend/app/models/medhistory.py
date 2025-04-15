@@ -1,11 +1,12 @@
 from sqlmodel import Field, SQLModel, Relationship
 from pydantic import field_serializer
 from datetime import date, datetime
-from typing import Any, Optional, List
+from typing import TYPE_CHECKING, Optional, List
 import uuid
 from .other import FileUpload
 
-User = Any # Using this to avoid Pylance errors
+if TYPE_CHECKING:
+    from .user import User  # Avoid circular import issues
 
 # Medical History Table models used for table creation
 class MedicalHistoryDates(SQLModel):
