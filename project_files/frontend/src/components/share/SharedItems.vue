@@ -12,7 +12,7 @@
     </div>
 
     <div class="card">
-      <Tabs v-model:value="activeTab" v-if="shareData && shareData.items">
+      <Tabs v-model:value="Object.keys(shareData.items)[0]" v-if="shareData && shareData.items">
         <TabList>
           <Tab v-for="key in Object.keys(shareData.items)" :key="key" :value="key">{{ key }}</Tab>
         </TabList>
@@ -21,11 +21,30 @@
             <DataTable
               v-if="key !== 'Analize de laborator'"
               :value="shareData.items[key]"
-              :dataKey=key
+              :dataKey="key"
               :paginator="true"
               :rows="10"
               :rowsPerPageOptions="[5, 10, 20]"
+              paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
+              currentPageReportTemplate="{first}-{last} din {totalRecords}"
+              v-model:filters="filters"
+              :globalFilterFields="['name', 'allergens']"
+              removableSort
             >
+              <template #header>
+                <div class="flex justify-end items-center">
+                  <IconField>
+                    <InputIcon>
+                      <i class="pi pi-search" />
+                    </InputIcon>
+                    <InputText
+                      size="small"
+                      v-model="filters['global'].value"
+                      placeholder="Cauta..."
+                    />
+                  </IconField>
+                </div>
+              </template>
               <Column
                 v-for="column in Object.keys(shareData.items[key][0]).filter(
                   (col) => !['id', 'date_added', 'normal_range', 'trend'].includes(col),
@@ -43,11 +62,13 @@
                     icon="pi pi-eye"
                     variant="text"
                     severity="secondary"
-                    @click="() => {
-                        recordType = key === 'Vaccinuri' ? 'vaccine' : 'medicalhistory',
+                    @click="
+                      () => {
+                        recordType = key === 'Vaccinuri' ? 'vaccine' : 'medicalhistory'
                         recordId = data['id']
                         displayFile = true
-                    }"
+                      }
+                    "
                     rounded
                   />
 
@@ -105,7 +126,25 @@
               :paginator="true"
               :rows="10"
               :rowsPerPageOptions="[5, 10, 20]"
+              paginatorTemplate="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
+              currentPageReportTemplate="{first}-{last} din {totalRecords}"
+              v-model:filters="filters"
+              :globalFilterFields="['name', 'code']"
             >
+              <template #header>
+                <div class="flex justify-end items-center">
+                  <IconField>
+                    <InputIcon>
+                      <i class="pi pi-search" />
+                    </InputIcon>
+                    <InputText
+                      size="small"
+                      v-model="filters['global'].value"
+                      placeholder="Cauta..."
+                    />
+                  </IconField>
+                </div>
+              </template>
               <Column expander style="width: 5rem" />
               <Column field="name" header="Nume"> </Column>
               <Column field="code" header="Cod"> </Column>
@@ -121,7 +160,8 @@
                   >
                     <Column
                       v-for="column in Object.keys(slotProps.data.results[0]).filter(
-                        (col) => !['id', 'medicalhistory', 'is_numeric', 'date_added'].includes(col),
+                        (col) =>
+                          !['id', 'medicalhistory', 'is_numeric', 'date_added'].includes(col),
                       )"
                       :key="column"
                       :field="column"
@@ -169,16 +209,19 @@
 <script setup>
 import { ref } from 'vue'
 import ShowSharedFile from './ShowSharedFile.vue'
-
-const activeTab = ref('')
-const expandedRows = ref({})
-const displayFile = ref(false)
-const recordType = ref('')
-const recordId = ref('')
+import { FilterMatchMode } from '@primevue/core/api'
 
 const props = defineProps({
   shareData: Object,
   pin: String,
+})
+
+const expandedRows = ref({})
+const displayFile = ref(false)
+const recordType = ref('')
+const recordId = ref('')
+const filters = ref({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 })
 
 console.log('shareData', props.shareData)

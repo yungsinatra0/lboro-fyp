@@ -43,7 +43,7 @@
     >
       <template #header>
         <!-- Desktop filter section - only visible on larger screens -->
-        <div class="hidden md:flex justify-end align-items-center flex-wrap gap-2 mb-2">
+        <div class="hidden md:flex justify-end items-center flex-wrap gap-2 mb-2">
           <DatePicker
             v-model="selectedDates"
             placeholder="Selecteaza datele"
