@@ -89,17 +89,41 @@ const checkPin = async () => {
   }
 
   try {
-    console.log(route.params.code)
-    console.log(pin.value)
     const response = await api.post(`/share/${route.params.code}/verify`, { pin: pin.value })
     if (response.data) {
-      shareData.value = response.data
+      shareData.value = changeKeyToRO(response.data)
       displayPINCheck.value = false
-      console.log(response.data)    
+      console.log(shareData.value)
     }
   } catch (error) {
     pinError.value = 'PIN-ul introdus este gresit'
     console.error('Error checking PIN:', error)
   }
+}
+
+const changeKeyToRO = (data) => {
+    if (!data?.items) return data
+    
+    const keyMappings = {
+        'vaccines': 'Vaccinuri',
+        'allergies': 'Alergii',
+        'medications': 'Medicamente',
+        'healthdata': 'Semne vitale',
+        'medicalhistory': 'Istoric medical',
+        'labtests': 'Analize de laborator'
+    }
+    
+    // Create a new items object with renamed keys
+    const newItems = {}
+    
+    for (const [key, value] of Object.entries(data.items)) {
+        const newKey = keyMappings[key] || key
+        newItems[newKey] = value
+    }
+    
+    // Replace the original items object
+    data.items = newItems
+    
+    return data
 }
 </script>
