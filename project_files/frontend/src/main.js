@@ -5,7 +5,7 @@ import Primevue from 'primevue/config'
 import Tooltip from 'primevue/tooltip'
 import App from './App.vue'
 import router from './router'
-import "./base.css";
+import "./base.css"
 
 // Primevue components
 import Button from 'primevue/button'
@@ -45,58 +45,68 @@ import IftaLabel from 'primevue/iftalabel'
 import RadioButton from 'primevue/radiobutton'
 import RadioButtonGroup from 'primevue/radiobuttongroup'
 import ToggleButton from 'primevue/togglebutton'
+import Tabs from 'primevue/tabs'
+import TabList from 'primevue/tablist'
+import Tab from 'primevue/tab'
+import TabPanels from 'primevue/tabpanels'
+import TabPanel from 'primevue/tabpanel'
 
 
-const pinia = createPinia();
+const pinia = createPinia()
 
-const app = createApp(App);
+const app = createApp(App)
 
-app.use(pinia);
-app.use(router);
+app.use(pinia)
+app.use(router)
 app.use(Primevue, {
     theme: 'none',
     ripple: true,
-});
-app.use(ConfirmationService);
+})
+app.use(ConfirmationService)
 
 // Adding primevue components
-app.component('Button', Button); 
-app.component('Card', Card);
-app.component('DataTable', DataTable);
-app.component('Column', Column);
-app.component('Tag', Tag);
-app.component('Dialog', Dialog);
-app.component('Stepper', Stepper);
-app.component('StepList', StepList);
-app.component('StepPanels', StepPanels);
-app.component('SelectButton', SelectButton);
-app.component('Slider', Slider);
-app.component('Step', Step);
-app.component('StepPanel', StepPanel);
-app.component('InputOtp', InputOtp);
-app.component('Message', Message);
-app.component('DatePicker', DatePicker);
-app.component('InputText', InputText);
-app.component('IconField', IconField);
-app.component('InputIcon', InputIcon);
-app.component('ProgressSpinner', ProgressSpinner);
-app.component('DataView', DataView);
-app.component('Select', Select);
-app.component('Menu', Menu);
-app.component('MultiSelect', MultiSelect);
-app.component('ConfirmDialog', ConfirmDialog);
-app.component('Form', Form);
-app.component('Textarea', Textarea);
-app.component('Image', Image);
-app.component('Menubar', Menubar);
-app.component('Password', Password);
-app.component('FileUpload', FileUpload);
-app.component('ToggleSwitch', ToggleSwitch);
-app.component('InputNumber', InputNumber);
-app.component('IftaLabel', IftaLabel);
-app.component('RadioButton', RadioButton);
-app.component('RadioButtonGroup', RadioButtonGroup);
-app.component('ToggleButton', ToggleButton);
+app.component('Button', Button) 
+app.component('Card', Card)
+app.component('DataTable', DataTable)
+app.component('Column', Column)
+app.component('Tag', Tag)
+app.component('Dialog', Dialog)
+app.component('Stepper', Stepper)
+app.component('StepList', StepList)
+app.component('StepPanels', StepPanels)
+app.component('SelectButton', SelectButton)
+app.component('Slider', Slider)
+app.component('Step', Step)
+app.component('StepPanel', StepPanel)
+app.component('InputOtp', InputOtp)
+app.component('Message', Message)
+app.component('DatePicker', DatePicker)
+app.component('InputText', InputText)
+app.component('IconField', IconField)
+app.component('InputIcon', InputIcon)
+app.component('ProgressSpinner', ProgressSpinner)
+app.component('DataView', DataView)
+app.component('Select', Select)
+app.component('Menu', Menu)
+app.component('MultiSelect', MultiSelect)
+app.component('ConfirmDialog', ConfirmDialog)
+app.component('Form', Form)
+app.component('Textarea', Textarea)
+app.component('Image', Image)
+app.component('Menubar', Menubar)
+app.component('Password', Password)
+app.component('FileUpload', FileUpload)
+app.component('ToggleSwitch', ToggleSwitch)
+app.component('InputNumber', InputNumber)
+app.component('IftaLabel', IftaLabel)
+app.component('RadioButton', RadioButton)
+app.component('RadioButtonGroup', RadioButtonGroup)
+app.component('ToggleButton', ToggleButton)
+app.component('Tabs', Tabs)
+app.component('TabList', TabList)
+app.component('Tab', Tab)
+app.component('TabPanels', TabPanels)
+app.component('TabPanel', TabPanel)
 
-app.directive('tooltip', Tooltip);
+app.directive('tooltip', Tooltip)
 app.mount('#app')

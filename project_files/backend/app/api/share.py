@@ -85,7 +85,7 @@ async def verify_share_token(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Share token not found")
     
     if not verify_hash(pin, share_token.hashed_pin):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid PIN")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid PIN")
     
     user = session.exec(select(User).where(User.id == share_token.user_id)).first()
     
