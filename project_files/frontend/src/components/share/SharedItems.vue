@@ -47,7 +47,9 @@
               </template>
               <Column
                 v-for="column in Object.keys(shareData.items[key][0]).filter(
-                  (col) => !['id', 'date_added', 'normal_range', 'trend'].includes(col),
+                  (col) =>
+                    !['id', 'date_added', 'normal_range', 'trend'].includes(col) &&
+                    !col.includes('original'),
                 )"
                 :key="column"
                 :field="column"
@@ -56,7 +58,6 @@
               >
                 <template #body="{ data }">
                   <!-- File/Certificate icons -->
-
                   <Button
                     v-if="['certificate', 'file'].includes(column) && data[column] === true"
                     icon="pi pi-eye"
@@ -112,6 +113,10 @@
                     {{ data[column] }}
                   </Tag>
 
+                  <span v-else-if="column.includes('date')">
+                    {{ data[`original_${column}`] }}
+                  </span>
+
                   <!-- Regular text value -->
                   <span v-else-if="data[column] !== false">{{ data[column] }}</span>
                 </template>
@@ -161,12 +166,16 @@
                     <Column
                       v-for="column in Object.keys(slotProps.data.results[0]).filter(
                         (col) =>
-                          !['id', 'medicalhistory', 'is_numeric', 'date_added'].includes(col),
+                          !['id', 'medicalhistory', 'is_numeric', 'date_added'].includes(col) && !col.includes('original'),
                       )"
                       :key="column"
                       :field="column"
                       :header="column"
-                    ></Column>
+                    >
+                    <template #body="slotProps" v-if="column === 'date_collection'">
+                        {{ slotProps.data[`original_${column}`] }}
+                    </template>
+                    </Column>
                     <Column header="file">
                       <template #body="slotProps">
                         <Button
@@ -223,6 +232,4 @@ const recordId = ref('')
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 })
-
-console.log('shareData', props.shareData)
 </script>

@@ -43,6 +43,7 @@ import api from '@/services/api'
 import { ref, computed, onMounted, watch } from 'vue'
 import { z } from 'zod'
 import { useRoute, useRouter } from 'vue-router'
+import { parseDates } from '@/utils'
 import SharedItems from '@/components/share/SharedItems.vue'
 
 const displayPINCheck = ref(false)
@@ -91,7 +92,22 @@ const checkPin = async () => {
   try {
     const response = await api.post(`/share/${route.params.code}/verify`, { pin: pin.value })
     if (response.data) {
-      shareData.value = changeKeyToRO(response.data)
+      shareData.value = {
+        ...response.data,
+        items: {
+          'Semne vitale': parseDates(response.data.items.healthdata, 'date_recorded'),
+          'Medicamente': parseDates(response.data.items.medications, 'date_prescribed'),
+          'Vaccinuri': parseDates(response.data.items.vaccines, 'date_received'),
+          'Alergii': parseDates(response.data.items.allergies, 'date_diagnosed'),
+          'Istoric medical': parseDates(response.data.items.medicalhistory, 'date_consultation'),
+          'Analize de laborator': response.data.items.labtests.map((test) => {
+            return {
+              ...test,
+              results: parseDates(test.results, 'date_collection'),
+            }
+          }),
+        },
+      }
       displayPINCheck.value = false
       console.log(shareData.value)
     }
@@ -99,31 +115,5 @@ const checkPin = async () => {
     pinError.value = 'PIN-ul introdus este gresit'
     console.error('Error checking PIN:', error)
   }
-}
-
-const changeKeyToRO = (data) => {
-    if (!data?.items) return data
-    
-    const keyMappings = {
-        'vaccines': 'Vaccinuri',
-        'allergies': 'Alergii',
-        'medications': 'Medicamente',
-        'healthdata': 'Semne vitale',
-        'medicalhistory': 'Istoric medical',
-        'labtests': 'Analize de laborator'
-    }
-    
-    // Create a new items object with renamed keys
-    const newItems = {}
-    
-    for (const [key, value] of Object.entries(data.items)) {
-        const newKey = keyMappings[key] || key
-        newItems[newKey] = value
-    }
-    
-    // Replace the original items object
-    data.items = newItems
-    
-    return data
 }
 </script>
