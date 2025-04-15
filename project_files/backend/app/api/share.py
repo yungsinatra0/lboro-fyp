@@ -1,11 +1,11 @@
-from fastapi import Depends, HTTPException, status, APIRouter, Body
+from fastapi import Depends, HTTPException, status, APIRouter, Body, Request
 from fastapi.responses import StreamingResponse
 from sqlmodel import Session, select
 import uuid
 from datetime import datetime, timedelta
 from typing import Annotated
 
-from ..models import User, ShareToken, SharedItem, CreateShareToken, ShareTokenResponse, ShareItemsResponse
+from ..models import User, ShareToken, SharedItem, CreateShareToken, ShareTokenResponse, ShareItemsResponse, FileResponse
 from ..utils import get_session, validate_session, create_hash, verify_hash, get_item_data, get_connected_record, decrypt_file
 
 router = APIRouter()
@@ -134,11 +134,53 @@ async def delete_share_token(
         "detail": "Share token deleted successfully"
     }
     
+# Get file metadata
+@router.get("/share/{share_code}/{record_type}/{record_id}/metadata")
+async def get_file_metadata(
+    share_code: str,
+    record_type: str,
+    record_id: uuid.UUID,
+    request: Request,
+    session: Session = Depends(get_session)    
+):
+    share_token = session.exec(select(ShareToken).where(ShareToken.share_code == share_code)).first()
+    
+    if not share_token:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Share token not found")
+    
+    if share_token.expiration_time < datetime.now():
+        raise HTTPException(status_code=status.HTTP_410_GONE, detail="Share token has expired")
+    
+    pin = request.headers.get('Authorization')
+    
+    if not pin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Authorization header missing")
+    
+    if not verify_hash(pin, share_token.hashed_pin):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid PIN")
+    
+    user_id = share_token.user_id
+    
+    record = await get_connected_record(record_type, record_id, user_id, session)
+    
+    if record_type == "vaccine":
+        file_record = record.certificate
+    elif record_type == "medicalhistory":
+        file_record = record.file
+    
+    return FileResponse(
+        id = file_record.id,
+        name = file_record.name,
+        file_type = file_record.file_type,
+        file_path = file_record.file_path,
+    )
+    
 @router.get("/share/{share_code}/file/{record_type}/{record_id}")
 async def get_shared_file(
     share_code: str,
     record_type: str,
     record_id: uuid.UUID,
+    request: Request,
     session: Session = Depends(get_session)
 ):
     share_token = session.exec(select(ShareToken).where(ShareToken.share_code == share_code)).first()
@@ -147,18 +189,15 @@ async def get_shared_file(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Share token not found") 
     
     if share_token.expiration_time < datetime.now():
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Share token has expired")
+        raise HTTPException(status_code=status.HTTP_410_GONE, detail="Share token has expired")
     
-    shared_item = session.exec(
-        select(SharedItem).where(
-            SharedItem.share_token_id == share_token.id,
-            SharedItem.item_id == record_id,
-            SharedItem.item_type == record_type
-        )
-    ).first()
+    pin = request.headers.get('Authorization')
     
-    if not shared_item:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Shared item not found")
+    if not pin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Authorization header missing")
+    
+    if not verify_hash(pin, share_token.hashed_pin):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid PIN")
     
     record = await get_connected_record(record_type, record_id, share_token.user_id, session)
     

@@ -1,6 +1,6 @@
 <template>
   <div v-if="isValid">
-    <SharedItems :share-data="shareData" />
+    <SharedItems :share-data="shareData" :pin="pin" />
   </div>
 
   <Dialog

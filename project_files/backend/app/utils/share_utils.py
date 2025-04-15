@@ -11,12 +11,12 @@ def get_item_data(grouped_items, session: Session):
         
         transformed_vaccines = []
         for vaccine in vaccines:
-            vaccine_data = vaccine.model_dump(exclude={"date_received", "user", "file"})
+            vaccine_data = vaccine.model_dump(exclude={"date_received", "user", "certificate"})
             vaccine_data["date_received"] = vaccine.date_received  
             
             transformed_vaccine = VaccineResponse(
                 **vaccine_data,
-                file = True if vaccine.certificate else False,
+                certificate = True if vaccine.certificate else False,
             )
             transformed_vaccines.append(transformed_vaccine)
             
