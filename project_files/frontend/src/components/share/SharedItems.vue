@@ -5,9 +5,10 @@
         <h2>Date pacient</h2>
         <span> {{ shareData?.patient.name }} </span> <span> {{ shareData?.patient.dob }} </span>
       </div>
-      <div>
-        <h2>Link-ul expira la</h2>
-        <span> {{ shareData?.expiration_time }} </span>
+      <div v-if="timer">
+        <span>{{ timer.hours }}</span
+        >:<span>{{ timer.minutes }}</span
+        >:<span>{{ timer.seconds }}</span>
       </div>
     </div>
 
@@ -166,15 +167,16 @@
                     <Column
                       v-for="column in Object.keys(slotProps.data.results[0]).filter(
                         (col) =>
-                          !['id', 'medicalhistory', 'is_numeric', 'date_added'].includes(col) && !col.includes('original'),
+                          !['id', 'medicalhistory', 'is_numeric', 'date_added'].includes(col) &&
+                          !col.includes('original'),
                       )"
                       :key="column"
                       :field="column"
                       :header="column"
                     >
-                    <template #body="slotProps" v-if="column === 'date_collection'">
+                      <template #body="slotProps" v-if="column === 'date_collection'">
                         {{ slotProps.data[`original_${column}`] }}
-                    </template>
+                      </template>
                     </Column>
                     <Column header="file">
                       <template #body="slotProps">
@@ -219,6 +221,8 @@
 import { ref } from 'vue'
 import ShowSharedFile from './ShowSharedFile.vue'
 import { FilterMatchMode } from '@primevue/core/api'
+import { parseISO } from 'date-fns'
+import { useTimer } from 'vue-timer-hook'
 
 const props = defineProps({
   shareData: Object,
@@ -232,4 +236,5 @@ const recordId = ref('')
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 })
+const timer = useTimer(parseISO(props.shareData.expiration_time))
 </script>
