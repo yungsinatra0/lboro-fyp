@@ -1,9 +1,8 @@
 <template>
-  <div v-if="isValid">
-    <SharedItems :share-data="shareData" :pin="pin" />
-  </div>
+  <SharedItems v-if="isValid && shareData !== null" :share-data="shareData" :pin="pin" />
 
   <Dialog
+    v-if="displayPINCheck"
     v-model:visible="displayPINCheck"
     modal
     header="Verificare PIN"
@@ -23,6 +22,7 @@
   </Dialog>
 
   <Dialog
+    v-if="displayInvalid"
     v-model:visible="displayInvalid"
     modal
     header="Link expirat"
@@ -96,9 +96,9 @@ const checkPin = async () => {
         ...response.data,
         items: {
           'Semne vitale': parseDates(response.data.items.healthdata, 'date_recorded'),
-          'Medicamente': parseDates(response.data.items.medications, 'date_prescribed'),
-          'Vaccinuri': parseDates(response.data.items.vaccines, 'date_received'),
-          'Alergii': parseDates(response.data.items.allergies, 'date_diagnosed'),
+          Medicamente: parseDates(response.data.items.medications, 'date_prescribed'),
+          Vaccinuri: parseDates(response.data.items.vaccines, 'date_received'),
+          Alergii: parseDates(response.data.items.allergies, 'date_diagnosed'),
           'Istoric medical': parseDates(response.data.items.medicalhistory, 'date_consultation'),
           'Analize de laborator': response.data.items.labtests.map((test) => {
             return {
