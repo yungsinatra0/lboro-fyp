@@ -179,7 +179,45 @@
                   <span v-else> - </span>
                 </template></Column
               >
-              <Column header="Trend"> </Column>
+              <Column header="Trend">
+                <template #body="slotProps">
+                  <span v-if="slotProps.data.results && slotProps.data.results.length">
+                    <i
+                      class="pi pi-arrow-up text-red-500"
+                      v-if="
+                        calculateTrend(
+                          slotProps.data.results[slotProps.data.results.length-1].value,
+                          slotProps.data.results[slotProps.data.results.length-1].reference_range,
+                          slotProps.data.results[slotProps.data.results.length-1].is_numeric,
+                        ) === 'up'
+                      "
+                      v-tooltip="'Peste limita normala'"
+                    ></i>
+                    <i
+                      class="pi pi-arrow-down text-red-500"
+                      v-else-if="
+                        calculateTrend(
+                          slotProps.data.results[slotProps.data.results.length-1].value,
+                          slotProps.data.results[slotProps.data.results.length-1].reference_range,
+                          slotProps.data.results[slotProps.data.results.length-1].is_numeric,
+                        ) === 'down'
+                      "
+                      v-tooltip="'Sub limita normala'"
+                    ></i>
+                    <i
+                      v-else-if="
+                        calculateTrend(
+                          slotProps.data.results[slotProps.data.results.length-1].value,
+                          slotProps.data.results[slotProps.data.results.length-1].reference_range,
+                          slotProps.data.results[slotProps.data.results.length-1].is_numeric,
+                        ) === 'normal'
+                      "
+                      class="pi pi-check text-green-500"
+                      v-tooltip="'In limitele normale'"
+                    ></i>
+                  </span>
+                </template>
+              </Column>
               <Column header="Evolutia rezultatelor"> </Column>
               <template #expansion="slotProps">
                 <div class="p-4">
@@ -240,6 +278,7 @@ import ShowSharedFile from './ShowSharedFile.vue'
 import { FilterMatchMode } from '@primevue/core/api'
 import { parseISO } from 'date-fns'
 import { useTimer } from 'vue-timer-hook'
+import { calculateTrend } from '@/utils'
 
 const props = defineProps({
   shareData: Object,
