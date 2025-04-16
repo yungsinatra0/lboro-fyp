@@ -140,7 +140,7 @@
           ></i>
         </template>
       </Column>
-      <Column header="Evolutia rezultatelor" class="hidden lg:table-cell">
+      <Column header="Evolutia rezultatelor" class="hidden md:table-cell">
         <template #body="slotProps">
           <template v-if="slotProps.data.results.some((result) => result.is_numeric === true)">
             <Line
@@ -260,7 +260,7 @@
 
 <script setup>
 import NavBar from '@/components/NavBar.vue'
-import { calculateTrend } from '@/utils'
+import { calculateTrend, getChartData } from '@/utils'
 import ShowFile from '@/components/medhistory/ShowFile.vue'
 import { FilterMatchMode } from '@primevue/core/api'
 import { ref, onMounted, computed } from 'vue'
@@ -415,38 +415,5 @@ const mobileChartOptions = {
       display: false,
     },
   },
-}
-
-const getChartData = (results) => {
-  const numericResults = results.filter((result) => result.is_numeric === true).reverse()
-  const labels = numericResults.map((result) => result.original_date_collection)
-  const data = numericResults.map((result) => parseFloat(result.value))
-
-  const pointBackgroundColors = numericResults.map((result) => {
-    const trend = calculateTrend(result.value, result.reference_range, result.is_numeric)
-    if (trend === 'up' || trend === 'down') return '#dc3545'
-    return '#36c02c'
-  })
-
-  const pointBorderColors = numericResults.map((result) => {
-    const trend = calculateTrend(result.value, result.reference_range, result.is_numeric)
-    if (trend === 'up' || trend === 'down') return '#dc3545'
-    return '#36c02c'
-  })
-
-  return {
-    labels,
-    datasets: [
-      {
-        data,
-        borderColor: '#9e9e9e',
-        tension: 0.4,
-        borderWidth: 1,
-        pointRadius: 3,
-        pointBackgroundColor: pointBackgroundColors,
-        pointBorderColor: pointBorderColors,
-      },
-    ],
-  }
 }
 </script>

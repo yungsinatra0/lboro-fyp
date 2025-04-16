@@ -186,9 +186,9 @@
                       class="pi pi-arrow-up text-red-500"
                       v-if="
                         calculateTrend(
-                          slotProps.data.results[slotProps.data.results.length-1].value,
-                          slotProps.data.results[slotProps.data.results.length-1].reference_range,
-                          slotProps.data.results[slotProps.data.results.length-1].is_numeric,
+                          slotProps.data.results[slotProps.data.results.length - 1].value,
+                          slotProps.data.results[slotProps.data.results.length - 1].reference_range,
+                          slotProps.data.results[slotProps.data.results.length - 1].is_numeric,
                         ) === 'up'
                       "
                       v-tooltip="'Peste limita normala'"
@@ -197,28 +197,35 @@
                       class="pi pi-arrow-down text-red-500"
                       v-else-if="
                         calculateTrend(
-                          slotProps.data.results[slotProps.data.results.length-1].value,
-                          slotProps.data.results[slotProps.data.results.length-1].reference_range,
-                          slotProps.data.results[slotProps.data.results.length-1].is_numeric,
+                          slotProps.data.results[slotProps.data.results.length - 1].value,
+                          slotProps.data.results[slotProps.data.results.length - 1].reference_range,
+                          slotProps.data.results[slotProps.data.results.length - 1].is_numeric,
                         ) === 'down'
                       "
                       v-tooltip="'Sub limita normala'"
                     ></i>
                     <i
-                      v-else-if="
-                        calculateTrend(
-                          slotProps.data.results[slotProps.data.results.length-1].value,
-                          slotProps.data.results[slotProps.data.results.length-1].reference_range,
-                          slotProps.data.results[slotProps.data.results.length-1].is_numeric,
-                        ) === 'normal'
-                      "
+                      v-else
                       class="pi pi-check text-green-500"
                       v-tooltip="'In limitele normale'"
                     ></i>
                   </span>
                 </template>
               </Column>
-              <Column header="Evolutia rezultatelor"> </Column>
+              <Column header="Evolutia rezultatelor">
+                <template #body="slotProps">
+                  <template
+                    v-if="slotProps.data.results.some((result) => result.is_numeric === true)"
+                  >
+                    <Line
+                        :data="getChartData([...slotProps.data.results].reverse())"
+                      :options="chartOptions"
+                      :width="150"
+                      :height="50"
+                    />
+                  </template>
+                </template>
+              </Column>
               <template #expansion="slotProps">
                 <div class="p-4">
                   <h2>Detalii pentru {{ slotProps.data.name }}</h2>
@@ -278,7 +285,20 @@ import ShowSharedFile from './ShowSharedFile.vue'
 import { FilterMatchMode } from '@primevue/core/api'
 import { parseISO } from 'date-fns'
 import { useTimer } from 'vue-timer-hook'
-import { calculateTrend } from '@/utils'
+import { calculateTrend, getChartData } from '@/utils'
+import { Line } from 'vue-chartjs'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js'
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
 const props = defineProps({
   shareData: Object,
@@ -300,6 +320,43 @@ onMounted(() => {
     timer.value = useTimer(expirationDate)
   }
 })
+
+const chartOptions = {
+  responsive: false,
+  maintainAspectRatio: false,
+  scales: {
+    y: {
+      display: false,
+      grid: {
+        display: false,
+      },
+      beginAtZero: false,
+    },
+    x: {
+      display: true,
+      grid: {
+        display: false,
+      },
+      title: {
+        display: false,
+      },
+      ticks: {
+        display: false,
+      },
+    },
+  },
+  plugins: {
+    legend: {
+      display: false,
+    },
+    tooltip: {
+      enabled: true,
+      position: 'nearest',
+      yAlign: 'center',
+      xAlign: 'center',
+    },
+  },
+}
 
 const showFile = (type, id) => {
   recordType.value = type

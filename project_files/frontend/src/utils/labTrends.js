@@ -1,5 +1,5 @@
 export const calculateTrend = (value, reference_range, is_numeric) => {
-    if (!value || !reference_range) return null
+    if (!value || !reference_range) return 'normal'
   
     if (is_numeric) {
       value = parseFloat(value)
@@ -27,3 +27,36 @@ export const calculateTrend = (value, reference_range, is_numeric) => {
     }
     return 'normal'
   }
+
+export const getChartData = (results) => {
+  const numericResults = results.filter((result) => result.is_numeric === true).reverse()
+  const labels = numericResults.map((result) => result.original_date_collection)
+  const data = numericResults.map((result) => parseFloat(result.value))
+
+  const pointBackgroundColors = numericResults.map((result) => {
+    const trend = calculateTrend(result.value, result.reference_range, result.is_numeric)
+    if (trend === 'up' || trend === 'down') return '#dc3545'
+    return '#36c02c'
+  })
+
+  const pointBorderColors = numericResults.map((result) => {
+    const trend = calculateTrend(result.value, result.reference_range, result.is_numeric)
+    if (trend === 'up' || trend === 'down') return '#dc3545'
+    return '#36c02c'
+  })
+
+  return {
+    labels,
+    datasets: [
+      {
+        data,
+        borderColor: '#9e9e9e',
+        tension: 0.4,
+        borderWidth: 1,
+        pointRadius: 3,
+        pointBackgroundColor: pointBackgroundColors,
+        pointBorderColor: pointBorderColors,
+      },
+    ],
+  }
+}
