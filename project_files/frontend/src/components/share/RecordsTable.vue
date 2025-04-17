@@ -75,6 +75,11 @@
           <span class="font-bold"> {{ slotProps.data.items.length }} </span>
         </template>
       </Column>
+      <Column header="Elemente selectate">
+      <template #body="slotProps">
+        <span class="font-bold"> {{ selectedChildRowsCount[`${slotProps.data.type}`] }} </span>
+      </template>
+      </Column>
       <Column expander style="width: 3em" />
       <template #expansion="slotProps">
         <DataTable
@@ -324,5 +329,17 @@ const onChildRowUnselect = (event, rowData) => {
   console.log('Selected Child Rows:', selectedChildRows.value)
 }
 
-// TODO: Display lab results properly with lab tests
+const selectedChildRowsCount = computed(() => {
+  const counts = {}
+  
+  // Count selected rows for each parent type
+  arrangedRecords.value.forEach(parentRow => {
+    const childRows = selectedChildRows.value.filter(childRow => {
+      return parentRow.items.some(item => item.id === childRow.id)
+    })
+    counts[parentRow.type] = childRows.length
+  })
+  
+  return counts
+})
 </script>
