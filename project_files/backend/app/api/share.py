@@ -82,18 +82,8 @@ async def verify_share_token(
         "name": user.name,
         "dob": user.dob.strftime("%d-%m-%Y") if user.dob else None,
     }
-    
-    # shared_items = session.exec(
-    #     select(SharedItem).where(SharedItem.share_token_id == share_token.id)
-    # ).all()
-    
-    # grouped_items = {}
-    # for item in shared_items:
-    #     if item.item_type not in grouped_items:
-    #         grouped_items[item.item_type] = []
-    #     grouped_items[item.item_type].append(item.item_id)
         
-    items_data = get_item_data(grouped_items, session)
+    items_data = get_item_data(share_token.shared_items, session)
     
     return {
         "expiration_time": share_token.expiration_time,

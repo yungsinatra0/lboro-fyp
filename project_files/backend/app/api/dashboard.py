@@ -119,15 +119,6 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
                 code = labresult.test.code,
                 medicalhistory = MedicalHistoryResponse(
                     id = labresult.medicalhistory.id,
-                    name = labresult.medicalhistory.name,
-                    doctor_name = labresult.medicalhistory.doctor_name,
-                    place = labresult.medicalhistory.place,
-                    notes = labresult.medicalhistory.notes,
-                    category = labresult.medicalhistory.category.name,
-                    subcategory = labresult.medicalhistory.subcategory.name if labresult.medicalhistory.subcategory else None,
-                    labsubcategory = labresult.medicalhistory.labsubcategory.name if labresult.medicalhistory.labsubcategory else None,
-                    date_consultation = labresult.medicalhistory.date_consultation,
-                    date_added = labresult.medicalhistory.date_added,
                     file = True if labresult.medicalhistory.file else False,
             )))
     

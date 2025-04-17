@@ -189,7 +189,7 @@ class LabResultResponseDashboard(LabDates):
     unit: str | None = None
     reference_range: str | None = None 
     method: str | None = None
-    medicalhistory: MedicalHistoryResponse
+    medicalhistory: MedicalHistoryResponseLab
     
     # Taken from LabTest to show the name of the test
     name: str
