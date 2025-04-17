@@ -82,8 +82,8 @@
                 :records="props.records"
                 @back="activateCallback('1')"
                 @next="
-                  async (selectedParentRows, selectedChildRows) => {
-                    const result = await createShareLink(selectedParentRows, selectedChildRows)
+                  async (selectedChildRows, allSelected) => {
+                    const result = await createShareLink(selectedChildRows, allSelected)
                     if (result) {
                       activateCallback('3')
                     } else {
@@ -211,11 +211,11 @@ const pinValidation = computed(() => {
   }
 })
 
-const createShareLink = async (selectedParentRows, selectedChildRows) => {
-  console.log('Received Parent Rows:', selectedParentRows)
+const createShareLink = async (selectedChildRows, allSelected) => {
+  // console.log('Received Parent Rows:', selectedParentRows)
   console.log('Received Child Rows:', selectedChildRows)
 
-  const sharedItems = processSharedItems(selectedParentRows, selectedChildRows)
+  const sharedItems = allSelected ? props.records : processSharedItems(selectedChildRows)
   console.log('Shared Items:', sharedItems)
 
   const timeInMinutes = selectedOption.value === 'Ore' ? time.value * 60 : time.value
@@ -224,7 +224,7 @@ const createShareLink = async (selectedParentRows, selectedChildRows) => {
     const response = await api.post('/share/create', {
       token_length: timeInMinutes,
       pin: pin.value,
-      shared_items: sharedItems,
+      shared_items: {},
     })
 
     linkData.value = response.data
@@ -236,22 +236,18 @@ const createShareLink = async (selectedParentRows, selectedChildRows) => {
   }
 }
 
-const processSharedItems = (selectedParentRows, selectedChildRows) => {
-  const sharedItems = []
+const processSharedItems = (selectedChildRows) => {
+  const sharedItems = {}
 
-  selectedParentRows.forEach((parentRow) => {
-    for (const item of parentRow.items) {
-      const itemId = item.id
-      // check the records in parentRow object versus the ones selected in the selectedChildRows
-      const selectedChildRow = selectedChildRows.some((childRow) => childRow.id === itemId)
-      if (selectedChildRow) {
-        sharedItems.push({
-          item_type: parentRow.type,
-          item_id: itemId,
-        })
-      }
+  for (const [type, records] of Object.entries(props.records)) {
+    const selectedRecords = records.filter((record) => {
+      return selectedChildRows.some((selected) => selected.id === record.id)
+    })
+
+    if (selectedRecords.length > 0) {
+      sharedItems[type] = selectedRecords
     }
-  })
+  }
 
   return sharedItems
 }
