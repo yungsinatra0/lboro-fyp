@@ -495,6 +495,15 @@ const addExtractedLab = async () => {
 const onRowEditSave = (event) => {
   let { newData, index } = event
 
+  // if filtering, get original index
+  // if not filtering, can just edit the data directly
+  // need to compare test name and something else like method or unit to find the original index
+
+  if (filters.value.global.value) {
+    const originalIndex = extractionResult.value.findIndex((item) => item.test_name === newData.test_name && item.method === newData.method && item.unit === newData.unit)
+    index = originalIndex
+  }
+  
   extractionResult.value[index] = newData
 }
 
