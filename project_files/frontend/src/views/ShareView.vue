@@ -95,7 +95,7 @@ const checkPin = async () => {
       shareData.value = {
         ...response.data,
         items: {
-          'Semne vitale': parseDates(response.data.items.healthdata, 'date_recorded'),
+          'Semne vitale': parseDates(response.data.items.vitals, 'date_recorded'),
           Medicamente: parseDates(response.data.items.medications, 'date_prescribed'),
           Vaccinuri: parseDates(response.data.items.vaccines, 'date_received'),
           Alergii: parseDates(response.data.items.allergies, 'date_diagnosed'),

@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status, Response, Request, APIRouter
 from sqlmodel import Session, select, col
 import uuid
 
-from ..models import User, Vaccine, VaccineResponse, Allergy, AllergyResponse, HealthData, HealthDataResponse, Medication, MedicationResponse, UserDashboard, MedicalHistory, MedicalHistoryResponse, LabResultResponseDashboard, LabResult
+from ..models import User, Vaccine, VaccineResponse, Allergy, AllergyResponse, HealthData, HealthDataResponse, Medication, MedicationResponse, UserDashboard, MedicalHistory, MedicalHistoryResponse, LabResultResponseDashboard, LabResult, MedicalHistoryResponseLab
 from ..utils import get_session, validate_session, group_compare_healthdata
 
 router = APIRouter()
@@ -117,7 +117,7 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
                 method = labresult.method,
                 name = labresult.test.name,
                 code = labresult.test.code,
-                medicalhistory = MedicalHistoryResponse(
+                medicalhistory = MedicalHistoryResponseLab(
                     id = labresult.medicalhistory.id,
                     file = True if labresult.medicalhistory.file else False,
             )))

@@ -116,7 +116,7 @@
             label="Next"
             icon="pi pi-arrow-right"
             iconPos="right"
-            @click="emit('next', selectedChildRows, allSelected)"
+            @click="emit('next', selectedChildRows)"
             :disabled="selectedChildRows.length === 0"
           />
         </div>
@@ -147,7 +147,7 @@ const parentName = (key) => {
       return 'Vaccine'
     case 'allergies':
       return 'Alergii'
-    case 'medhistory':
+    case 'medicalhistory':
       return 'Istoric medical'
   }
 }

@@ -82,8 +82,8 @@
                 :records="props.records"
                 @back="activateCallback('1')"
                 @next="
-                  async (selectedChildRows, allSelected) => {
-                    const result = await createShareLink(selectedChildRows, allSelected)
+                  async (selectedChildRows) => {
+                    const result = await createShareLink(selectedChildRows)
                     if (result) {
                       activateCallback('3')
                     } else {
@@ -185,7 +185,7 @@ import RecordsTable from '../share/RecordsTable.vue'
 import api from '@/services/api'
 import { computed, ref } from 'vue'
 import { z } from 'zod'
-import { format } from 'date-fns'
+import { format, formatISO } from 'date-fns'
 
 const props = defineProps({
   displayDialog: Boolean,
@@ -211,11 +211,11 @@ const pinValidation = computed(() => {
   }
 })
 
-const createShareLink = async (selectedChildRows, allSelected) => {
+const createShareLink = async (selectedChildRows) => {
   // console.log('Received Parent Rows:', selectedParentRows)
   console.log('Received Child Rows:', selectedChildRows)
 
-  const sharedItems = allSelected ? props.records : processSharedItems(selectedChildRows)
+  const sharedItems = processSharedItems(selectedChildRows)
   console.log('Shared Items:', sharedItems)
 
   const timeInMinutes = selectedOption.value === 'Ore' ? time.value * 60 : time.value
@@ -240,9 +240,24 @@ const processSharedItems = (selectedChildRows) => {
   const sharedItems = {}
 
   for (const [type, records] of Object.entries(props.records)) {
-    const selectedRecords = records.filter((record) => {
-      return selectedChildRows.some((selected) => selected.id === record.id)
-    })
+    const selectedRecords = records
+      .filter((record) => {
+        return selectedChildRows.some((selected) => selected.id === record.id)
+      })
+      .map((record) => {
+        const processedRecord = { ...record }
+
+        for (const key in processedRecord) {
+          if (key.includes('date') && !key.includes('original')) {
+            const date = processedRecord[key]
+
+            processedRecord[key] = formatISO(date, {
+              representation: 'date',
+            })
+          }
+        }
+        return processedRecord
+      })
 
     if (selectedRecords.length > 0) {
       sharedItems[type] = selectedRecords

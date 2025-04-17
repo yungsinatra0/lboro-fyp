@@ -85,6 +85,8 @@ async def verify_share_token(
         
     items_data = get_item_data(share_token.shared_items, session)
     
+    print(f"Items data: {items_data}")
+    
     return {
         "expiration_time": share_token.expiration_time,
         "patient": user_data,

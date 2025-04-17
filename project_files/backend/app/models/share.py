@@ -45,7 +45,7 @@ class ShareCategories(SQLModel):
     vaccines: List[VaccineResponse] = []
     allergies: List[AllergyResponse] = []
     medications: List[MedicationResponse] = []
-    healthdata: List[HealthDataResponse] = []
+    vitals: List[HealthDataResponse] = []
     medicalhistory: List[MedicalHistoryResponse] = []
     labtests: List[LabTestResponse] = []
    
