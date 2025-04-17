@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime, timedelta
 from typing import Annotated
 
-from ..models import User, ShareToken, SharedItem, CreateShareToken, ShareTokenResponse, ShareItemsResponse, FileResponse
+from ..models import User, ShareToken, CreateShareToken, ShareTokenResponse, ShareItemsResponse, FileResponse
 from ..utils import get_session, validate_session, create_hash, verify_hash, get_item_data, get_connected_record, decrypt_file
 
 router = APIRouter()
@@ -26,22 +26,11 @@ async def create_share_token(
         share_token = ShareToken(
             expiration_time=datetime.now() + timedelta(minutes=share_data.token_length),
             hashed_pin=hashed_pin,
+            shared_items=share_data.shared_items,
             user = user
         )
         
-        session.add(share_token)
-        session.flush()
-    
-        shared_items = []
-        for item in share_data.shared_items:
-            shared_item = SharedItem(
-                item_type=item.item_type,
-                item_id=item.item_id,
-                share_token=share_token
-            )
-            shared_items.append(shared_item)
-            session.add(shared_item)
-        
+        session.add(share_token)        
         session.commit()
         session.refresh(share_token)
         
@@ -93,18 +82,10 @@ async def verify_share_token(
         "name": user.name,
         "dob": user.dob.strftime("%d-%m-%Y") if user.dob else None,
     }
-    
-    shared_items = session.exec(
-        select(SharedItem).where(SharedItem.share_token_id == share_token.id)
-    ).all()
-    
-    grouped_items = {}
-    for item in shared_items:
-        if item.item_type not in grouped_items:
-            grouped_items[item.item_type] = []
-        grouped_items[item.item_type].append(item.item_id)
         
-    items_data = get_item_data(grouped_items, session)
+    items_data = get_item_data(share_token.shared_items, session)
+    
+    print(f"Items data: {items_data}")
     
     return {
         "expiration_time": share_token.expiration_time,

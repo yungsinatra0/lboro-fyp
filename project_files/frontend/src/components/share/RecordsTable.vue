@@ -116,18 +116,13 @@
       </template>
       <template #footer>
         <div class="flex justify-between align-items-center flex-wrap gap-2 mb-2">
-          <Button
-            label="Back"
-            severity="secondary"
-            icon="pi pi-arrow-left"
-            @click="emit('back')"
-          />
+          <Button label="Back" severity="secondary" icon="pi pi-arrow-left" @click="emit('back')" />
           <Button
             label="Next"
             icon="pi pi-arrow-right"
             iconPos="right"
-            @click="emit('next', selectedParentRows, selectedChildRows)"
-            :disabled="selectedParentRows.length === 0 && selectedChildRows.length === 0"
+            @click="emit('next', selectedChildRows)"
+            :disabled="selectedChildRows.length === 0"
           />
         </div>
       </template>
@@ -157,11 +152,13 @@ const parentName = (key) => {
       return 'Vaccine'
     case 'allergies':
       return 'Alergii'
-    case 'medhistory':
+    case 'medicalhistory':
       return 'Istoric medical'
   }
 }
 
+const numberCategories = ref(Object.keys(props.records).length)
+const allSelected = ref(false)
 const expandedRows = ref({})
 const selectedParentRows = ref([])
 const selectedChildRows = ref([])
@@ -175,11 +172,13 @@ const excludedColumns = [
   'date_recorded',
   'date_collection',
   'date_diagnosed',
+  'is_numeric'
 ]
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 })
 const selectedDates = ref(null)
+
 const arrangedRecords = computed(() => {
   return Object.entries(props.records).map(([type, items]) => {
     return {
@@ -251,12 +250,17 @@ const onParentRowSelect = (event) => {
       selectedParentRows.value = [...selectedParentRows.value, row]
       selectedChildRows.value = [...selectedChildRows.value, ...row.items]
     }
+    allSelected.value = true
   } else {
     // If it's an object, just push the items to selectedChildRows
     // This is the case when a parent row is selected and it has child rows
     for (const row of event.data.items) {
       if (row) {
         selectedChildRows.value = [...selectedChildRows.value, row]
+      }
+
+      if (numberCategories.value === selectedParentRows.value.length) {
+        allSelected.value = true
       }
     }
   }
@@ -269,7 +273,9 @@ const onParentRowUnselect = (event) => {
   if (!event.data) {
     selectedChildRows.value = []
     selectedParentRows.value = []
+    allSelected.value = false
   } else {
+    allSelected.value = false
     selectedChildRows.value = selectedChildRows.value.filter((childRow) => {
       return !event.data.items.some((parentRow) => parentRow.id === childRow.id)
     })

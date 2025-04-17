@@ -17,7 +17,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-[5fr_3fr_3fr] gap-4 mx-5">
       <RecentMedicalHistory
-        :medhistory="user_data?.data?.records?.medhistory.slice(0, 5)"
+        :medhistory="user_data?.data?.records?.medicalhistory.slice(0, 5)"
         class="mb-4 md:mb-0 md:h-full"
       />
       <RecentHealthData :vitals="groupedVitals" class="mb-4 md:mb-0 md:h-full" />
@@ -81,7 +81,7 @@ onMounted(async () => {
           medications: parseDates(response.data.medications, 'date_prescribed'),
           vaccines: parseDates(response.data.vaccines, 'date_received'),
           allergies: parseDates(response.data.allergies, 'date_diagnosed'),
-          medhistory: parseDates(response.data.medicalhistory, 'date_consultation'),
+          medicalhistory: parseDates(response.data.medicalhistory, 'date_consultation'),
           labresults: parseDates(response.data.labresults, 'date_collection'),
         },
       },
