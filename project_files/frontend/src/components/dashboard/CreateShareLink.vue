@@ -224,7 +224,7 @@ const createShareLink = async (selectedChildRows, allSelected) => {
     const response = await api.post('/share/create', {
       token_length: timeInMinutes,
       pin: pin.value,
-      shared_items: {},
+      shared_items: sharedItems,
     })
 
     linkData.value = response.data
