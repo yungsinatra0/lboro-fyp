@@ -4,6 +4,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from .utils import limiter
+
 from .api import get_all_routers
 from .utils import create_db_and_tables
 
@@ -17,8 +22,12 @@ async def lifespan(app: FastAPI):
         print(f"Error creating database and tables: {e}")
     yield
 
-# Initialize the FastAPI application
+# Initialise the FastAPI application
 app = FastAPI(lifespan=lifespan)
+
+# Middleware to handle rate limiting and setting exception handlers
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Middleware to compress responses for larger payloads
 app.add_middleware(GZipMiddleware, minimum_size=1000)
