@@ -39,7 +39,7 @@
             >
           </div>
         </div>
-        
+
         <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4">
           <label for="doctor_name" class="font-semibold w-full md:w-24"
             >Numele doctorului <span class="text-rose-600">*</span></label
@@ -56,7 +56,7 @@
             >
           </div>
         </div>
-        
+
         <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4">
           <label for="place" class="font-semibold w-full md:w-24">Locație</label>
           <div class="w-full md:w-1/2">
@@ -71,7 +71,7 @@
             >
           </div>
         </div>
-        
+
         <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4">
           <label for="category" class="font-semibold w-full md:w-24"
             >Categorie <span class="text-rose-600">*</span></label
@@ -94,9 +94,14 @@
             >
           </div>
         </div>
-        
-        <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4" v-if="$form.category?.value === 'Consultație'">
-          <label for="subcategory" class="font-semibold w-full md:w-24">Subcategorie consultație</label>
+
+        <div
+          class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4"
+          v-if="$form.category?.value === 'Consultație'"
+        >
+          <label for="subcategory" class="font-semibold w-full md:w-24"
+            >Subcategorie consultație</label
+          >
           <div class="w-full md:w-1/2">
             <Select
               name="subcategory"
@@ -115,9 +120,14 @@
             >
           </div>
         </div>
-        
-        <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4" v-if="$form.category?.value === 'Laborator'">
-          <label for="labsubcategory" class="font-semibold w-full md:w-24">Subcategorie laborator</label>
+
+        <div
+          class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4"
+          v-if="$form.category?.value === 'Laborator'"
+        >
+          <label for="labsubcategory" class="font-semibold w-full md:w-24"
+            >Subcategorie laborator</label
+          >
           <div class="w-full md:w-1/2">
             <Select
               name="labsubcategory"
@@ -136,9 +146,14 @@
             >
           </div>
         </div>
-        
-        <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4" v-if="$form.category?.value === 'Laborator'">
-          <label for="extract" class="font-semibold w-full md:w-24">Extrage date laborator cu AI?</label>
+
+        <div
+          class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4"
+          v-if="$form.category?.value === 'Laborator'"
+        >
+          <label for="extract" class="font-semibold w-full md:w-24"
+            >Extrage date laborator cu AI?</label
+          >
           <ToggleSwitch name="extract" />
           <Message
             v-if="$form.extract?.invalid"
@@ -149,7 +164,7 @@
             >{{ $form.extract.error.message }}</Message
           >
         </div>
-        
+
         <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4">
           <label for="date_consultation" class="font-semibold w-full md:w-24"
             >Data efectuării<span class="text-rose-600">*</span></label
@@ -174,7 +189,7 @@
             >
           </div>
         </div>
-        
+
         <div class="flex flex-col md:flex-row gap-2 md:gap-4 mb-4">
           <label for="notes" class="font-semibold w-full md:w-24">Notite</label>
           <Textarea
@@ -187,7 +202,7 @@
             placeholder="Adaugă note sau observații"
           />
         </div>
-        
+
         <div class="my-4">
           <FileUpload
             name="file"
@@ -201,7 +216,7 @@
           >
           </FileUpload>
         </div>
-        
+
         <div class="shrink-0 pt-3 flex justify-end gap-2">
           <Button
             label="Anulează"
@@ -212,11 +227,11 @@
             type="button"
             class="text-sm md:text-base px-2 md:px-4"
           />
-          <Button 
-            label="Salvează" 
-            severity="success" 
-            autofocus 
-            type="submit" 
+          <Button
+            label="Salvează"
+            severity="success"
+            autofocus
+            type="submit"
             class="text-sm md:text-base px-2 md:px-4"
           />
         </div>
@@ -230,8 +245,10 @@
 
       <div v-else class="flex flex-col items-center p-4">
         <div v-if="!extractSuccess" class="w-full">
-          <h2 class="text-lg md:text-xl font-medium mb-4">Analizati rezultatele extrase si schimbati daca sunt gresite</h2>
-          
+          <h2 class="text-lg md:text-xl font-medium mb-4">
+            Analizati rezultatele extrase si schimbati daca sunt gresite
+          </h2>
+
           <div class="mb-4">
             <IconField class="w-full">
               <InputIcon>
@@ -265,12 +282,21 @@
               scrollable
               scrollHeight="flex"
             >
-              <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header">
+              <Column
+                v-for="col of columns"
+                :key="col.field"
+                :field="col.field"
+                :header="col.header"
+              >
                 <template #editor="{ data, field }">
                   <InputText v-model="data[field]" class="w-full" fluid />
                 </template>
                 <template #body="{ data, field }">
-                  <span v-if="field != 'test_name'" class="block truncate max-w-[120px] text-sm md:text-base md:max-w-none">{{ data[field] }}</span>
+                  <span
+                    v-if="field != 'test_name'"
+                    class="block truncate max-w-[120px] text-sm md:text-base md:max-w-none"
+                    >{{ data[field] }}</span
+                  >
                   <span v-else class="font-semibold text-sm">{{ data[field] }}</span>
                 </template>
               </Column>
@@ -281,7 +307,7 @@
               />
             </DataTable>
           </div>
-          
+
           <div class="shrink-0 pt-3 flex justify-end gap-2">
             <Button
               label="Salvează"
@@ -500,11 +526,17 @@ const onRowEditSave = (event) => {
   // need to compare test name and something else like method or unit to find the original index
 
   if (filters.value.global.value) {
-    const originalIndex = extractionResult.value.findIndex((item) => item.test_name === newData.test_name && item.method === newData.method && item.unit === newData.unit)
-    index = originalIndex
+    const originalIndex = extractionResult.value.findIndex(
+      (item) => item.test_name === newData.test_name,
+    )
+
+    if (originalIndex !== -1) {
+      extractionResult.value[originalIndex] = newData
+    }
+    
+  } else {
+    extractionResult.value[index] = newData
   }
-  
-  extractionResult.value[index] = newData
 }
 
 const onSelect = (event) => {
