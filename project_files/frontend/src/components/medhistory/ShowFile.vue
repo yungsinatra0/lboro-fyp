@@ -33,7 +33,6 @@
 </template>
 
 <script setup>
-// TODO: Add support for medical imagining file types like DICOM. Redirect to 3rd party if needed (if 3D).
 import { ref, onMounted } from 'vue'
 import api from '@/services/api'
 

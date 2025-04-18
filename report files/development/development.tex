@@ -1047,8 +1047,6 @@ async def create_lab_tests(extraction_result: LabsCreate, user_id: uuid.UUID = D
         session.add(lab_result)
         session.flush()
         
-        # TODO: Maybe later have an array to store the lab results and return them all at once
-        
     session.commit()
     
     return {
