@@ -868,5 +868,8 @@ project_files/backend/app/generators/
 project_files/backend/migrations
 project_files/backend/alembic.ini
 
+# VSCode settings
+.vscode
+
 # End of https://www.toptal.com/developers/gitignore/api/windows,macos,linux,tex,latex,node,vue,vuejs,python
 
