@@ -3,6 +3,23 @@ from ..models import LabTest, LabTestResponse, LabResultResponse, MedicalHistory
 import datetime
 
 def get_item_data(grouped_items: dict, session: Session):
+    """
+    Process shared items for a share link to conform to the ShareCategories model.
+    
+    This function takes the JSON of shared items from a dashboard API response and
+    processes them appropriately based on their category. Most items are processed
+    as-is, but lab results require special handling - they are sent as individual
+    lab results from the dashboard, but need to be reorganized as lab tests with
+    their respective results as children.
+    
+    Args:
+        grouped_items: Dictionary of items grouped by their category type
+        session: Database session for querying lab test information
+        
+    Returns:
+        dict: Processed data structure with items organized by category,
+              with lab results properly nested under their respective lab tests
+    """
     items_data = {}
     
     for type_name, items in grouped_items.items():
