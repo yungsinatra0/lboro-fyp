@@ -7,11 +7,14 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .user import User  # Avoid circular import issues
 
-# Allergy Table models used for table creation
+# Allergen Table models for database many-to-many relationships
+# These models are used to create the many-to-many relationships between Allergy and Allergens, and Allergy and Reactions.
 class AllergyAllergensLink(SQLModel, table=True):
     allergy_id: uuid.UUID = Field(foreign_key="allergy.id", primary_key=True)
     allergen_id: uuid.UUID = Field(foreign_key="allergens.id", primary_key=True)
     
+# Reactions Table models for database many-to-many relationships
+# These models are used to create the many-to-many relationships between Allergy and Allergens, and Allergy and Reactions.    
 class AllergyReactionsLink(SQLModel, table=True):
     allergy_id: uuid.UUID = Field(foreign_key="allergy.id", primary_key=True)
     reaction_id: uuid.UUID = Field(foreign_key="reactions.id", primary_key=True)
@@ -25,6 +28,7 @@ class AllergyDates(SQLModel):
     def serialize_date_diagnosed(self, value: date) -> str:
         return value.strftime("%d-%m-%Y")
 
+# Allergy model for database
 class Allergy(AllergyDates, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     notes: str | None = None
@@ -38,7 +42,7 @@ class Allergy(AllergyDates, table=True):
     severity_id : uuid.UUID = Field(foreign_key="severity.id")
     severity: "Severity" = Relationship(back_populates="allergies")
 
-# Allergy response model
+# Allergy response model, used for API responses
 class AllergyResponse(AllergyDates):
     id: uuid.UUID
     severity: str
@@ -46,14 +50,14 @@ class AllergyResponse(AllergyDates):
     reactions: list[str]
     notes: str | None = None
     
-# Allergy create model
+# Allergy create model, used for API requests to create a new allergy
 class AllergyCreate(AllergyDates):
     severity: str
     allergens: list[str]
     reactions: list[str]
     notes: str | None = None
     
-# Allergy update model
+# Allergy update model, used for API requests to update an existing allergy
 class AllergyUpdate(SQLModel):
     severity: str | None = None
     allergens: list[str] | None = None
@@ -67,6 +71,7 @@ class AllergyUpdate(SQLModel):
             return None
         return value.strftime("%d-%m-%Y")
 
+# Allergens, Reactions and Severity models for database
 class Allergens(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
@@ -84,7 +89,8 @@ class Severity(SQLModel, table=True):
     name: str
     
     allergies: list[Allergy] = Relationship(back_populates="severity")
-    
+
+# Allergens, Reactions and Severity response models, used for API responses    
 class AllergensResponse(SQLModel):
     id: uuid.UUID
     name: str

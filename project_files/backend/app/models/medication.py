@@ -7,7 +7,7 @@ import uuid
 if TYPE_CHECKING:
     from .user import User  # Avoid circular import issues
 
-# Medication Table models used for table creation
+# Medication model for date and serializers
 class MedicationDates(SQLModel):
     date_prescribed: date
     date_added: datetime = Field(default_factory=datetime.now)
@@ -16,6 +16,7 @@ class MedicationDates(SQLModel):
     def serialize_date_prescribed(self, value: date) -> str:
         return value.strftime("%d-%m-%Y")
 
+# Medication model for database
 class Medication(MedicationDates, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
@@ -34,7 +35,7 @@ class Medication(MedicationDates, table=True):
     form_id : uuid.UUID = Field(foreign_key="medicationform.id")
     form: "MedicationForm" = Relationship(back_populates="medications")
 
-# Medication response model
+# Medication response model, used for API responses
 class MedicationResponse(MedicationDates):
     id: uuid.UUID
     name: str
@@ -46,7 +47,7 @@ class MedicationResponse(MedicationDates):
     form: str
     notes: str | None = None
 
-# Medication create model
+# Medication create model, used for API requests to create a new medication
 class MedicationCreate(MedicationDates):
     name: str
     dosage: str
@@ -57,7 +58,7 @@ class MedicationCreate(MedicationDates):
     form: str
     notes: str | None = None
     
-# Medication update model
+# Medication update model, used for API requests to update an existing medication
 class MedicationUpdate(SQLModel):
     name: str | None = None
     dosage: str | None = None
@@ -75,22 +76,26 @@ class MedicationUpdate(SQLModel):
             return None
         return value.strftime("%d-%m-%Y")
 
+# Medication Route model for database
 class MedicationRoute(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
     
     medications: list[Medication] = Relationship(back_populates="route")
     
+# Medication Route response model, used for API responses
 class MedicationRouteResponse(SQLModel):
     id: uuid.UUID
     name: str
     
+# Medication Form model for database
 class MedicationForm(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
     
     medications: list[Medication] = Relationship(back_populates="form")
     
+# Medication Form response model, used for API responses
 class MedicationFormResponse(SQLModel):
     id: uuid.UUID
     name: str

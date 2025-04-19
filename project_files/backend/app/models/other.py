@@ -9,13 +9,13 @@ if TYPE_CHECKING:
     from .vaccine import Vaccine  # Avoid circular import issues
     from .medhistory import MedicalHistory, LabResult
     
-# API Response model
+# API Response model for standardized API responses
 class APIResponse(SQLModel):
     status: int
     message: str
     data: dict | list | None = None
     
-# File Table models used for table creation
+# File Upload model for database, used to store information about uploaded files
 class FileUpload(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
@@ -34,6 +34,7 @@ class FileUpload(SQLModel, table=True):
     def serialize_uploaded_at(self, value: datetime) -> str:
         return value.strftime("%d-%m-%Y %H:%M:%S")
     
+# File response model, used for API responses when returning file metadata
 class FileResponse(SQLModel):
     id: uuid.UUID
     name: str

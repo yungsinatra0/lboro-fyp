@@ -8,7 +8,7 @@ from .other import FileUpload
 if TYPE_CHECKING:
     from .user import User  # Avoid circular import issues
 
-# Medical History Table models used for table creation
+# Medical History model for date and serializers
 class MedicalHistoryDates(SQLModel):
     date_consultation: date
     date_added: datetime = Field(default_factory=datetime.now)
@@ -17,6 +17,7 @@ class MedicalHistoryDates(SQLModel):
     def serialize_date_consultation(self, value: date) -> str:
         return value.strftime("%d-%m-%Y")
     
+# Medical History model for database - medical history are records that include things like consultations, imaging and lab tests.
 class MedicalHistory(MedicalHistoryDates, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str = Field(unique=True)
@@ -40,25 +41,28 @@ class MedicalHistory(MedicalHistoryDates, table=True):
     
     file: Optional["FileUpload"] = Relationship(back_populates="medicalhistory", cascade_delete=True)
     
+# Medical Category model for database, example categories include "Consultation", "Imaging", "Lab Test"
 class MedicalCategory(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
     
     medicalhistory: list["MedicalHistory"] = Relationship(back_populates="category")
     
+# Medical Subcategory model for database, examples of subcategories include "Cardiology", "Dermatology"
 class MedicalSubcategory(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
     
     medicalhistory: list["MedicalHistory"] = Relationship(back_populates="subcategory")
     
+# Lab Subcategory model for database, examples include "Blood Tests", "Urine Tests"
 class LabSubcategory(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
     
     medicalhistory: list["MedicalHistory"] = Relationship(back_populates="labsubcategory")
 
-# Medical History response model
+# Medical History response model, used for API responses
 class MedicalHistoryResponse(MedicalHistoryDates):
     id: uuid.UUID
     name: str
@@ -70,11 +74,12 @@ class MedicalHistoryResponse(MedicalHistoryDates):
     labsubcategory: str | None = None
     file: bool | None = None
     
+# Medical History response model for lab results, used for API responses
 class MedicalHistoryResponseLab(SQLModel):
     id: uuid.UUID
     file: bool | None = None
     
-# Medical History create model
+# Medical History create model, used for API requests to create a new medical history entry
 class MedicalHistoryCreate(MedicalHistoryDates):
     name: str
     doctor_name: str
@@ -84,7 +89,7 @@ class MedicalHistoryCreate(MedicalHistoryDates):
     subcategory: str | None = None
     labsubcategory: str | None = None
     
-# Medical History update model
+# Medical History update model, used for API requests to update an existing medical history entry
 class MedicalHistoryUpdate(SQLModel):
     name: str | None = None
     doctor_name: str | None = None
@@ -101,18 +106,22 @@ class MedicalHistoryUpdate(SQLModel):
             return None
         return value.strftime("%d-%m-%Y")
     
+# Medical Category response model, used for API responses
 class MedicalCategoryResponse(SQLModel):
     id: uuid.UUID
     name: str
     
+# Medical Subcategory response model, used for API responses
 class MedicalSubcategoryResponse(SQLModel):
     id: uuid.UUID
     name: str
     
+# Lab Subcategory response model, used for API responses
 class LabSubcategoryResponse(SQLModel):
     id: uuid.UUID
     name: str
     
+# Lab model for date and serializers
 class LabDates(SQLModel):
     date_collection: date
     date_added: datetime = Field(default_factory=datetime.now)
@@ -121,6 +130,7 @@ class LabDates(SQLModel):
     def serialize_date_collection(self, value: date) -> str:
         return value.strftime("%d-%m-%Y")
     
+# Lab Test model for database - lab test are parent records that only include the name of the test and a code. The actual results are stored in the LabResult model.
 class LabTest(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str 
@@ -128,6 +138,7 @@ class LabTest(SQLModel, table=True):
     
     results: List["LabResult"] = Relationship(back_populates="test")
     
+# Lab Result model for database - lab result are child records that include the actual results of the lab tests. Each lab test can have multiple results.
 class LabResult(LabDates, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     value: str
@@ -144,6 +155,7 @@ class LabResult(LabDates, table=True):
     medicalhistory_id: uuid.UUID = Field(foreign_key="medicalhistory.id")
     medicalhistory: MedicalHistory = Relationship(back_populates="labresults")
     
+# Lab Result create model, used for API requests to create a new lab result
 class LabResultCreate(SQLModel):
     # Fields for labtest
     name: str
@@ -156,6 +168,7 @@ class LabResultCreate(SQLModel):
     reference_range: str | None = None 
     method: str | None = None
     
+# Labs create model, used for API requests to create multiple lab results at once
 class LabsCreate(SQLModel):
     lab_tests: List[LabResultCreate]
     date_collection: date
@@ -163,10 +176,12 @@ class LabsCreate(SQLModel):
     # Relationships
     medicalhistory_id: uuid.UUID
     
+# Lab Result Medical History model, used for simplified medical history representation in lab results
 class LabResultMedicalHistory(SQLModel):
     id: uuid.UUID
     file: bool
     
+# Lab Result response model, used for API responses
 class LabResultResponse(LabDates):
     id: uuid.UUID
     value: str
@@ -176,12 +191,14 @@ class LabResultResponse(LabDates):
     method: str | None = None
     medicalhistory: MedicalHistoryResponseLab
     
+# Lab Test response model, used for API responses
 class LabTestResponse(SQLModel):
     id: uuid.UUID
     name: str
     code: str | None = None
     results: List[LabResultResponse]
     
+# Lab Result response model for dashboard, used for API responses in the dashboard
 class LabResultResponseDashboard(LabDates):
     id: uuid.UUID
     value: str
@@ -191,6 +208,6 @@ class LabResultResponseDashboard(LabDates):
     method: str | None = None
     medicalhistory: MedicalHistoryResponseLab
     
-    # Taken from LabTest to show the name of the test
+    # Taken from LabTest to show the name of the test without having to join the table
     name: str
-    code: str | None = None    
+    code: str | None = None

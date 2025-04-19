@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .user import User  # Avoid circular import issues
 
-# Health data Table models used for table creation
+# Health data model for date and serializers
 class HealthDataDates(SQLModel):
     date_recorded: date
     date_added: datetime = Field(default_factory=datetime.now)
@@ -16,6 +16,7 @@ class HealthDataDates(SQLModel):
     def serialize_date_recorded(self, value: date) -> str:
         return value.strftime("%d-%m-%Y")
     
+# Health data model for database
 class HealthData(HealthDataDates, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     value: float | None = None
@@ -29,7 +30,7 @@ class HealthData(HealthDataDates, table=True):
     type_id : uuid.UUID = Field(foreign_key="healthdatatype.id")
     type: "HealthDataType" = Relationship(back_populates="healthdata") 
     
-# Health data response model
+# Health data response model, used for API responses
 class HealthDataResponse(HealthDataDates):
     id: uuid.UUID
     name: str
@@ -41,7 +42,7 @@ class HealthDataResponse(HealthDataDates):
     normal_range: str | None = None
     trend: str | None = None     
     
-# Health data create model
+# Health data create models, used for API requests to create new health data entries. Different models for different types of health data - simple is all that have single values and blood pressure is a compound type with two values.
 class SimpleHealthDataCreate(HealthDataDates):
     name: str
     value: float
@@ -53,7 +54,7 @@ class BloodPressureCreate(HealthDataDates):
     value_diastolic: float
     notes: str | None = None
     
-# Health data update model
+# Health data update model, used for API requests to update an existing health data entry
 class HealthDataUpdate(SQLModel):
     name: str | None = None
     value: float | None = None
@@ -68,6 +69,7 @@ class HealthDataUpdate(SQLModel):
             return None
         return value.strftime("%d-%m-%Y")
 
+# Health data type model for database
 class HealthDataType(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
@@ -77,6 +79,7 @@ class HealthDataType(SQLModel, table=True):
     
     healthdata: list[HealthData] = Relationship(back_populates="type")
     
+# Health data type response model, used for API responses
 class HealthDataTypeResponse(SQLModel):
     id: uuid.UUID
     name: str

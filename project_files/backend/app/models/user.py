@@ -19,14 +19,14 @@ class DateFormattingModel(SQLModel):
             return None
         return value.strftime("%d-%m-%Y")
 
-# Session table model used for storing sessions in the database.
+# Session table model used for storing authentication sessions in the database
 class AuthSession(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     user_id: uuid.UUID
     expires_at: datetime
     created_at: datetime = Field(default_factory=datetime.now)    
     
-# User Table model used for table creation, also contains sensitive info like email, password hash and MFA secret
+# User model for database, contains all user information and relationships to other models
 class User(DateFormattingModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
@@ -41,12 +41,13 @@ class User(DateFormattingModel, table=True):
     labresults: list["LabResult"] = Relationship(back_populates="user", cascade_delete=True)
     share_tokens: list["ShareToken"] = Relationship(back_populates="user", cascade_delete=True)
 
+# User response model, used for API responses when returning basic user information
 class UserResponse(DateFormattingModel):
     id: uuid.UUID
     name: str
     email: EmailStr
     
-# User object response for dashboard
+# User dashboard model, used for API responses to populate user dashboard with all health data
 class UserDashboard(SQLModel):
     id: uuid.UUID
     name: str
@@ -57,22 +58,22 @@ class UserDashboard(SQLModel):
     medicalhistory: list["MedicalHistoryResponse"]
     labresults: list["LabResultResponseDashboard"]
 
-# User Data model used for login and registration  
+# User authentication model, used for API requests during login and registration
 class UserAuth(DateFormattingModel):
     email: EmailStr
     password: str
     name: str | None = None # Will only be used for registration
     
-# User data model used for password change
+# User password change model, used for API requests to change a user's password
 class UserPasswordChange(SQLModel):
     current_password: str
     new_password: str
 
-# User Data model used for most API responses
+# User public model, minimal user data for API responses requiring only user ID
 class UserPublic(SQLModel):
     id: uuid.UUID
     
-# User Data model used for updating user info
+# User update model, used for API requests to update user information
 class UserUpdate(DateFormattingModel):
     name: str | None = None
     email: EmailStr | None = None

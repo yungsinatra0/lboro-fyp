@@ -8,7 +8,7 @@ from .other import FileUpload
 if TYPE_CHECKING:
     from .user import User  # Avoid circular import issues
 
-# Vaccine model containing dates and serializers
+# Vaccine model for date and serializers
 class VaccineDates(SQLModel):
     date_received: date
     date_added: datetime = Field(default_factory=datetime.now)
@@ -17,7 +17,7 @@ class VaccineDates(SQLModel):
     def serialize_date_received(self, value: date) -> str:
         return value.strftime("%d-%m-%Y")
     
-# Vaccine Table model used for table creation
+# Vaccine model for database
 class Vaccine(VaccineDates, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
@@ -28,19 +28,19 @@ class Vaccine(VaccineDates, table=True):
     
     certificate: Optional["FileUpload"] = Relationship(back_populates="vaccine", cascade_delete=True)
 
-# Vaccine response model
+# Vaccine response model, used for API responses
 class VaccineResponse(VaccineDates):
     id: uuid.UUID
     name: str
     provider: str
     certificate: bool | None = None
 
-# Vaccine create model
+# Vaccine create model, used for API requests to create a new vaccine
 class VaccineCreate(VaccineDates):
     name: str
     provider: str
 
-# Vaccine update model
+# Vaccine update model, used for API requests to update an existing vaccine
 class VaccineUpdate(SQLModel):
     name: str | None = None
     provider: str | None = None
