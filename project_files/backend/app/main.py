@@ -12,6 +12,7 @@ from .utils import limiter
 from .api import get_all_routers
 from .utils import create_db_and_tables
 
+# Lifespan can be used to perform startup and shutdown tasks for the FastAPI application.
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Try creating the database and tables before starting the API server (will not do anything if they already exist)
@@ -55,5 +56,6 @@ app.add_middleware(
 # Will be enabled in production
 # app.add_middleware(HTTPSRedirectMiddleware)
 
+# Iterate through all routers and include them in the FastAPI application
 for router in get_all_routers():
     app.include_router(router)
