@@ -361,7 +361,7 @@ const resolver = zodResolver(
     form: z.string().nonempty('Forma medicamentului este obligatorie.'),
     route: z.string().nonempty('Calea de administrare a medicamentului este obligatorie.'),
     dosageUnits: z.string().optional(),
-    frequencyUnits: z.string().nonempty('Unitatea de masura a frecventei este obligatorie.'),
+    frequencyUnits: z.string().optional(),
     frequencyChoice: z.string().nonempty('Alege o optiune pentru frecventa.'),
   }),
 )
@@ -399,7 +399,7 @@ const addMedication = async (medicationDetails) => {
       time_of_day: medicationDetails.timeOfDay,
     })
 
-    emit('add', response.data.medication)
+    emit('add', response.data)
     emit('close')
   } catch (error) {
     console.error('Error adding medication:', error)

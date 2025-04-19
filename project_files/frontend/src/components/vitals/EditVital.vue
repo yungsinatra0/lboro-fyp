@@ -225,9 +225,9 @@ const updateVitals = async (vitalDetails) => {
         }
     )
     emit('edit', {
-        ...response.data.healthdata,
-        original_date_recorded: response.data.healthdata.date_recorded,
-        date_recorded: parse(response.data.healthdata.date_recorded, 'dd-MM-yyyy', new Date()),
+        ...response.data,
+        original_date_recorded: response.data.date_recorded,
+        date_recorded: parse(response.data.date_recorded, 'dd-MM-yyyy', new Date()),
     })
     emit('close')
   } catch (error) {

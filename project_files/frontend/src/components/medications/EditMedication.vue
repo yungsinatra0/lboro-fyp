@@ -475,7 +475,7 @@ const updateMedication = async (medicationDetails) => {
       time_of_day: medicationDetails.timeOfDay,
     })
 
-    emit('edit', response.data.medication)
+    emit('edit', response.data)
     emit('close')
   } catch (error) {
     console.error('Error updating medication:', error)

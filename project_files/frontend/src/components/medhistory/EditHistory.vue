@@ -292,7 +292,7 @@ const updateMedicalHistory = async (medicalHistoryDetails) => {
       notes: medicalHistoryDetails.notes || null,
     })
 
-    emit('edit', response.data.medicalhistory)
+    emit('edit', response.data)
     emit('close')
   } catch (error) {
     console.error('Error updating medical history:', error)

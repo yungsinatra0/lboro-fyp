@@ -198,7 +198,7 @@ const addVitals = async (values) => {
           date_recorded: formattedDate,
           notes: values.notes,
         })
-        emit('add', response.data.healthdata)
+        emit('add', response.data)
         displayAddDialog.value = false
       } catch (error) {
         console.error(error)

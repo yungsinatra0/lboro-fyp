@@ -136,7 +136,7 @@ const addVaccine = async (vaccineDetails) => {
     if (uploadedFile.value) {
       const formData = new FormData()
       formData.append('file', uploadedFile.value)
-      await api.post(`upload/vaccine/${response.data.vaccine.id}`, formData, {
+      await api.post(`upload/vaccine/${response.data.id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -144,7 +144,7 @@ const addVaccine = async (vaccineDetails) => {
       hasCertificate = true
     }
 
-    emit('add', { ...response.data.vaccine, certificate: hasCertificate })
+    emit('add', { ...response.data, certificate: hasCertificate })
     emit('close')
   } catch (error) {
     console.error('Error in vaccine operation:', error)

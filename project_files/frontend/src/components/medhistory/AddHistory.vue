@@ -339,10 +339,8 @@
             severity="success"
             class="px-4 py-2 md:px-6 md:py-3 text-base md:text-lg"
             @click="
-              () => {
-                router.push({ path: '/laborator' })
-                emit('close')
-              }
+              router.push({ path: '/laborator' });
+              emit('close')
             "
             autofocus
             type="button"
@@ -444,7 +442,7 @@ const addMedicalHistory = async (medicalHistoryDetails) => {
     if (uploadedFile.value) {
       const formData = new FormData()
       formData.append('file', uploadedFile.value)
-      await api.post(`upload/medicalhistory/${response.data.medicalhistory.id}`, formData, {
+      await api.post(`upload/medicalhistory/${response.data.id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -454,37 +452,29 @@ const addMedicalHistory = async (medicalHistoryDetails) => {
 
     if (medicalHistoryDetails.extract) {
       emit('add', {
-        ...response.data.medicalhistory,
-        original_date_consultation: response.data.medicalhistory.date_consultation,
-        date_consultation: parse(
-          response.data.medicalhistory.date_consultation,
-          'dd-MM-yyyy',
-          new Date(),
-        ),
+        ...response.data,
+        original_date_consultation: response.data.date_consultation,
+        date_consultation: parse(response.data.date_consultation, 'dd-MM-yyyy', new Date()),
         file: hasFile,
       })
 
       labDetails.value = {
-        medicalhistory_id: response.data.medicalhistory.id,
+        medicalhistory_id: response.data.id,
         date_collection: formattedDate,
       }
 
       loadingState.value = true
 
-      const llm_response = await api.post(`/labtests/extract/${response.data.medicalhistory.id}`)
+      const llm_response = await api.post(`/labtests/extract/${response.data.id}`)
 
       extractionResult.value = JSON.parse(llm_response.data)
 
       loadingState.value = false
     } else {
       emit('add', {
-        ...response.data.medicalhistory,
-        original_date_consultation: response.data.medicalhistory.date_consultation,
-        date_consultation: parse(
-          response.data.medicalhistory.date_consultation,
-          'dd-MM-yyyy',
-          new Date(),
-        ),
+        ...response.data,
+        original_date_consultation: response.data.date_consultation,
+        date_consultation: parse(response.data.date_consultation, 'dd-MM-yyyy', new Date()),
         file: hasFile,
       })
       emit('close')
@@ -510,7 +500,7 @@ const addExtractedLab = async () => {
       })),
     })
 
-    if (response.status === 200) {
+    if (response.status === 201) {
       extractSuccess.value = true
     }
   } catch (error) {
@@ -533,7 +523,6 @@ const onRowEditSave = (event) => {
     if (originalIndex !== -1) {
       extractionResult.value[originalIndex] = newData
     }
-    
   } else {
     extractionResult.value[index] = newData
   }

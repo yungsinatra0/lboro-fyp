@@ -3,18 +3,37 @@ from sqlmodel import Session, select, col
 import uuid
 
 from ..models import User, Vaccine, VaccineResponse, Allergy, AllergyResponse, HealthData, HealthDataResponse, Medication, MedicationResponse, UserDashboard, MedicalHistory, MedicalHistoryResponse, LabResultResponseDashboard, LabResult, MedicalHistoryResponseLab
-from ..utils import get_session, validate_session, group_compare_healthdata
+from ..utils import get_session, validate_session, limiter
 
 router = APIRouter()
 
 # Homepage/dashboard endpoint, returns the user object with related data to display in the dashboard
-@router.get("/dashboard", response_model=UserDashboard)
-async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session: Session = Depends(get_session)):
+@router.get("/dashboard", response_model=UserDashboard, status_code=status.HTTP_200_OK)
+@limiter.limit("5/minute")
+async def get_dashboard(request: Request, user_id: uuid.UUID = Depends(validate_session),  session: Session = Depends(get_session)):
+    """ Dashboard endpoint. Will be used to get all the user-related health data from the database, order it by date added and return it to the client.
+    This will be used to display the data in the dashboard page of the application.
+
+    Args:
+        request (Request): Request is automatically used by the endpoint and the rate limiter middleware to limit the number of requests from a single IP address.
+        user_id (uuid.UUID, optional): User ID of the logged in user. This is automatically used by the endpoint to get the user ID from the session cookie and validate for database access.
+        session (Session, optional): Session is automatically used by the endpoint to access the database by using the SQLModel ORM.
+
+    Raises:
+        HTTPException: 403 FORBIDDEN if the user ID from the session does not match the user ID from the database.
+
+    Returns:
+        user_dashboard: Object with all the user-related health data to display in the dashboard page of the application.
+    """
+    
+    # Get the session ID from the request cookie and get the user id from the database
     user = session.get(User, user_id)
     
+    # Compare the user ID from the session with the user ID from the database
     if user_id != user.id:
-        raise HTTPException(status_code=403, detail="You do not have permission to access this endpoint!")   
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You do not have permission to access this endpoint!")   
     
+    # Get all the objects in the database, sorted by date added in descending order (newest first)
     newest_vaccines = session.exec(select(Vaccine).where(Vaccine.user_id == user_id).order_by(col(Vaccine.date_added).desc())).all()
     newest_allergies = session.exec(select(Allergy).where(Allergy.user_id == user_id).order_by(col(Allergy.date_added).desc())).all()
     newest_healthdata = session.exec(select(HealthData).where(HealthData.user_id == user_id).order_by(col(HealthData.date_recorded).desc())).all()
@@ -22,6 +41,7 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
     newest_medicalhistory = session.exec(select(MedicalHistory).where(MedicalHistory.user_id == user_id).order_by(col(MedicalHistory.date_added).desc())).all()
     newest_labresults = session.exec(select(LabResult).where(LabResult.user_id == user_id).order_by(col(LabResult.date_added).desc())).all()
     
+    # Iterate through vaccines to get only the relevant fields - this is because VaccineResponse expects a bool for certificate
     vaccines_response = []
     for vaccine in newest_vaccines:
         vaccines_response.append(
@@ -70,6 +90,7 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
                 date_added=medication.date_added               
         ))
     
+    # Iterate through health data to get only the relevant fields, which differ for blood pressure.
     healthdata_response = []
     for data in newest_healthdata:
         healthdata_response.append(HealthDataResponse(
@@ -83,7 +104,8 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
             notes = data.notes,
             date_added = data.date_added
         ))
-        
+    
+    # Iterate through medical history to get only the relevant fields - same as above, expects str for category, subcategory and labsubcategory    
     medicalhistory_response = []
     for history in newest_medicalhistory:
         category = history.category.name if history.category else None
@@ -103,7 +125,8 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
                 date_consultation = history.date_consultation,
                 date_added = history.date_added
             ))
-        
+    
+    # Iterate through lab results to get only the relevant fields, will also add lab test fields such as name, code
     labresults_response = []
     for labresult in newest_labresults:
         labresults_response.append(
@@ -122,6 +145,7 @@ async def get_dashboard(user_id: uuid.UUID = Depends(validate_session), session:
                     file = True if labresult.medicalhistory.file else False,
             )))
     
+    # Create the user dashboard object with all the data, which also will be validated by Pydantic to ensure all the fields are correct
     user_dashboard = UserDashboard(
         id = user.id,
         name = user.name,

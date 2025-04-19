@@ -203,7 +203,7 @@ const addAllergy = async (allergyDetails) => {
       severity: allergyDetails.severity,
       notes: allergyDetails.notes,
     })
-    emit('add', response.data.allergy)
+    emit('add', response.data)
     emit('close')
   } catch (error) {
     console.error('Error adding allergy: ', error)

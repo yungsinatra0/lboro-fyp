@@ -127,7 +127,7 @@ const updateVaccine = async (vaccineDetails) => {
       date_received: formattedDate,
       provider: vaccineDetails.provider,
     })
-    emit('edit', response.data.vaccine)
+    emit('edit', response.data)
     emit('close')
   } catch (error) {
     console.error('Error updating vaccine:', error)
