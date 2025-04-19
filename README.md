@@ -1,18 +1,16 @@
 # LBORO-FYP
-My Final Year Project for ITMB degree at Loughborough University
+My Computing Final Year Project for the ITMB course at Loughborough University
 
 ## Project Description
-Personal Health Record (PHR) System - A mobile-first web application that allows patients to store, access, and share their medical information with healthcare providers.
+Personal Health Record (PHR) System - A web application that allows patients to store, access, and share their medical information with healthcare providers.
 
 ### Features
-- User authentication with secure password hashing
+- User authentication with secure password hashing and session management
 - Medical history document upload and viewing
-- Lab results tracking with historical data visualization
-- Vital signs monitoring
-- Medication tracking
-- Vaccination and allergy records
-- Patient profile management
-- Secure sharing of medical records with healthcare providers via QR code or short link
+- Lab results tracking with historical data visualisation via table or graph
+- Vital signs monitoring (at the moment just manual) and visualisation
+- Vaccination, medication and allergy record management
+- Sharing of medical records with healthcare providers via short link
 
 ### Technologies Used
 - **Backend**: FastAPI with PostgreSQL
@@ -77,8 +75,9 @@ npm run dev
 ## Running the Application
 
 After setup, the application should be available at:
-- Frontend: http://localhost:3000 (or the port specified in your Vue config)
+- Frontend: http://localhost:5173 (or the port specified in your Vue config)
 - Backend API: http://localhost:8000
+- For API Docs: http://localhost:8000/docs
 
 ## Troubleshooting
 
