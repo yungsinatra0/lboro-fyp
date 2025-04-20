@@ -1,3 +1,8 @@
+/**
+ * Helper function to calculate the trend of a lab result based on its value and reference range. Will select the latest value for each type of health data and determine if it is stable, up, or down based on the given reference range.
+ * @param {Array} healthdata - Array of health data objects
+ * @returns {Array} - Array of health data objects with trend information. Contains one of each type of health data with the latest value and its trend (stable, up, down).
+ */
 export const groupCompareHealthdata = (healthdata) => {
   const groupedData = {}
 

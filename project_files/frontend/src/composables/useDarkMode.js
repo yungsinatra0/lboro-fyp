@@ -1,5 +1,10 @@
 import { ref, onMounted } from 'vue'
 
+/**
+ * Function to manage the dark mode state of the application. 
+ * It initializes the dark mode based on user preference and provides a method to toggle it. 
+ * @returns {Object} - An object containing the current dark mode state and a method to toggle it.
+ */
 export function useDarkMode() {
   const isDarkMode = ref(false)
 
@@ -26,6 +31,5 @@ export function useDarkMode() {
   return {
     isDarkMode,
     toggleDarkMode,
-
   }
 }

@@ -13,6 +13,10 @@ import MedHistoryView from '@/views/MedHistoryView.vue'
 import LabTestView from '@/views/LabTestView.vue'
 import ShareView from '@/views/ShareView.vue'
 
+/**
+ * Vue Router configuration for the application.
+ * It defines the routes, their respective components and whether authentication is required to access the specific routes.
+ */
 const router = createRouter({
   history: createWebHistory(), // Will need to change base URL if not using root
   routes: [
@@ -91,21 +95,29 @@ const router = createRouter({
   ],
 })
 
-// Navigation guard
+/**
+ * Navigation guard to check authentication status before each route change.
+ * It redirects to the login page if the user is not authenticated and tries to access a protected route.
+ * It also redirects authenticated users away from the login and register pages, to avoid circular login loops.
+ * @param {Object} to - The target route object being navigated to. Can also use from to get the current route.
+ * @returns {Object|boolean} - Returns a route object to redirect to or true to continue navigation.
+ */
 router.beforeEach(async (to) => {
   const authStore = useAuthStore()
 
-  await authStore.checkAuth() // Check authentication status before each route change
+  // Check authentication status before each route change
+  await authStore.checkAuth() 
 
+  // If the route requires authentication, check if the user is authenticated
   if (to.meta.requiresAuth) {
-    if (!authStore.isAuthenticated && to.path !== '/login' && to.path !== '/register') {
+    if (!authStore.isAuthenticated) {
       return { name: 'Login' } // Redirect to login if not authenticated
     }
-  } else if (authStore.isAuthenticated && to.name !== 'Share') {
+  } else if (authStore.isAuthenticated && to.name !== 'Share' && to.name == 'Login' || to.name == 'Register') {
     return { name: 'Dashboard' } // Redirect to dashboard if authenticated and going to login or register
   }
 
-  return true // Continue to requested route if no conditions are met (I think the documentation says to return true)
+  return true // Continue to requested route if no conditions are met
 })
 
 export default router

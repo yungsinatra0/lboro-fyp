@@ -1,3 +1,4 @@
+// Basic setup for a Vue.js application using PrimeVue components and Pinia for state management
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 import ConfirmationService from 'primevue/confirmationservice'
@@ -7,7 +8,8 @@ import App from './App.vue'
 import router from './router'
 import "./base.css"
 
-// Primevue components
+// Importing Primevue components in the main file so they can be used globally
+// This is a common practice in Vue.js applications to keep the code organized and maintainable
 import Button from 'primevue/button'
 import Card from 'primevue/card'
 import DataTable from 'primevue/datatable'
@@ -51,11 +53,13 @@ import Tab from 'primevue/tab'
 import TabPanels from 'primevue/tabpanels'
 import TabPanel from 'primevue/tabpanel'
 
-
+// Initialising the Pinia store
 const pinia = createPinia()
 
+// Creating the Vue application instance
 const app = createApp(App)
 
+// Adding the Pinia store, router, Primevue and confirmation service (confirmation pop-ups) to the Vue application
 app.use(pinia)
 app.use(router)
 app.use(Primevue, {
@@ -64,7 +68,8 @@ app.use(Primevue, {
 })
 app.use(ConfirmationService)
 
-// Adding primevue components
+// Adding primevue components to the Vue application
+// This allows us to use these components in any part of the application without needing to import them in each file
 app.component('Button', Button) 
 app.component('Card', Card)
 app.component('DataTable', DataTable)
@@ -108,5 +113,7 @@ app.component('Tab', Tab)
 app.component('TabPanels', TabPanels)
 app.component('TabPanel', TabPanel)
 
+// Registering the tooltip directive globally
+// This allows us to use tooltips in any part of the application
 app.directive('tooltip', Tooltip)
 app.mount('#app')
