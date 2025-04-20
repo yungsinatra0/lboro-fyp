@@ -12,14 +12,19 @@
     </template>
 
     <span class="text-gray-500 dark:text-gray-400 block mb-4 md:mb-8 text-sm md:text-base">
-      Schimba informația pentru alergia selectată.
+      Schimba informația pentru alergia selectată. Câmpurile marcate cu <span class="text-red-500">*</span> sunt obligatorii.
     </span>
+
+    <!-- Show error message if API returns an error -->
+    <Message v-if="errorMessage" severity="error" class="mb-4 w-full">
+      {{ errorMessage }}
+    </Message>
 
     <Form v-slot="$form" :initialValues @submit="onFormSubmit" :resolver="resolver">
       <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 mb-6">
-        <label for="allergens" class="font-semibold text-sm md:text-base w-full md:w-1/4"
-          >Alergen</label
-        >
+        <label for="allergens" class="font-semibold text-sm md:text-base w-full md:w-1/4">
+          Alergen <span class="text-red-500">*</span>
+        </label>
         <div class="w-full md:w-3/4">
           <MultiSelect
             name="allergens"
@@ -40,9 +45,9 @@
       </div>
 
       <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 mb-6">
-        <label for="reactions" class="font-semibold text-sm md:text-base w-full md:w-1/4"
-          >Simptome</label
-        >
+        <label for="reactions" class="font-semibold text-sm md:text-base w-full md:w-1/4">
+          Simptome <span class="text-red-500">*</span>
+        </label>
         <div class="w-full md:w-3/4">
           <MultiSelect
             name="reactions"
@@ -63,9 +68,9 @@
       </div>
 
       <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 mb-6">
-        <label for="severity" class="font-semibold text-sm md:text-base w-full md:w-1/4"
-          >Severitate</label
-        >
+        <label for="severity" class="font-semibold text-sm md:text-base w-full md:w-1/4">
+          Severitate <span class="text-red-500">*</span>
+        </label>
         <div class="w-full md:w-3/4">
           <Select
             name="severity"
@@ -85,9 +90,9 @@
       </div>
 
       <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 mb-6">
-        <label for="dateDiagnosed" class="font-semibold text-sm md:text-base w-full md:w-1/4"
-          >Data diagnosticării</label
-        >
+        <label for="dateDiagnosed" class="font-semibold text-sm md:text-base w-full md:w-1/4">
+          Data diagnosticării <span class="text-red-500">*</span>
+        </label>
         <div class="w-full md:w-3/4">
           <DatePicker
             name="dateDiagnosed"
@@ -145,6 +150,7 @@
           label="Salvează"
           severity="success"
           class="px-4 py-2 text-sm md:text-base"
+          :loading="isSubmitting"
           type="submit"
         />
       </div>
@@ -153,12 +159,24 @@
 </template>
 
 <script setup>
+/**
+ * @file EditAllergy.vue
+ * @description Component for editing an existing allergy. Displays a dialog with a form pre-filled with allergy details,
+ * which then sends a request to the backend to update the allergy.
+ */
 import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import api from '@/services/api'
 import { ref } from 'vue'
 import { parse, format } from 'date-fns'
 
+/**
+ * @prop {Boolean} displayDialog - Controls the visibility of the dialog.
+ * @prop {Object} allergy - The allergy object to be edited.
+ * @prop {Array} allergens - List of allergens to choose from.
+ * @prop {Array} reactions - List of reactions to choose from.
+ * @prop {Array} severities - List of severities to choose from.
+ */
 const props = defineProps({
   displayDialog: Boolean,
   allergy: Object,
@@ -167,9 +185,15 @@ const props = defineProps({
   severities: Array,
 })
 
+/**
+ * @emit {Function} edit - Emits the 'edit' event with the updated allergy data.
+ * @emit {Function} close - Emits the 'close' event to close the dialog.
+ */
 const emit = defineEmits(['edit', 'close'])
 const maxDate = ref(new Date())
 const displayEditDialog = ref(props.displayDialog)
+const errorMessage = ref('')
+const isSubmitting = ref(false)
 
 const initialValues = ref({
   dateDiagnosed: parse(props.allergy.date_diagnosed, 'dd-MM-yyyy', new Date()),
@@ -179,6 +203,7 @@ const initialValues = ref({
   notes: props.allergy.notes,
 })
 
+// Zod resolver for form validation
 const resolver = zodResolver(
   z.object({
     dateDiagnosed: z
@@ -193,7 +218,13 @@ const resolver = zodResolver(
   }),
 )
 
+/**
+ * @description Sends a PATCH request to the backend to update an existing allergy with the provided details.
+ * @param allergyDetails - The updated details of the allergy.
+ */
 const updateAllergy = async (allergyDetails) => {
+  isSubmitting.value = true
+  
   try {
     let formattedDate = format(allergyDetails.dateDiagnosed, 'yyyy-MM-dd')
 
@@ -207,7 +238,11 @@ const updateAllergy = async (allergyDetails) => {
     emit('edit', response.data)
     emit('close')
   } catch (error) {
-    console.error('Error adding allergy: ', error)
+    console.error('Error updating allergy: ', error)
+    // Access the error detail from FastAPI response
+    errorMessage.value = error.response?.data?.detail || 'A apărut o eroare la actualizarea alergiei. Vă rugăm să încercați din nou.'
+  } finally {
+    isSubmitting.value = false
   }
 }
 
@@ -220,7 +255,7 @@ const onFormSubmit = (e) => {
   // e.reset: A function that resets the form to its initial state.
 
   if (!e.valid) {
-    console.error('Error adding allergy: ', e.errors)
+    console.error('Error updating allergy: ', e.errors)
     return
   }
 

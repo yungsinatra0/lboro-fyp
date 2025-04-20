@@ -34,6 +34,9 @@ def get_allergies(request: Request, user_id: uuid.UUID = Depends(validate_sessio
     # Get the session ID from the request cookie and get the user id from the database
     user = session.get(User, user_id)
     
+    if not user.allergies:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No allergies found for this user")
+    
     # Get all the allergies for the user
     result = []
     for allergy in user.allergies:
@@ -129,9 +132,8 @@ def add_allergy(allergy: AllergyCreate, request: Request, user_id: uuid.UUID = D
             date_added = new_allergy.date_added
         )
         
-        return {
-            allergy_response
-        }
+        return allergy_response
+    
     except Exception as e:
         session.rollback()
         print(f"Error adding allergy: {e}")
@@ -266,9 +268,7 @@ def update_allergy(allergy_id: uuid.UUID, allergy_new: AllergyUpdate, request: R
             notes = allergy_db.notes,
             date_added = allergy_db.date_added
         )
-        return {
-            allergy_response
-        }
+        return allergy_response
         
     except Exception as e:
         session.rollback()
@@ -292,6 +292,10 @@ def get_allergens(user_id: uuid.UUID = Depends(validate_session), session: Sessi
         list[AllergensResponse]: A list of all allergen records
     """
     allergens = session.exec(select(Allergens)).all()
+    
+    if not allergens:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No allergens found")
+    
     return allergens
 
 # Get all reactions
@@ -312,6 +316,10 @@ def get_reactions(user_id: uuid.UUID = Depends(validate_session), session: Sessi
     """
     
     reactions = session.exec(select(Reactions)).all()
+    
+    if not reactions:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No reactions found")
+    
     return reactions
 
 # Get all severities
@@ -331,4 +339,8 @@ def get_severities(user_id: uuid.UUID = Depends(validate_session), session: Sess
         list[SeverityResponse]: List of all severity levels
     """
     severities = session.exec(select(Severity)).all()
+    
+    if not severities:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No severities found")
+    
     return severities

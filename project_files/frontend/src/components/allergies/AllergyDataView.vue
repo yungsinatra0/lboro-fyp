@@ -6,6 +6,12 @@
       :sortOrder="sortOrder"
       :sortField="sortField"
     >
+      <template #empty>
+        <div class="flex flex-col items-center justify-center w-full h-full">
+          <i class="pi pi-exclamation-triangle text-4xl text-surface-400" />
+          <h3 class="text-xl font-semibold text-surface-900 dark:text-surface-0 mt-2">Nu au fost gasite alergii</h3>
+        </div>
+      </template>
       <template #header>
         <div class="flex flex-col md:flex-row justify-between items-center gap-2">
           <div class="flex flex-col gap-2 md:flex-row items-center md:gap-4">
@@ -242,17 +248,33 @@
 </template>
 
 <script setup>
+/**
+ * @file AllergyDataView.vue
+ * @description AllergyDataView component displays a list of allergies in either grid or list format.
+ * It allows users to filter allergies based on allergens, reactions, and severities.
+ * Users can also sort allergies and perform actions like editing or deleting an allergy.
+ */
 import { ref, computed } from 'vue'
 import { useConfirm } from 'primevue/useconfirm'
 import api from '@/services/api'
 
+/**
+ * @prop {Array} allergies - List of allergies to display, received from the parent component from API call.
+ * @prop {Array} allergens - List of allergens to filter allergies, received from the parent component from API call.
+ * @prop {Array} reactions - List of reactions to filter allergies, received from the parent component from API call.
+ * @prop {Array} severities - List of severities to filter allergies, received from the parent component from API call.
+ */
 const props = defineProps({
-  allergies: Object,
+  allergies: Array,
   allergens: Array,
   reactions: Array,
   severities: Array,
 })
 
+/**
+ * @emit {Function} delete - Emit event to delete an allergy.
+ * @emit {Function} openEdit - Emit event to open the edit dialog for an allergy.
+ */
 const emit = defineEmits(['delete', 'openEdit'])
 
 const layout = ref('grid')
@@ -272,33 +294,50 @@ const selectedReactions = ref([])
 const selectedSeverities = ref([])
 const searchQuery = ref('')
 
+/**
+ * @computed {Array} filteredAllergies - Computed property to filter allergies based on selected allergens, reactions, severities, and search query.
+ */
 const filteredAllergies = computed(() => {
   
+  // Filter allergies based on selected allergens
   if (selectedAllergens.value.length > 0) {
     return props.allergies.filter((allergy) =>
       allergy.allergens.some((allergen) => selectedAllergens.value.includes(allergen))
     )
   }
 
+  // Filter allergies based on selected reactions
   if (selectedReactions.value.length > 0) {
     return props.allergies.filter((allergy) =>
       allergy.reactions.some((reaction) => selectedReactions.value.includes(reaction))
     )
   }
 
+  // Filter allergies based on selected severities
   if (selectedSeverities.value.length > 0) {
     return props.allergies.filter((allergy) =>
       selectedSeverities.value.includes(allergy.severity)
     )
   }  
 
-  return props.allergies.filter((allergy) =>
-    allergy.allergens.some((allergen) =>
-      allergen.toLowerCase().includes(searchQuery.value.toLowerCase())
+  // Filter allergies based on search query
+  if (searchQuery.value.length > 0) {
+    return props.allergies.filter((allergy) =>
+      allergy.allergens.some((allergen) =>
+        allergen.toLowerCase().includes(searchQuery.value.toLowerCase())
+      )
     )
-  )
+  }
+
+  return props.allergies
 })
 
+/**
+ * @function onSortChange
+ * @description This function is used to handle the sorting of allergies based on the selected sort option.
+ * It updates the sortOrder and sortField based on the selected value. Taken from PrimeVue documentation.
+ * @param {Object} event - The event object containing the selected sort option.
+ */
 const onSortChange = (event) => {
   const value = event.value.value
   const sortValue = event.value
@@ -314,11 +353,13 @@ const onSortChange = (event) => {
   }
 }
 
+// Menu items ref object for the context menu. 
 const menuItems = ref([
   {
     label: 'Optiuni',
     items: [
       {
+        // Edit option for the allergy. Opens edit dialog when clicked.
         label: 'Editeaza',
         icon: 'pi pi-pencil',
         command: () => {
@@ -328,6 +369,7 @@ const menuItems = ref([
         },
       },
       {
+        // Delete option for the allergy. Shows confirmation dialog when clicked.
         label: 'Sterge',
         icon: 'pi pi-trash',
         command: (event) => {
@@ -345,6 +387,7 @@ const toggle = (event, id) => {
   menu.value.toggle(event)
 }
 
+// Confirmation menu for deleting an allergy. It shows a confirmation dialog when the delete option is clicked.
 const confirmDelete = (event, id) => {
   confirm.require({
     target: event.currentTarget,
@@ -372,6 +415,7 @@ const confirmDelete = (event, id) => {
   })
 }
 
+// Function to get the severity type for the tag based on the severity value.
 const getSeverityType = (severity) => {
   switch (severity) {
     case 'Ușoară':
