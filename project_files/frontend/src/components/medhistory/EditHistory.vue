@@ -15,6 +15,11 @@
       Actualizează informațiile pentru înregistrarea medicală selectată.
     </span>
     <span class="text-rose-600 text-sm block mb-8">* Câmpurile marcate sunt obligatorii</span>
+    
+    <Message v-if="formError" severity="error" class="mb-4 w-full">
+      {{ formError }}
+    </Message>
+    
     <Form v-slot="$form" :initialValues="initialValues" @submit="onFormSubmit" :resolver="resolver">
       <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 mb-6">
         <label for="name" class="font-semibold text-sm md:text-base w-full md:w-1/4"
@@ -207,6 +212,7 @@
           severity="success"
           class="px-4 py-2 text-sm md:text-base"
           type="submit"
+          :loading="isSubmitting"
         />
       </div>
     </Form>
@@ -214,12 +220,24 @@
 </template>
 
 <script setup>
+/**
+ * @file EditHistory.vue
+ * @description Component for editing an existing medical history record. It displays a dialog with a form
+ * pre-filled with the current record data and sends a request to update the record in the backend.
+ */
 import { parse, format } from 'date-fns'
 import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import api from '@/services/api'
 import { ref, computed } from 'vue'
 
+/**
+ * @prop {Boolean} displayDialog - Controls the visibility of the dialog.
+ * @prop {Object} medicalHistory - The medical history record to be edited.
+ * @prop {Array} categories - List of medical categories to choose from.
+ * @prop {Array} subcategories - List of consultation subcategories to choose from.
+ * @prop {Array} labsubcategories - List of laboratory subcategories to choose from.
+ */
 const props = defineProps({
   displayDialog: Boolean,
   medicalHistory: Object,
@@ -228,10 +246,21 @@ const props = defineProps({
   labsubcategories: Array,
 })
 
+/**
+ * @emit {Function} edit - Emits the 'edit' event with the updated medical history data.
+ * @emit {Function} close - Emits the 'close' event to close the dialog.
+ */
 const emit = defineEmits(['edit', 'close'])
 const maxDate = ref(new Date())
 const displayEditDialog = ref(props.displayDialog)
+const formError = ref(null)
+const isSubmitting = ref(false)
 
+/**
+ * @computed {Object} initialValues
+ * @description Computes the initial values for the form based on the current medical history record.
+ * Handles date parsing and default values for optional fields.
+ */
 const initialValues = computed(() => {
   if (!props.medicalHistory) return {}
 
@@ -253,6 +282,11 @@ const initialValues = computed(() => {
   }
 })
 
+/**
+ * @constant {Function} resolver
+ * @description Form validation resolver using Zod schemas.
+ * Validates required fields and ensures the consultation date is not in the future.
+ */
 const resolver = zodResolver(
   z.object({
     name: z.string().nonempty('Numele înregistrării este obligatoriu.'),
@@ -271,7 +305,16 @@ const resolver = zodResolver(
   }),
 )
 
+/**
+ * @function updateMedicalHistory
+ * @description Sends a PATCH request to the backend to update the medical history record with provided details.
+ * Handles errors and loading states during the update process.
+ * @param {Object} medicalHistoryDetails - The updated details of the medical history record.
+ */
 const updateMedicalHistory = async (medicalHistoryDetails) => {
+  isSubmitting.value = true
+  formError.value = null
+  
   try {
     let formattedDate = format(medicalHistoryDetails.date_consultation, 'yyyy-MM-dd')
 
@@ -296,9 +339,19 @@ const updateMedicalHistory = async (medicalHistoryDetails) => {
     emit('close')
   } catch (error) {
     console.error('Error updating medical history:', error)
+    formError.value = error.response?.data?.detail || 
+      'A apărut o eroare la actualizarea înregistrării medicale. Te rugăm să încerci din nou.'
+  } finally {
+    isSubmitting.value = false
   }
 }
 
+/**
+ * @function onFormSubmit
+ * @description Handles the form submission event.
+ * Validates the form data and calls updateMedicalHistory if valid.
+ * @param {Object} e - The form submission event.
+ */
 const onFormSubmit = (e) => {
   if (!e.valid) {
     console.error('Error updating medical history: ', e.errors)

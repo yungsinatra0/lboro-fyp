@@ -41,7 +41,11 @@
           <p>Nu au fost gasite rezultate care sa corespunda criteriilor de cautare.</p>
         </div>
       </template>
-      <template #loading> Se incarca datele. Va rugam asteptati. </template>
+      
+      <template #loading>
+        <ProgressSpinner />
+        Se incarca datele. Va rugam asteptati.
+      </template>
 
       <Column field="name" header="Descriere" :showFilterMenu="true">
         <template #body="slotProps">
@@ -139,7 +143,9 @@
 
       <Column field="notes" header="Notite">
         <template #body="slotProps">
-          <span class="text-sm md:text-base">{{ slotProps.data.notes ? slotProps.data.notes : '-' }}</span>
+          <span class="text-sm md:text-base">{{
+            slotProps.data.notes ? slotProps.data.notes : '-'
+          }}</span>
         </template>
       </Column>
 
@@ -179,12 +185,20 @@
 </template>
 
 <script setup>
+/**
+ * @file HistoryTableView.vue
+ * @description This file contains the HistoryTableView component, which is used to display the medical history records in a table format using PrimeVue's DataTable component and data fetched from API on the history page.
+ */
 import { ref } from 'vue'
 import { FilterMatchMode } from '@primevue/core/api'
 import { useConfirm } from 'primevue/useconfirm'
 import ConfirmDialog from 'primevue/confirmdialog'
 import api from '@/services/api'
 
+/**
+ * @prop {Array} history - The medical history records to be displayed in the table.
+ * @prop {Array} categories - The list of categories for filtering the history records.
+ */
 // eslint-disable-next-line no-unused-vars
 const props = defineProps({
   history: Array,
@@ -194,10 +208,15 @@ const props = defineProps({
 const selectedHistoryId = ref(null)
 const menu = ref(null)
 const confirm = useConfirm()
+/**
+ * @emit {Function} delete - Emits the 'delete' event with the ID of the deleted history record.
+ * @emit {Function} openEdit - Emits the 'openEdit' event with the ID of the history record to be edited.
+ * @emit {Function} showFile - Emits the 'showFile' event with the ID of the history record to show the file.
+ */
 const emit = defineEmits(['delete', 'openEdit', 'showFile'])
 const loading = ref(false)
 
-// Initialize filters
+// Initialize filters used by the DataTable component
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   name: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -206,11 +225,20 @@ const filters = ref({
   category: { value: null, matchMode: FilterMatchMode.EQUALS },
 })
 
+/**
+ * @function toggle - Toggles the visibility of the context menu for editing or deleting a history record.
+ * @param event - The event triggered by the button click.
+ * @param id - The ID of the history record to be edited or deleted.
+ */
 const toggle = (event, id) => {
   selectedHistoryId.value = id
   menu.value.toggle(event)
 }
 
+/**
+ * @constant {Array} menuItems - The items to be displayed in the context menu.
+ * Each item has a label, icon, and command to be executed when clicked.
+ */
 const menuItems = ref([
   {
     label: 'Optiuni',
@@ -237,6 +265,12 @@ const menuItems = ref([
   },
 ])
 
+/**
+ * @function confirmDelete
+ * @description Displays a confirmation dialog before deleting a medical history record. If confirmed, it sends a delete request to the API and emits the 'delete' event with the ID of the record.
+ * @param event - The event triggered by the button click.
+ * @param id - The ID of the medical history record to be deleted.
+ */
 const confirmDelete = (event, id) => {
   confirm.require({
     target: event.currentTarget,

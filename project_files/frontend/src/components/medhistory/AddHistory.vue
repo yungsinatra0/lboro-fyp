@@ -11,12 +11,16 @@
         <span class="font-bold text-xl md:text-2xl">Înregistrare medicală nouă</span>
       </div>
     </template>
+
+    <!-- First form section where the medical history record details are input -->
     <div v-if="!loadingState && !extractionResult">
       <span class="text-surface-500 dark:text-surface-400 block mb-2"
         >Adaugă informații pentru o nouă înregistrare medicală.</span
       >
       <div class="text-rose-600 text-sm mb-2 md:mb-4">* Câmpurile marcate sunt obligatorii</div>
-      <span v-if="formError" class="text-rose-600 text-sm block mb-4 md:mb-8">{{ formError }}</span>
+      <Message v-if="formError" severity="error" class="mb-4 w-full">
+        {{ formError }}
+      </Message>
       <Form
         v-slot="$form"
         :initialValues="initialValues"
@@ -232,11 +236,14 @@
             severity="success"
             autofocus
             type="submit"
+            :loading="isSubmitting"
             class="text-sm md:text-base px-2 md:px-4"
           />
         </div>
       </Form>
     </div>
+
+    <!-- If extraction is selected, wait for the LLM response and then display the extracted results. -->
     <div v-else>
       <div class="flex flex-col items-center p-4" v-if="!extractionResult">
         <ProgressSpinner />
@@ -263,6 +270,7 @@
             </IconField>
           </div>
 
+          <!-- Table to display the extraction results, can filter and edit the results -->
           <div class="w-full overflow-x-auto">
             <DataTable
               :value="extractionResult"
@@ -328,6 +336,8 @@
             />
           </div>
         </div>
+
+        <!-- If extraction and selection is succesful, show success screen and allow user to be directed to the lab results page -->
         <div v-else class="flex flex-col items-center p-4 md:p-8">
           <i class="pi pi-check-circle text-4xl md:text-6xl text-green-500 mb-4" />
           <Message severity="success" class="mb-6 text-base md:text-lg">
@@ -352,6 +362,12 @@
 </template>
 
 <script setup>
+/**
+ * @file AddHistory.vue
+ * @description Component for adding a new medical history record. It displays a dialog with a form to input
+ * medical history details and sends a request to the backend. For laboratory records, it also supports
+ * AI-based extraction of test results from uploaded documents.
+ */
 import { FilterMatchMode } from '@primevue/core/api'
 import { parse, format } from 'date-fns'
 import { z } from 'zod'
@@ -360,6 +376,12 @@ import api from '@/services/api'
 import { ref } from 'vue'
 import router from '@/router'
 
+/**
+ * @prop {Boolean} displayDialog - Controls the visibility of the dialog.
+ * @prop {Array} categories - List of medical categories to choose from.
+ * @prop {Array} subcategories - List of consultation subcategories to choose from.
+ * @prop {Array} labsubcategories - List of laboratory subcategories to choose from.
+ */
 const props = defineProps({
   displayDialog: Boolean,
   categories: Array,
@@ -367,6 +389,10 @@ const props = defineProps({
   labsubcategories: Array,
 })
 
+/**
+ * @emit {Function} add - Emits the 'add' event with the new medical history data.
+ * @emit {Function} close - Emits the 'close' event to close the dialog.
+ */
 const emit = defineEmits(['add', 'close'])
 const maxDate = ref(new Date())
 const displayAddDialog = ref(props.displayDialog)
@@ -377,6 +403,7 @@ const editingRows = ref([])
 const labDetails = ref(null)
 const formError = ref(null)
 const extractSuccess = ref(false)
+const isSubmitting = ref(false)
 const columns = ref([
   { field: 'test_name', header: 'Test' },
   { field: 'test_code', header: 'Cod' },
@@ -420,10 +447,21 @@ const resolver = zodResolver(
   }),
 )
 
+/**
+ * @function addMedicalHistory
+ * @description Sends a POST request to the backend to add a new medical history record with provided details.
+ * If a file is uploaded, it also uploads the file. For laboratory records with AI extraction enabled,
+ * it processes the document to extract test results.
+ * @param {Object} medicalHistoryDetails - The details of the medical history record to be added.
+ */
 const addMedicalHistory = async (medicalHistoryDetails) => {
+  isSubmitting.value = true
+  formError.value = null
+
   try {
     let formattedDate = format(medicalHistoryDetails.date_consultation, 'yyyy-MM-dd')
 
+    // Try adding the medical history record first
     const response = await api.post('me/medicalhistory', {
       name: medicalHistoryDetails.name,
       doctor_name: medicalHistoryDetails.doctor_name,
@@ -439,6 +477,7 @@ const addMedicalHistory = async (medicalHistoryDetails) => {
 
     let hasFile = false
 
+    // If there's a file to upload, send a separate request to upload it
     if (uploadedFile.value) {
       const formData = new FormData()
       formData.append('file', uploadedFile.value)
@@ -450,6 +489,7 @@ const addMedicalHistory = async (medicalHistoryDetails) => {
       hasFile = true
     }
 
+    // If the user has enabled extraction, process the document to extract test results
     if (medicalHistoryDetails.extract) {
       emit('add', {
         ...response.data,
@@ -465,12 +505,22 @@ const addMedicalHistory = async (medicalHistoryDetails) => {
 
       loadingState.value = true
 
-      const llm_response = await api.post(`/labtests/extract/${response.data.id}`)
-
-      extractionResult.value = JSON.parse(llm_response.data)
+      try {
+        const llm_response = await api.post(`/labtests/extract/${response.data.id}`)
+        extractionResult.value = JSON.parse(llm_response.data)
+      } catch (err) {
+        formError.value =
+          err.response?.data?.detail ||
+          'Eroare la extragerea rezultatelor. Te rugăm să încerci din nou.'
+        loadingState.value = false
+        isSubmitting.value = false
+        return
+      }
 
       loadingState.value = false
-    } else {
+    }
+    // if no extraction, just emit the add event with the response data
+    else {
       emit('add', {
         ...response.data,
         original_date_consultation: response.data.date_consultation,
@@ -479,13 +529,25 @@ const addMedicalHistory = async (medicalHistoryDetails) => {
       })
       emit('close')
     }
-  } catch (error) {
-    console.error('Error in medical history operation:', error)
-    formError.value = error.response.data.detail
+  } catch (err) {
+    console.error('Error in medical history operation:', err)
+    formError.value =
+      err.response?.data?.detail || 'A apărut o eroare. Te rugăm să încerci din nou mai târziu.'
+  } finally {
+    isSubmitting.value = false
   }
 }
 
+/**
+ * @function addExtractedLab
+ * @description Sends a POST request to add the extracted laboratory test results to the database.
+ * Updates the UI state based on the success or failure of the operation.
+ */
 const addExtractedLab = async () => {
+  isSubmitting.value = true
+  formError.value = null
+
+  // Send the extracted lab test results to the backend
   try {
     const response = await api.post('/me/labtests', {
       medicalhistory_id: labDetails.value.medicalhistory_id,
@@ -503,11 +565,21 @@ const addExtractedLab = async () => {
     if (response.status === 201) {
       extractSuccess.value = true
     }
-  } catch (error) {
-    console.error('Error in adding extracted lab:', error)
+  } catch (err) {
+    console.error('Error in adding extracted lab:', err)
+    formError.value =
+      err.response?.data?.detail || 'Eroare la salvarea rezultatelor. Te rugăm să încerci din nou.'
+  } finally {
+    isSubmitting.value = false
   }
 }
 
+/**
+ * @function onRowEditSave
+ * @description Handles saving edits made to rows in the data table of extracted lab test results.
+ * Ensures that the correct row is updated when filtering is active.
+ * @param {Object} event - The row edit event containing new data and row index.
+ */
 const onRowEditSave = (event) => {
   let { newData, index } = event
 
@@ -528,10 +600,22 @@ const onRowEditSave = (event) => {
   }
 }
 
+/**
+ * @function onSelect
+ * @description Handles the file selection event from the file uploader.
+ * Stores the selected file for later upload.
+ * @param {Object} event - The file selection event.
+ */
 const onSelect = (event) => {
   uploadedFile.value = event.files[0]
 }
 
+/**
+ * @function onFormSubmit
+ * @description Handles the form submission event.
+ * Validates the form data and calls addMedicalHistory if valid.
+ * @param {Object} e - The form submission event.
+ */
 const onFormSubmit = (e) => {
   if (!e.valid) {
     console.error('Error adding medical history: ', e.errors)
