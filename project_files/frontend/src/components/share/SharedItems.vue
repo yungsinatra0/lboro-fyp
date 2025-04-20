@@ -9,6 +9,8 @@
           <span class="text-gray-500 ml-2">| Data nașterii: {{ shareData?.patient.dob }}</span>
         </div>
       </div>
+
+      <!-- Timer to show how much time is left until link expiration -->
       <div v-if="timer" class="bg-primary bg-opacity-10 py-2 px-4 rounded-full flex items-center">
         <i class="pi pi-clock mr-2 text-primary"></i>
         <span class="font-mono font-medium">
@@ -19,6 +21,7 @@
       </div>
     </div>
 
+    <!-- Tab component to show each shared item for each tab -->
     <div class="card">
       <Tabs v-model:value="Object.keys(shareData.items)[0]" v-if="shareData && shareData.items">
         <TabList>
@@ -26,6 +29,7 @@
         </TabList>
         <TabPanels>
           <TabPanel v-for="key in Object.keys(shareData.items)" :key="key" :value="key">
+            <!-- Table to show shared records -->
             <DataTable
               v-if="key !== 'Analize de laborator'"
               :value="shareData.items[key]"
@@ -127,6 +131,7 @@
               </Column>
             </DataTable>
 
+            <!-- Table used for lab results only -->
             <DataTable
               v-else-if="key === 'Analize de laborator'"
               :value="shareData.items[key]"
@@ -226,6 +231,8 @@
                   </template>
                 </template>
               </Column>
+
+              <!-- Expanded table that shows the results for each test name -->
               <template #expansion="slotProps">
                 <div class="p-4">
                   <h2>Detalii pentru {{ slotProps.data.name }}</h2>
@@ -280,6 +287,10 @@
 </template>
 
 <script setup>
+/**
+ * @file SharedItems.vue
+ * @description This file contains the SharedItems component, which is responsible for displaying the shared items via the share link and handling the file display.
+ */
 import { ref, onMounted } from 'vue'
 import ShowSharedFile from './ShowSharedFile.vue'
 import { FilterMatchMode } from '@primevue/core/api'
@@ -300,6 +311,10 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
+/**
+ * @prop {Object} shareData - the data shared via the share link.
+ * @prop {String} pin - the PIN code for accessing the shared data. Used for authorizing the file view requests.
+ */
 const props = defineProps({
   shareData: Object,
   pin: String,
@@ -314,6 +329,9 @@ const filters = ref({
 })
 const timer = ref(null)
 
+/**
+ * @description This function is called when the component is mounted. It checks if the shareData has an expiration time and sets up a timer if it does.
+ */
 onMounted(() => {
   if (props.shareData.expiration_time) {
     const expirationDate = parseISO(props.shareData.expiration_time)
@@ -321,6 +339,7 @@ onMounted(() => {
   }
 })
 
+// Chart options for the sparkline charts for lab results
 const chartOptions = {
   responsive: false,
   maintainAspectRatio: false,
@@ -358,12 +377,23 @@ const chartOptions = {
   },
 }
 
+/**
+ * @function showFile
+ * @description This function is used to show the file or certificate associated with a specific record.
+ * @param type - The type of the record (e.g., 'vaccine', 'medicalhistory')
+ * @param id - The ID of the record to be displayed
+ */
 const showFile = (type, id) => {
   recordType.value = type
   recordId.value = id
   displayFile.value = true
 }
 
+/**
+ * @function getFilteredColumns
+ * @description This function filters the columns of the non-lab items from data table based on the provided key.
+ * @param key - The key of the item to be filtered
+ */
 const getFilteredColumns = (key) => {
   if (!props.shareData?.items?.[key]?.[0]) return []
   return Object.keys(props.shareData.items[key][0]).filter(
@@ -372,6 +402,11 @@ const getFilteredColumns = (key) => {
   )
 }
 
+/**
+ * @function getFilteredColumnsLabs
+ * @description This function filters the columns of the lab results from data table based on the provided result object.
+ * @param result - The result object from the lab result
+ */
 const getFilteredColumnsLabs = (result) => {
   if (!result) return []
   return Object.keys(result).filter(

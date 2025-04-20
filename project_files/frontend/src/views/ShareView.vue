@@ -1,6 +1,8 @@
 <template>
+  <!-- Component to display the shared items once the user passes the verification -->
   <SharedItems v-if="isValid && shareData !== null" :share-data="shareData" :pin="pin" />
 
+  <!-- Component to check the PIN if the share link is valid -->
   <Dialog
     v-if="displayPINCheck"
     v-model:visible="displayPINCheck"
@@ -17,19 +19,20 @@
       }}</Message>
     </div>
     <div class="flex justify-center mt-4">
-      <Button label="Verifica" @click="checkPin" class="w-full" />
+      <Button label="Verifica" @click="checkPin" class="w-full" :loading="loading" />
     </div>
   </Dialog>
 
+  <!-- Dialog shown if the link has expired. Pushes user to the landing page. -->
   <Dialog
     v-if="displayInvalid"
     v-model:visible="displayInvalid"
     modal
-    header="Link expirat"
+    header="Link invalid"
     @hide="router.push({ path: '/' })"
   >
     <div class="flex flex-col items-center justify-center gap-4">
-      <h1 class="font-bold">Link-ul de partajare a expirat</h1>
+      <h1 class="font-bold">{{ errorMessage || 'Link-ul de partajare a expirat' }}</h1>
       <p>Te rugam sa ceri pacientului tau un nou link de partajare.</p>
     </div>
     <div class="flex justify-center mt-4">
@@ -39,6 +42,10 @@
 </template>
 
 <script setup>
+/**
+ * @file ShareView.vue
+ * @description This file contains the ShareView component, which is responsible for displaying the shared items and handling the PIN verification process.
+ */
 import api from '@/services/api'
 import { ref, computed, onMounted, watch } from 'vue'
 import { z } from 'zod'
@@ -54,26 +61,41 @@ const router = useRouter()
 const shareData = ref(null)
 const isValid = ref(false)
 const pinError = ref('')
+const loading = ref(false)
+const errorMessage = ref('')
 
+// Watch for changes in the pin value and reset the error message if the length is less than 6
 watch(pin, () => {
   if (pin.value.length < 6) {
     pinError.value = ''
   }
 })
 
+/**
+ * @description On component mount, check if the share link is valid. If valid, show the PIN check dialog.
+ */
 onMounted(async () => {
   try {
     const response = await api.get(`/share/${route.params.code}`)
     if (response.data.valid) {
       displayPINCheck.value = true
       isValid.value = true
+    } else {
+      errorMessage.value = 'Link-ul de partajare nu este valid'
+      displayInvalid.value = true
     }
   } catch (error) {
     console.error('Error fetching share data:', error)
+    errorMessage.value =
+      error.response?.data?.detail || 'A apărut o eroare la verificarea link-ului'
     displayInvalid.value = true
   }
 })
 
+/**
+ * @function pinValidation
+ * @description Validates the PIN input using Zod schema. The PIN must be exactly 6 characters long.
+ */
 const pinValidation = computed(() => {
   const pinSchema = z.string().length(6, { message: 'PIN-ul trebuie sa contina 6 caractere' })
   const result = pinSchema.safeParse(pin.value)
@@ -84,10 +106,17 @@ const pinValidation = computed(() => {
   }
 })
 
+/**
+ * @function checkPin
+ * @description Checks the entered PIN against the one stored in the database. If valid, fetches the shared data and updates the shareData ref.
+ */
 const checkPin = async () => {
   if (!pinValidation.value.success) {
     return
   }
+
+  loading.value = true
+  pinError.value = ''
 
   try {
     const response = await api.post(`/share/${route.params.code}/verify`, { pin: pin.value })
@@ -109,11 +138,15 @@ const checkPin = async () => {
         },
       }
       displayPINCheck.value = false
-      console.log(shareData.value)
     }
   } catch (error) {
-    pinError.value = 'PIN-ul introdus este gresit'
-    console.error('Error checking PIN:', error)
+    if (error.response?.status === 403) {
+      pinError.value = 'PIN-ul introdus este greșit'
+    } else {
+      pinError.value = error.response?.data?.detail || 'A apărut o eroare la verificarea PIN-ului'
+    }
+  } finally {
+    loading.value = false
   }
 }
 </script>

@@ -6,7 +6,12 @@
     class="w-full md:w-3/4 md:h-3/4"
     @hide="emit('close')"
   >
-    <div v-if="fileObjectURL && metadata?.file_type == 'application/pdf'">
+    <div v-if="loading" class="flex justify-center items-center p-8">
+      <ProgressSpinner />
+      <span class="ml-3">Se încarcă fișierul...</span>
+    </div>
+
+    <div v-else-if="fileObjectURL && metadata?.file_type == 'application/pdf'">
       <object
         :data="fileObjectURL"
         type="application/pdf"
@@ -34,15 +39,32 @@
 </template>
 
 <script setup>
+/**
+ * @file ShowSharedFile.vue
+ * @description Component to display a shared medical file. Supports viewing PDF files and images.
+ * Uses the share API to fetch the file using the provided PIN and code.
+ */
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import api from '@/services/api'
 
+/**
+ * @emit {Function} close - Emits when the dialog is closed
+ */
 const emit = defineEmits(['close'])
+
 const metadata = ref(null)
 const fileBlob = ref(null)
 const fileObjectURL = ref(null)
 const error = ref(null)
+const loading = ref(true)
 
+/**
+ * @prop {Boolean} displayDialog - Controls the visibility of the dialog
+ * @prop {String} pin - PIN code for authorization to access the shared file
+ * @prop {String} code - Unique code identifying the share link
+ * @prop {String} recordType - Type of medical record (e.g., 'medicalhistory')
+ * @prop {String} recordId - ID of the specific record
+ */
 const props = defineProps({
   displayDialog: Boolean,
   pin: String,
@@ -53,17 +75,27 @@ const props = defineProps({
 
 const visible = ref(props.displayDialog)
 
+/**
+ * On component mount, fetch the file metadata and the file itself
+ */
 onMounted(() => {
   fetchMetadata()
   fetchFile()
 })
 
+/**
+ * Before component unmount, clean up any object URLs to prevent memory leaks
+ */
 onBeforeUnmount(() => {
   if (fileObjectURL.value) {
     URL.revokeObjectURL(fileObjectURL.value)
   }
 })
 
+/**
+ * @function fetchMetadata
+ * @description Fetches the metadata for the file, including its type and name
+ */
 const fetchMetadata = async () => {
   try {
     const response = await api.get(
@@ -77,11 +109,16 @@ const fetchMetadata = async () => {
     metadata.value = response.data
   } catch (err) {
     console.error('Error fetching metadata:', err)
-    error.value = 'Nu s-au putut încărca metadatele fișierului'
+    error.value = err.response?.data?.detail || 'Nu s-au putut încărca metadatele fișierului'
   }
 }
 
+/**
+ * @function fetchFile
+ * @description Fetches the actual file blob and creates an object URL for display
+ */
 const fetchFile = async () => {
+  loading.value = true
   try {
     const response = await api.get(
       `/share/${props.code}/file/${props.recordType}/${props.recordId}`,
@@ -97,6 +134,8 @@ const fetchFile = async () => {
   } catch (err) {
     console.error('Error fetching file:', err)
     error.value = 'Nu s-a putut încărca fișierul'
+  } finally {
+    loading.value = false
   }
 }
 </script>
