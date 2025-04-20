@@ -126,14 +126,26 @@
 </template>
 
 <script setup>
+/**
+ * @file VaccineDataView.vue
+ * @description Component for displaying a list of vaccines in either grid or list view.
+ */
 import { ref, computed } from 'vue'
 import { useConfirm } from 'primevue/useconfirm'
 import api from '@/services/api'
 
+/**
+ * @prop {Object} vaccines - The list of vaccines to display.
+ */
 const props = defineProps({
   vaccines: Object,
 })
 
+/**
+ * @emit {Function} delete - Emitted when a vaccine is deleted.
+ * @emit {Function} openEdit - Emitted when a vaccine is edited.
+ * @emit {Function} showFile - Emitted when a file is shown.
+ */
 const emit = defineEmits(['delete', 'openEdit', 'showFile'])
 
 const layout = ref('grid')
@@ -151,6 +163,10 @@ const sortOptions = ref([
 const hasCertificateOnly = ref(false)
 const searchQuery = ref('')
 
+/**
+ * Sort function to handle the sorting of the vaccines. Taken from PrimeVue documentation.
+ * @param event - The event object from the sort change.
+ */
 const onSortChange = (event) => {
   const value = event.value.value
   const sortValue = event.value
@@ -166,6 +182,10 @@ const onSortChange = (event) => {
   }
 }
 
+/**
+ * @computed filteredVaccines - Computed property to filter the vaccines based on the search query and certificate status.
+ * It filters the vaccines based on the name and provider, and also checks if the vaccine has a certificate.
+ */
 const filteredVaccines = computed(() => {
   let result = props.vaccines
 
@@ -184,6 +204,7 @@ const filteredVaccines = computed(() => {
   return result
 })
 
+// Menu items for the context menu
 const menuItems = ref([
   {
     label: 'Optiuni',
@@ -210,11 +231,13 @@ const menuItems = ref([
   },
 ])
 
+// Function to handle the toggle of the context menu
 const toggle = (event, id) => {
   selectedVaccineId.value = id
   menu.value.toggle(event)
 }
 
+// Function to handle the confirmation of deletion of a vaccine
 const confirmDelete = (event, id) => {
   confirm.require({
     target: event.currentTarget,

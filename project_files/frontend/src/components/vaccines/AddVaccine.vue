@@ -12,11 +12,17 @@
       </div>
     </template>
     <span class="text-surface-500 dark:text-surface-400 block mb-8"
-      >Adauga informatia pentru un vaccin nou.</span
+      >Adauga informatia pentru un vaccin nou. Câmpurile marcate cu <span class="text-red-500">*</span> sunt obligatorii.</span
     >
+    
+    <!-- Show error message if API returns an error -->
+    <Message v-if="errorMessage" severity="error" class="mb-4 w-full">
+      {{ errorMessage }}
+    </Message>
+    
     <Form v-slot="$form" :initialValues @submit="onFormSubmit" :resolver="resolver">
       <div class="flex items-center gap-4 mb-4">
-        <label for="name" class="font-semibold w-24">Numele vaccinului</label>
+        <label for="name" class="font-semibold w-24">Numele vaccinului <span class="text-red-500">*</span></label>
         <InputText name="name" class="flex w-1/2" autocomplete="off" type="text" fluid />
         <Message
           v-if="$form.name?.invalid"
@@ -28,7 +34,7 @@
         >
       </div>
       <div class="flex items-center gap-4 mb-4">
-        <label for="provider" class="font-semibold w-24">Numele furnizorului</label>
+        <label for="provider" class="font-semibold w-24">Numele furnizorului <span class="text-red-500">*</span></label>
         <InputText name="provider" class="flex w-1/2" autocomplete="off" type="text" fluid />
         <Message
           v-if="$form.provider?.invalid"
@@ -40,7 +46,7 @@
         >
       </div>
       <div class="flex items-center gap-4 mb-4">
-        <label for="dateReceived" class="font-semibold w-24">Data primirii vaccinului</label>
+        <label for="dateReceived" class="font-semibold w-24">Data primirii vaccinului <span class="text-red-500">*</span></label>
         <DatePicker
           name="dateReceived"
           dateFormat="dd/mm/yy"
@@ -82,26 +88,40 @@
           autofocus
           type="button"
         />
-        <Button label="Salveaza" severity="success" autofocus type="submit" />
+        <Button label="Salveaza" severity="success" autofocus type="submit" :loading="isSubmitting" />
       </div>
     </Form>
   </Dialog>
 </template>
 
 <script setup>
+/**
+ * @file AddVaccine.vue
+ * @description Component for adding a new vaccine. Displays a dialog with a form to input vaccine details, which then sends a request to the backend to add the vaccine.
+ */
 import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import api from '@/services/api'
 import { ref } from 'vue'
 import { format } from 'date-fns'
 
+/**
+ * @prop {Boolean} displayDialog - Controls the visibility of the dialog.
+ */
 const props = defineProps({
   displayDialog: Boolean,
 })
+
+/**
+ * @emit {Function} add - Emits the 'add' event with the new vaccine data.
+ * @emit {Function} close - Emits the 'close' event to close the dialog.
+ */
 const emit = defineEmits(['add', 'close'])
 const maxDate = ref(new Date())
 const displayAddDialog = ref(props.displayDialog)
 const uploadedFile = ref(null)
+const errorMessage = ref('')
+const isSubmitting = ref(false)
 
 const initialValues = ref({
   name: '',
@@ -109,6 +129,7 @@ const initialValues = ref({
   dateReceived: null,
 })
 
+// Zod resolver for form validation
 const resolver = zodResolver(
   z.object({
     name: z.string().nonempty('Numele vaccinului este obligatoriu.'),
@@ -121,7 +142,14 @@ const resolver = zodResolver(
   }),
 )
 
+/**
+ * @description Sends a POST request to the backend to add a new vaccine with the provided details.
+ * @param vaccineDetails - The details of the vaccine to be added.
+ */
 const addVaccine = async (vaccineDetails) => {
+  isSubmitting.value = true
+  errorMessage.value = ''
+  
   try {
     let formattedDate = format(vaccineDetails.dateReceived, 'yyyy-MM-dd')
 
@@ -148,14 +176,25 @@ const addVaccine = async (vaccineDetails) => {
     emit('close')
   } catch (error) {
     console.error('Error in vaccine operation:', error)
+    errorMessage.value = error.response?.data?.detail || 'A apărut o eroare la adăugarea vaccinului. Vă rugăm să încercați din nou.'
+  } finally {
+    isSubmitting.value = false
   }
 }
 
+/**
+ * @description Handles file selection from the FileUpload component
+ * @param event - The file selection event
+ */
 const onSelect = (event) => {
   uploadedFile.value = event.files[0] // doing only for one file for now
   console.log(uploadedFile.value)
 }
 
+/**
+ * @description Handles form submission
+ * @param e - Form submission event with validation status and values
+ */
 const onFormSubmit = (e) => {
   // e.originalEvent: Represents the native form submit event.
   // e.valid: A boolean that indicates whether the form is valid or not.

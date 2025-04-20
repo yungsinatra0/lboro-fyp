@@ -57,6 +57,10 @@
 </template>
 
 <script setup>
+/**
+ * @file VaccineView.vue
+ * @description This file contains the VaccineView component, which is responsible for displaying and managing the user's vaccines. This is the main view for vaccines, containing other components for adding, editing, viewing vaccines and their certificates.
+ */
 import NavBar from '@/components/NavBar.vue'
 import { onMounted, ref } from 'vue'
 import api from '@/services/api'
@@ -75,40 +79,82 @@ const displayCertificateDialog = ref(false)
 const vaccineIdForCertificate = ref(null)
 const editDialogData = ref(null)
 
+/**
+ * @function onMounted
+ * @description This function is called when the component is mounted. It fetches the user's vaccines from the API and sets them to the vaccines ref.
+ * It also handles any errors that may occur during the API call.
+ */
 onMounted(async () => {
   try {
     const response = await api.get('me/vaccines')
     vaccines.value = response.data
   } catch (err) {
-    error.value = 'A aparut o eroare la incarcarea vaccinelor' + err
+    error.value = err.response?.data?.detail || 'A aparut o eroare la incarcarea vaccinelor. Te rugam sa incerci mai tarziu.'
   } finally {
     loading.value = false
   }
 })
 
+/**
+ * @function showAddDialog
+ * @description This function is used to show the add vaccine dialog.
+ * It sets the displayAddDialog ref to true, which will trigger the dialog to be displayed.
+ */
 const showAddDialog = () => {
   displayAddDialog.value = true
 }
 
+/**
+ * @function addVaccine
+ * @description This function is used to add a new vaccine to the list of vaccines.
+ * It takes the new vaccine object as a parameter and pushes it to the vaccines array.
+ * @param {object} vaccine - The new vaccine object to be added.
+ */
 const addVaccine = (vaccine) => {
   vaccines.value.push(vaccine)
 }
 
+/**
+ * @function deleteVaccine
+ * @description This function is used to delete a vaccine from the list of vaccines.
+ * It takes the id of the vaccine as a parameter and removes it from the vaccines array.
+ * @param {number} id - The id of the vaccine to be deleted.
+ */
 const deleteVaccine = (id) => {
   vaccines.value = vaccines.value.filter((vaccine) => vaccine.id !== id)
 }
 
+/**
+ * @function openEditDialog
+ * @description This function is used to open the edit vaccine dialog.
+ * It takes the id of the vaccine as a parameter, finds the relevant vaccine object and sets the editDialogData ref to the vaccine object.
+ * It also sets the displayEditDialog ref to true, which will trigger the dialog to be displayed.
+ * @param {number} id - The id of the vaccine to be edited.
+ */
 const openEditDialog = (id) => {
   displayEditDialog.value = true
   const vaccine = vaccines.value.find((vaccine) => vaccine.id === id)
   editDialogData.value = vaccine
 }
 
+/**
+ * @function refreshUpdatedVaccine
+ * @description This function is used to refresh the updated vaccine in the list of vaccines.
+ * It takes the updated vaccine object as a parameter and updates the relevant vaccine object in the vaccines array.
+ * @param {object} vaccine - The updated vaccine object to be refreshed.
+ */
 const refreshUpdatedVaccine = (vaccine) => {
   const index = vaccines.value.findIndex((v) => v.id === vaccine.id)
   vaccines.value[index] = vaccine
 }
 
+/**
+ * @function showCertificate
+ * @description This function is used to show the certificate dialog for a specific vaccine.
+ * It takes the id of the vaccine as a parameter and sets it to the vaccineIdForCertificate ref.
+ * It also sets the displayCertificateDialog ref to true, which will trigger the dialog to be displayed.
+ * @param {number} id - The id of the vaccine whose certificate is to be shown.
+ */
 const showCertificate = (id) => {
   displayCertificateDialog.value = true
   vaccineIdForCertificate.value = id

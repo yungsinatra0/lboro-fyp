@@ -12,11 +12,17 @@
       </div>
     </template>
     <span class="text-surface-500 dark:text-surface-400 block mb-8"
-      >Actualizeaza informatia pentru vaccinul selectat.</span
+      >Actualizeaza informatia pentru vaccinul selectat. Câmpurile marcate cu <span class="text-red-500">*</span> sunt obligatorii.</span
     >
+    
+    <!-- Show error message if API returns an error -->
+    <Message v-if="errorMessage" severity="error" class="mb-4 w-full">
+      {{ errorMessage }}
+    </Message>
+    
     <Form v-slot="$form" :initialValues @submit="onFormSubmit" :resolver="resolver">
       <div class="flex items-center gap-4 mb-4">
-        <label for="name" class="font-semibold w-24">Numele vaccinului</label>
+        <label for="name" class="font-semibold w-24">Numele vaccinului <span class="text-red-500">*</span></label>
         <InputText name="name" class="flex w-1/2" autocomplete="off" type="text" fluid />
         <Message
           v-if="$form.name?.invalid"
@@ -28,7 +34,7 @@
         >
       </div>
       <div class="flex items-center gap-4 mb-4">
-        <label for="provider" class="font-semibold w-24">Numele furnizorului</label>
+        <label for="provider" class="font-semibold w-24">Numele furnizorului <span class="text-red-500">*</span></label>
         <InputText name="provider" class="flex w-1/2" autocomplete="off" type="text" fluid />
         <Message
           v-if="$form.provider?.invalid"
@@ -40,7 +46,7 @@
         >
       </div>
       <div class="flex items-center gap-4 mb-4">
-        <label for="dateReceived" class="font-semibold w-24">Data primirii vaccinului</label>
+        <label for="dateReceived" class="font-semibold w-24">Data primirii vaccinului <span class="text-red-500">*</span></label>
         <DatePicker
           name="dateReceived"
           dateFormat="dd/mm/yy"
@@ -79,26 +85,41 @@
           autofocus
           type="button"
         />
-        <Button label="Salveaza" severity="success" autofocus type="submit" />
+        <Button label="Salveaza" severity="success" autofocus type="submit" :loading="isSubmitting" />
       </div>
     </Form>
   </Dialog>
 </template>
 
 <script setup>
+/**
+ * @file EditVaccine.vue
+ * @description Component for editing an existing vaccine. Displays a dialog with a form to update vaccine details, which then sends a request to the backend to update the vaccine.
+ */
 import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import api from '@/services/api'
 import { ref } from 'vue'
 import { parse, format } from 'date-fns'
 
+/**
+ * @prop {Boolean} displayDialog - Controls the visibility of the dialog.
+ * @prop {Object} vaccine - The vaccine object to be edited.
+ */
 const props = defineProps({
   displayDialog: Boolean,
   vaccine: Object
 })
+
+/**
+ * @emit {Function} edit - Emits the 'edit' event with the updated vaccine data.
+ * @emit {Function} close - Emits the 'close' event to close the dialog.
+ */
 const emit = defineEmits(['edit', 'close'])
 const maxDate = ref(new Date())
 const displayEditDialog = ref(props.displayDialog)
+const errorMessage = ref('')
+const isSubmitting = ref(false)
 
 const initialValues = ref({
   name: props.vaccine.name,
@@ -106,6 +127,7 @@ const initialValues = ref({
   dateReceived: parse(props.vaccine.date_received, 'dd-MM-yyyy', new Date()),
 })
 
+// Zod resolver for form validation
 const resolver = zodResolver(
   z.object({
     name: z.string().nonempty('Numele vaccinului este obligatoriu.'),
@@ -118,7 +140,14 @@ const resolver = zodResolver(
   }),
 )
 
+/**
+ * @description Sends a PATCH request to the backend to update an existing vaccine with the provided details.
+ * @param vaccineDetails - The updated details of the vaccine.
+ */
 const updateVaccine = async (vaccineDetails) => {
+  isSubmitting.value = true
+  errorMessage.value = ''
+  
   try {
     let formattedDate = format(vaccineDetails.dateReceived, 'yyyy-MM-dd')
 
@@ -131,9 +160,16 @@ const updateVaccine = async (vaccineDetails) => {
     emit('close')
   } catch (error) {
     console.error('Error updating vaccine:', error)
+    errorMessage.value = error.response?.data?.detail || 'A apărut o eroare la actualizarea vaccinului. Vă rugăm să încercați din nou.'
+  } finally {
+    isSubmitting.value = false
   }
 }
 
+/**
+ * @description Handles form submission
+ * @param e - Form submission event with validation status and values
+ */
 const onFormSubmit = (e) => {
   // e.originalEvent: Represents the native form submit event.
   // e.valid: A boolean that indicates whether the form is valid or not.
