@@ -265,7 +265,7 @@ const createShareLink = async (selectedChildRows) => {
     return true
   } catch (error) {
     console.error('Error creating share link:', error)
-    apiError.value = error.response?.data?.message || 
+    apiError.value = error.response?.data?.detail || 
                      'A apărut o eroare la crearea link-ului de partajare. Încearcă din nou.'
     return false
   }

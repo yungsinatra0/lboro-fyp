@@ -32,6 +32,9 @@
           as="router-link"
           class="p-0 pl-1"
         />
+        <Message v-if="registerError" severity="error" class="mt-3 w-full">
+          {{ registerError }}
+        </Message>
       </div>
 
       <Form
@@ -109,13 +112,24 @@
             </ul>
           </Message>
         </div>
-        <Button type="submit" severity="secondary" label="Inregistrare" />
+        <Button 
+          type="submit" 
+          severity="secondary" 
+          label="Inregistrare" 
+          :loading="isLoading" 
+          :disabled="isLoading" 
+        />
       </Form>
     </div>
   </div>
 </template>
 
 <script setup>
+/**
+ * @file RegisterView.vue
+ * 
+ * @description This file handles the registration process for a new user.
+ */
 import { Form } from '@primevue/forms'
 import api from '../services/api'
 import { ref } from 'vue'
@@ -132,7 +146,12 @@ const initialValues = ref({
 })
 
 const maxDate = ref(new Date())
+const isLoading = ref(false)
+const registerError = ref(null)
 
+/**
+ * @description The resolver is used to validate the form fields using Zod schema.
+ */
 const resolver = zodResolver(
   z.object({
     email: z
@@ -161,7 +180,15 @@ const resolver = zodResolver(
   }),
 )
 
+/**
+ * @description The register function is used to create a new user account.
+ * @param {Object} credentials - User registration information.
+ * @returns {Promise<void>} A promise that resolves when registration is successful.
+ */
 async function register(credentials) {
+  isLoading.value = true
+  registerError.value = null
+  
   try {
     await api.post('/register', {
       name: credentials.name + ' ' + credentials.surname,
@@ -170,11 +197,30 @@ async function register(credentials) {
       dob: credentials.dob,
     })
     router.push('/login')
-  } catch {
-    console.log('Register failed')
+  } catch (error) {
+    
+    if (!error.response) {
+      registerError.value = 'Nu s-a putut conecta la server. Verificați conexiunea la internet.'
+    } else {
+      const status = error.response.status
+      
+      if (status === 409) {
+        registerError.value = 'Această adresă de email este deja înregistrată.'
+      } else if (status >= 500) {
+        registerError.value = 'Serviciul este momentan indisponibil. Vă rugăm să încercați mai târziu.'
+      } else {
+        registerError.value = error.response.data?.detail || 'A apărut o eroare la înregistrare.'
+      }
+    }
+  } finally {
+    isLoading.value = false
   }
 }
 
+/**
+ * @description Handles form submission, validates the form and calls the register function.
+ * @param {Object} e - The form submission event with form data and validation state.
+ */
 const onFormSubmit = (e) => {
   // e.originalEvent: Represents the native form submit event.
   // e.valid: A boolean that indicates whether the form is valid or not.
@@ -184,7 +230,7 @@ const onFormSubmit = (e) => {
   // e.reset: A function that resets the form to its initial state.
 
   if (!e.valid) {
-    console.log('Error adding vaccine: ', e.errors)
+    console.log('Error validating form:', e.errors)
     return
   }
 

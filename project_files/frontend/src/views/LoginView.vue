@@ -35,6 +35,9 @@
         <h2 v-if="wrongPassword" class="text-rose-600 text-sm text-center">
             {{ wrongPassword }}
         </h2>
+        <Message v-if="loginError" severity="error" class="mt-3 w-full">
+          {{ loginError }}
+        </Message>
       </div>
 
       <Form
@@ -67,7 +70,13 @@
             {{ $form.password.error.message }}</Message
           >
         </div>
-        <Button type="submit" severity="secondary" label="Autentificare" />
+        <Button 
+          type="submit" 
+          severity="secondary" 
+          label="Autentificare" 
+          :loading="isLoading" 
+          :disabled="isLoading" 
+        />
       </Form>
 
       <div class="flex flex-col items-center my-3">
@@ -82,16 +91,27 @@
 </template>
 
 <script setup>
+/** 
+ * @file LoginView.vue
+ * @description This file contains the LoginView component, which is responsible for rendering the login form and handling user authentication.
+ */
 import api from '../services/api'
 import { ref } from 'vue'
 import router from '@/router'
 
 const wrongPassword = ref(null)
+const loginError = ref(null)
+const isLoading = ref(false)
 const initialValues = ref({
   email: '',
   password: '',
 })
 
+/**
+ * @description The resolver function is used to validate the form values before submission.
+ * @param {Object} values - The form values to validate. 
+ * @returns {Object} An object containing any validation errors and the form values.
+ */
 const resolver = ({ values }) => {
   const errors = {}
   if (!values.email) {
@@ -108,7 +128,16 @@ const resolver = ({ values }) => {
   }
 }
 
+/**
+ * @description The login function is used to authenticate the user with the provided credentials.
+ * @param {Object} credentials - The user's email and password.
+ * @returns {Promise<void>} A promise that resolves when the login is successful.
+ */
 async function login(credentials) {
+  isLoading.value = true
+  loginError.value = null
+  wrongPassword.value = null
+  
   try {
     await api.post('/login', {
       email: credentials.email,
@@ -117,10 +146,30 @@ async function login(credentials) {
     router.push('/dashboard')
   } catch (error) {
     console.error('Error logging in: ', error)
-    wrongPassword.value = 'Parola introdusa este gresita'
+    
+    // Handle error scenarios
+    if (!error.response) {
+      loginError.value = 'Nu s-a putut conecta la server. Verificați conexiunea la internet.'
+    } else {
+      const status = error.response.status
+      
+      if (status === 401) {
+        wrongPassword.value = 'Email sau parolă incorectă'
+      } else if (status >= 500) {
+        loginError.value = 'Serviciul este momentan indisponibil. Vă rugăm să încercați mai târziu.'
+      } else {
+        loginError.value = error.response.data?.detail || 'A apărut o eroare la autentificare.'
+      }
+    }
+  } finally {
+    isLoading.value = false
   }
 }
 
+/**
+ * @description Handles form submission, validates the form and calls the login function.
+ * @param {Object} e - The form submission event with form data and validation state.
+ */
 const onFormSubmit = (e) => {
   // e.originalEvent: Represents the native form submit event.
   // e.valid: A boolean that indicates whether the form is valid or not.
@@ -130,7 +179,7 @@ const onFormSubmit = (e) => {
   // e.reset: A function that resets the form to its initial state.
 
   if (!e.valid) {
-    console.log('Error adding vaccine: ', e.errors)
+    console.log('Error validating form: ', e.errors)
     return
   }
 

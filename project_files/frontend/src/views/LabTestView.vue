@@ -338,7 +338,7 @@ const fetchLabTests = async () => {
   } catch (err) {
     console.error('Error fetching lab tests:', err)
     error.value =
-      err.response?.data?.message || 'Nu s-au putut încărca analizele. Vă rugăm încercați din nou.'
+      err.response?.data?.detail || 'Nu s-au putut încărca analizele. Vă rugăm încercați din nou.'
   } finally {
     loading.value = false
   }
