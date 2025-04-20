@@ -36,10 +36,22 @@
         >
           <span class="font-bold"> Interval de referinta: </span> {{ vitalModel.normal_range }}
         </Message>
+        
+        <!-- Error message display -->
+        <Message v-if="errorMessage" severity="error" class="mb-4 w-full">
+          {{ errorMessage }}
+        </Message>
+        
         <div v-if="vitalModel">
+          <!-- Loading state -->
+          <div v-if="isLoading" class="flex justify-center items-center h-[40vh]">
+            <ProgressSpinner strokeWidth="4" animationDuration=".5s" />
+            <span class="ml-2">Se procesează datele...</span>
+          </div>
+          
           <DataTable
             :value="filteredVitalData"
-            v-if="layout === 'table'"
+            v-else-if="layout === 'table'"
             removableSort
             sortField="date_recorded"
             :sortOrder="-1"
@@ -88,6 +100,11 @@
 </template>
 
 <script setup>
+/**
+ * @file VitalsHistory.vue
+ * @description Component for displaying a history of vital sign measurements. It provides both table and graph views
+ * with filtering options by vital type and date range. Users can also edit or delete vital records.
+ */
 import { useConfirm } from 'primevue/useconfirm'
 import api from '@/services/api'
 import { ref, computed, watch } from 'vue'
@@ -106,20 +123,33 @@ import Message from 'primevue/message'
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
+/**
+ * @prop {Array} vitals - Array of vital sign measurements
+ * @prop {Array} vitalTypes - Array of available vital sign types
+ */
 const props = defineProps({
   vitals: Array,
   vitalTypes: Array,
 })
 
+/**
+ * @emit {Function} delete - Emits when a vital record is deleted with the ID of the deleted record
+ * @emit {Function} openEdit - Emits when a user wants to edit a vital record with the ID of the record to edit
+ */
 const emit = defineEmits(['delete', 'openEdit'])
 
 const vitalModel = ref()
 const selectedVitalId = ref(null)
 const menu = ref()
 const confirm = useConfirm()
-
 const selectedDates = ref(null)
+const isLoading = ref(false)
+const errorMessage = ref('')
 
+/**
+ * @description Watch for changes in vitalTypes prop and set the default vitalModel
+ * if it's not already set and there are types available
+ */
 watch(
   () => props.vitalTypes,
   (newTypes) => {
@@ -133,14 +163,20 @@ watch(
 const options = ref(['table', 'graph'])
 const layout = ref('table')
 
+/**
+ * @description Computed property that filters vital data based on selected type and date range
+ * @returns {Array} Filtered and sorted vital data
+ */
 const filteredVitalData = computed(() => {
   let filtered
   if (selectedDates.value) {
+    // Check if selected dates is only one date
     if (!selectedDates.value[1]) {
       filtered = props.vitals.filter(
         (vital) =>
           vital.date_recorded >= selectedDates.value[0] && vital.name === vitalModel.value.name,
       )
+      // Both selected dates are present
     } else if (selectedDates.value[0] && selectedDates.value[1]) {
       filtered = props.vitals.filter(
         (vital) =>
@@ -158,6 +194,9 @@ const filteredVitalData = computed(() => {
   return [...filtered].reverse()
 })
 
+/**
+ * @description Configuration options for the chart display
+ */
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
@@ -170,11 +209,16 @@ const chartOptions = {
   },
 }
 
+/**
+ * @description Computed property that prepares chart data based on filtered vital data
+ * @returns {Object} Chart data configuration
+ */
 const chartData = computed(() => {
   if (!filteredVitalData.value.length) {
     return {}
   }
 
+  // Check if the vital model is compound (e.g., blood pressure)
   if (vitalModel.value.is_compound) {
     return {
       labels: filteredVitalData.value.map((vital) => vital.original_date_recorded),
@@ -197,6 +241,7 @@ const chartData = computed(() => {
         },
         ...(vitalModel.value.normal_range
           ? [
+              // Removing labels for normal range lines so they don't crowd the legend
               {
                 label: 'none',
                 showLine: true,
@@ -294,11 +339,19 @@ const chartData = computed(() => {
   }
 })
 
+/**
+ * @description Toggles the context menu for a vital record
+ * @param {Event} event - The click event
+ * @param {string} id - The ID of the vital record
+ */
 const toggle = (event, id) => {
   selectedVitalId.value = id
   menu.value.toggle(event)
 }
 
+/**
+ * @description Menu items configuration for the context menu
+ */
 const menuItems = ref([
   {
     label: 'Optiuni',
@@ -325,6 +378,11 @@ const menuItems = ref([
   },
 ])
 
+/**
+ * @description Shows a confirmation dialog for deleting a vital record
+ * @param {Event} event - The click event
+ * @param {string} id - The ID of the vital record to delete
+ */
 const confirmDelete = (event, id) => {
   confirm.require({
     target: event.currentTarget,
@@ -341,17 +399,24 @@ const confirmDelete = (event, id) => {
       severity: 'danger',
     },
     accept: async () => {
+      isLoading.value = true
+      errorMessage.value = ''
+      
       try {
         await api.delete(`/me/healthdata/${id}`)
         emit('delete', id)
       } catch (error) {
-        console.error(error)
+        console.error('Error deleting vital sign:', error)
+        errorMessage.value = error.response?.data?.detail || 'A apărut o eroare la ștergerea semnului vital. Vă rugăm să încercați din nou.'
+      } finally {
+        isLoading.value = false
       }
     },
     reject: () => {},
   })
 }
 
+// Card styling configuration
 const cardStyles = {
   body: { class: 'px-4 py-1 flex flex-col flex-1' },
   content: { class: 'flex-1 flex flex-col' },

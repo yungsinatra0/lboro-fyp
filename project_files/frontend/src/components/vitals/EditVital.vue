@@ -12,11 +12,19 @@
       </div>
     </template>
     <span class="text-surface-500 dark:text-surface-400 block mb-8"
-      >Modifica informatia pentru semnul vital.</span
+      >Modifica informatia pentru semnul vital. Câmpurile marcate cu <span class="text-red-500">*</span> sunt obligatorii.</span
     >
+    
+    <!-- Show error message if API returns an error -->
+    <Message v-if="errorMessage" severity="error" class="mb-4 w-full">
+      {{ errorMessage }}
+    </Message>
+    
     <Form v-slot="$form" :initialValues="initialValues" @submit="onFormSubmit" :resolver="resolver">
       <div class="flex items-center gap-4 mb-4">
-        <label for="vitalDataTypes" class="font-semibold w-24">Tipul semnului vital</label>
+        <label for="vitalDataTypes" class="font-semibold w-24">
+          Tipul semnului vital <span class="text-red-500">*</span>
+        </label>
         <Select
           name="vitalDataTypes"
           :options="vitalTypes"
@@ -38,7 +46,9 @@
         class="flex items-center gap-4 mb-4"
         v-if="$form.vitalDataTypes && $form.vitalDataTypes.value.is_compound === false"
       >
-        <label for="value" class="font-semibold w-24">Valoarea</label>
+        <label for="value" class="font-semibold w-24">
+          Valoarea <span class="text-red-500">*</span>
+        </label>
         <InputNumber
           name="value"
           class="flex w-1/2 md:w-1/3"
@@ -62,7 +72,9 @@
         class="flex items-center gap-4 mb-4"
         v-if="$form.vitalDataTypes && $form.vitalDataTypes.value.is_compound === true"
       >
-        <label for="valueSystolic" class="font-semibold w-24">Valoarea sistolica</label>
+        <label for="valueSystolic" class="font-semibold w-24">
+          Valoarea sistolica <span class="text-red-500">*</span>
+        </label>
         <InputNumber
           name="valueSystolic"
           class="flex w-1/2 md:w-1/3"
@@ -70,7 +82,9 @@
           :min="0"
           fluid
         />
-        <label for="valueDiastolic" class="font-semibold w-24">Valoarea diastolica</label>
+        <label for="valueDiastolic" class="font-semibold w-24">
+          Valoarea diastolica <span class="text-red-500">*</span>
+        </label>
         <InputNumber
           name="valueDiastolic"
           class="flex w-1/2 md:w-1/3"
@@ -99,9 +113,9 @@
         >
       </div>
       <div class="flex items-center gap-4 mb-4">
-        <label for="dateRecorded" class="font-semibold w-24"
-          >Data inregistrarii semnului vital</label
-        >
+        <label for="dateRecorded" class="font-semibold w-24">
+          Data înregistrării <span class="text-red-500">*</span>
+        </label>
         <DatePicker
           name="dateRecorded"
           dateFormat="dd/mm/yy"
@@ -147,29 +161,48 @@
           autofocus
           type="button"
         />
-        <Button label="Salveaza" severity="success" autofocus type="submit" />
+        <Button label="Salveaza" severity="success" autofocus type="submit" :loading="isSubmitting" />
       </div>
     </Form>
   </Dialog>
 </template>
 
 <script setup>
+/**
+ * @file EditVital.vue
+ * @description Component for editing an existing vital sign measurement. Displays a dialog with a form pre-filled with
+ * the current values of the vital sign, allowing the user to modify them.
+ */
 import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import api from '@/services/api'
 import { ref, computed } from 'vue'
 import { parse, format } from 'date-fns'
 
+/**
+ * @prop {Boolean} displayDialog - Controls the visibility of the dialog.
+ * @prop {Array} vitalTypes - Array of vital sign types that can be selected.
+ * @prop {Object} vital - The vital sign object to be edited.
+ */
 const props = defineProps({
   displayDialog: Boolean,
   vitalTypes: Array,
   vital: Object
 })
 
+/**
+ * @emit {Function} edit - Emits the 'edit' event with the updated vital sign data.
+ * @emit {Function} close - Emits the 'close' event to close the dialog.
+ */
 const emit = defineEmits(['edit', 'close'])
 const maxDate = ref(new Date())
 const displayEditDialog = ref(props.displayDialog)
+const errorMessage = ref('')
+const isSubmitting = ref(false)
 
+/**
+ * Computed property for initial form values based on the vital sign being edited
+ */
 const initialValues = computed (() => {
   return {
     vitalDataTypes: props.vitalTypes.find((type) => type.name === props.vital.name),
@@ -181,6 +214,10 @@ const initialValues = computed (() => {
   }
 })
 
+/**
+ * Zod resolver for form validation
+ * The resolver uses Zod to define the schema for the form fields and their validation rules.
+ */
 const resolver = zodResolver(
   z.object({
     value: z
@@ -210,7 +247,14 @@ const resolver = zodResolver(
   }),
 )
 
+/**
+ * @description Sends a PATCH request to the backend to update an existing vital sign with the provided details.
+ * @param {Object} vitalDetails - The updated details of the vital sign.
+ */
 const updateVitals = async (vitalDetails) => {
+  isSubmitting.value = true
+  errorMessage.value = ''
+  
   try {
     let formattedDate = format(vitalDetails.dateRecorded, 'yyyy-MM-dd')
 
@@ -231,10 +275,17 @@ const updateVitals = async (vitalDetails) => {
     })
     emit('close')
   } catch (error) {
-    console.error(error)
+    console.error('Error updating vital sign:', error)
+    errorMessage.value = error.response?.data?.detail || 'A apărut o eroare la actualizarea semnului vital. Vă rugăm să încercați din nou.'
+  } finally {
+    isSubmitting.value = false
   }
 }
 
+/**
+ * @description Handles form submission
+ * @param {Object} e - Form submission event with validation status and values
+ */
 const onFormSubmit = (e) => {
   // e.originalEvent: Represents the native form submit event.
   // e.valid: A boolean that indicates whether the form is valid or not.
