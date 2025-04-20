@@ -12,13 +12,18 @@
     </template>
 
     <span class="text-gray-500 dark:text-gray-400 block mb-4 md:mb-8 text-sm md:text-base">
-      Adauga informatia pentru un medicament nou.
+      Adauga informatia pentru un medicament nou. Câmpurile marcate cu <span class="text-red-500">*</span> sunt obligatorii.
     </span>
+
+    <!-- Show error message if API returns an error -->
+    <Message v-if="errorMessage" severity="error" class="mb-4 w-full">
+      {{ errorMessage }}
+    </Message>
 
     <Form v-slot="$form" :initialValues @submit="onFormSubmit" :resolver="resolver">
       <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 mb-6">
         <label for="name" class="font-semibold text-sm md:text-base w-full md:w-1/4"
-          >Numele medicamentului</label
+          >Numele medicamentului <span class="text-red-500">*</span></label
         >
         <div class="w-full md:w-3/4 flex flex-col">
           <InputText name="name" class="w-full md:w-3/4" autocomplete="off" type="text" fluid />
@@ -35,7 +40,7 @@
 
       <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 mb-6">
         <label for="dosage" class="font-semibold text-sm md:text-base w-full md:w-1/4"
-          >Dozajul medicamentului</label
+          >Dozajul medicamentului <span class="text-red-500">*</span></label
         >
         <div class="w-full md:w-3/4">
           <div class="flex flex-row items-center gap-2">
@@ -71,7 +76,7 @@
 
       <div class="flex flex-col gap-4 md:gap-6 mb-6">
           <div class="flex flex-row gap-4 items-center">
-            <label class="font-semibold text-sm md:text-base"> Tipul frecventei </label>
+            <label class="font-semibold text-sm md:text-base"> Tipul frecventei <span class="text-red-500">*</span></label>
             <RadioButtonGroup name="frequencyChoice" class="flex flex-row">
 
               <div class="flex items-center gap-2 ml-2">
@@ -168,7 +173,7 @@
 
       <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-6">
         <label for="datePrescribed" class="font-semibold text-sm md:text-base w-full md:w-1/4"
-          >Data prescrierii medicamentului</label
+          >Data prescrierii medicamentului <span class="text-red-500">*</span></label
         >
         <div class="w-full md:w-1/4">
           <DatePicker
@@ -193,7 +198,7 @@
 
       <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 mb-6">
         <label for="duration" class="font-semibold text-sm md:text-base w-full md:w-1/4"
-          >Durata luarii medicamentului</label
+          >Durata luarii medicamentului <span class="text-red-500">*</span></label
         >
         <div class="w-full md:w-3/4">
           <IftaLabel class="flex items-center gap-2">
@@ -212,7 +217,7 @@
 
       <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 mb-6">
         <label for="form" class="font-semibold text-sm md:text-base w-full md:w-1/4"
-          >Forma luarii medicamentului</label
+          >Forma luarii medicamentului <span class="text-red-500">*</span></label
         >
         <div class="w-full md:w-3/4">
           <Select name="form" :options="forms" placeholder="Forma" fluid class="w-full md:w-1/3" />
@@ -229,7 +234,7 @@
 
       <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 mb-6">
         <label for="route" class="font-semibold text-sm md:text-base w-full md:w-1/4"
-          >Calea de administrare a medicamentului</label
+          >Calea de administrare a medicamentului <span class="text-red-500">*</span></label
         >
         <div class="w-full md:w-3/4">
           <Select
@@ -285,6 +290,7 @@
           label="Salveaza"
           severity="success"
           class="px-4 py-2 text-sm md:text-base"
+          :loading="isSubmitting"
           type="submit"
         />
       </div>
@@ -293,21 +299,37 @@
 </template>
 
 <script setup>
+/**
+ * @file AddMedication.vue
+ * @description Component for adding a new medication. Displays a dialog with a form to input medication details,
+ * which then sends a request to the backend to add the medication.
+ */
 import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import api from '@/services/api'
 import { ref } from 'vue'
 import { format } from 'date-fns'
 
+/**
+ * @prop {Boolean} displayDialog - Controls the visibility of the dialog.
+ * @prop {Array} forms - List of medication forms to choose from.
+ * @prop {Array} routes - List of medication routes to choose from.
+ */
 const props = defineProps({
   displayDialog: Boolean,
   forms: Array,
   routes: Array,
 })
 
+/**
+ * @emit {Function} add - Emits the 'add' event with the new medication data.
+ * @emit {Function} close - Emits the 'close' event to close the dialog.
+ */
 const emit = defineEmits(['add', 'close'])
 const maxDate = ref(new Date())
 const displayAddDialog = ref(props.displayDialog)
+const errorMessage = ref('')
+const isSubmitting = ref(false)
 
 const dosageUnits = ref([
   'capsula',
@@ -366,7 +388,14 @@ const resolver = zodResolver(
   }),
 )
 
+/**
+ * @description Sends a POST request to the backend to add a new medication with the provided details.
+ * @param {Object} medicationDetails - The details of the medication to be added.
+ */
 const addMedication = async (medicationDetails) => {
+  isSubmitting.value = true
+  errorMessage.value = ''
+  
   try {
     let formattedDate = format(medicationDetails.datePrescribed, 'yyyy-MM-dd')
 
@@ -403,9 +432,16 @@ const addMedication = async (medicationDetails) => {
     emit('close')
   } catch (error) {
     console.error('Error adding medication:', error)
+    errorMessage.value = error.response?.data?.detail || 'A apărut o eroare la adăugarea medicamentului. Vă rugăm să încercați din nou.'
+  } finally {
+    isSubmitting.value = false
   }
 }
 
+/**
+ * @description Handles the form submission event. Validates the form and calls addMedication if valid.
+ * @param {Object} e - The form submission event object.
+ */
 const onFormSubmit = (e) => {
   // e.originalEvent: Represents the native form submit event.
   // e.valid: A boolean that indicates whether the form is valid or not.

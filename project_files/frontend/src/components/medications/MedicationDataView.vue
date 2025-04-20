@@ -239,10 +239,19 @@
 </template>
 
 <script setup>
+/**
+ * @file MedicationDataView.vue
+ * @description MedicationDataView component displays a list of medications in either grid or list format.
+ * It allows users to filter medications based on search terms and sort options.
+ * Users can also perform actions like editing or deleting a medication.
+ */
 import { ref, computed } from 'vue'
 import { useConfirm } from 'primevue/useconfirm'
 import api from '@/services/api'
 
+/**
+ * @prop {Array} medications - List of medications to display, received from the parent component from API call.
+ */
 const props = defineProps({
   medications: Object,
 })
@@ -271,6 +280,12 @@ const filteredMedicine = computed(() => {
   })
 })
 
+/**
+ * @function onSortChange
+ * @description This function is used to handle the sorting of medications based on the selected sort option.
+ * It updates the sortOrder and sortField based on the selected value. Taken from PrimeVue documentation.
+ * @param {Object} event - The event object containing the selected sort option.
+ */
 const onSortChange = (event) => {
   const value = event.value.value
   const sortValue = event.value
@@ -312,11 +327,25 @@ const menuItems = ref([
   },
 ])
 
+/**
+ * @function toggle
+ * @description This function is used to toggle the context menu for a medication.
+ * It sets the selectedMedicationId to the id of the medication and toggles the menu.
+ * @param {Event} event - The event object.
+ * @param {number} id - The id of the medication.
+ */
 const toggle = (event, id) => {
   selectedMedicationId.value = id
   menu.value.toggle(event)
 }
 
+/**
+ * @function confirmDelete
+ * @description Confirmation menu for deleting a medication. It shows a confirmation dialog when the delete option is clicked.
+ * If confirmed, it calls the API to delete the medication and emits a delete event to the parent component.
+ * @param {Event} event - The event object.
+ * @param {number} id - The id of the medication to be deleted.
+ */
 const confirmDelete = (event, id) => {
   confirm.require({
     target: event.currentTarget,

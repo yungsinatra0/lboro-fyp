@@ -12,13 +12,18 @@
     </template>
 
     <span class="text-gray-500 dark:text-gray-400 block mb-4 md:mb-8 text-sm md:text-base">
-      Actualizeaza informatia pentru medicamentul selectat.
+      Actualizeaza informatia pentru medicamentul selectat. Câmpurile marcate cu <span class="text-red-500">*</span> sunt obligatorii.
     </span>
+
+    <!-- Show error message if API returns an error -->
+    <Message v-if="errorMessage" severity="error" class="mb-4 w-full">
+      {{ errorMessage }}
+    </Message>
 
     <Form v-slot="$form" :initialValues="initialValues" @submit="onFormSubmit" :resolver="resolver">
       <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 mb-6">
         <label for="name" class="font-semibold text-sm md:text-base w-full md:w-1/4"
-          >Numele medicamentului</label
+          >Numele medicamentului <span class="text-red-500">*</span></label
         >
         <div class="w-full md:w-3/4 flex flex-col">
           <InputText name="name" class="w-full md:w-3/4" autocomplete="off" type="text" fluid />
@@ -35,7 +40,7 @@
 
       <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 mb-6">
         <label for="dosage" class="font-semibold text-sm md:text-base w-full md:w-1/4"
-          >Dozajul medicamentului</label
+          >Dozajul medicamentului <span class="text-red-500">*</span></label
         >
         <div class="w-full md:w-3/4">
           <div class="flex flex-row items-center gap-2">
@@ -71,7 +76,7 @@
 
       <div class="flex flex-col gap-4 md:gap-6 mb-6">
         <div class="flex flex-row gap-4 items-center">
-          <label class="font-semibold text-sm md:text-base"> Tipul frecventei </label>
+          <label class="font-semibold text-sm md:text-base"> Tipul frecventei <span class="text-red-500">*</span></label>
           <RadioButtonGroup name="frequencyChoice" class="flex flex-row">
             <div class="flex items-center gap-2 ml-2">
               <RadioButton value="standard" inputId="standard" />
@@ -173,7 +178,7 @@
 
       <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-6">
         <label for="datePrescribed" class="font-semibold text-sm md:text-base w-full md:w-1/4"
-          >Data prescrierii medicamentului</label
+          >Data prescrierii medicamentului <span class="text-red-500">*</span></label
         >
         <div class="w-full md:w-1/4">
           <DatePicker
@@ -198,7 +203,7 @@
 
       <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 mb-6">
         <label for="duration" class="font-semibold text-sm md:text-base w-full md:w-1/4"
-          >Durata luarii medicamentului</label
+          >Durata luarii medicamentului <span class="text-red-500">*</span></label
         >
         <div class="w-full md:w-3/4">
           <IftaLabel class="flex items-center gap-2">
@@ -217,7 +222,7 @@
 
       <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 mb-6">
         <label for="form" class="font-semibold text-sm md:text-base w-full md:w-1/4"
-          >Forma luarii medicamentului</label
+          >Forma luarii medicamentului <span class="text-red-500">*</span></label
         >
         <div class="w-full md:w-3/4">
           <Select name="form" :options="forms" placeholder="Forma" fluid class="w-full md:w-1/3" />
@@ -234,7 +239,7 @@
 
       <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 mb-6">
         <label for="route" class="font-semibold text-sm md:text-base w-full md:w-1/4"
-          >Calea de administrare a medicamentului</label
+          >Calea de administrare a medicamentului <span class="text-red-500">*</span></label
         >
         <div class="w-full md:w-3/4">
           <Select
@@ -290,6 +295,7 @@
           label="Salveaza"
           severity="success"
           class="px-4 py-2 text-sm md:text-base"
+          :loading="isSubmitting"
           type="submit"
         />
       </div>
@@ -298,12 +304,23 @@
 </template>
 
 <script setup>
+/**
+ * @file EditMedication.vue
+ * @description Component for editing an existing medication. Displays a dialog with a form to update medication details,
+ * which then sends a request to the backend to update the medication.
+ */
 import { z } from 'zod'
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import api from '@/services/api'
 import { ref, computed } from 'vue'
 import { parse, format } from 'date-fns'
 
+/**
+ * @prop {Boolean} displayDialog - Controls the visibility of the dialog.
+ * @prop {Object} medication - The medication object to be edited.
+ * @prop {Array} forms - List of medication forms to choose from.
+ * @prop {Array} routes - List of medication routes to choose from.
+ */
 const props = defineProps({
   displayDialog: Boolean,
   medication: Object,
@@ -311,9 +328,15 @@ const props = defineProps({
   routes: Array,
 })
 
+/**
+ * @emit {Function} edit - Emits the 'edit' event with the updated medication data.
+ * @emit {Function} close - Emits the 'close' event to close the dialog.
+ */
 const emit = defineEmits(['edit', 'close'])
 const maxDate = ref(new Date())
 const displayEditDialog = ref(props.displayDialog)
+const errorMessage = ref('')
+const isSubmitting = ref(false)
 
 const dosageUnits = ref([
   'capsula',
@@ -329,6 +352,10 @@ const dosageUnits = ref([
 ])
 const frequency = ref(['pe zi', 'pe saptamana', 'pe luna'])
 
+/**
+ * @computed {Object} initialValues - Computed property that extracts and formats the values from the medication object.
+ * This is used to initialize the form with the current medication values.
+ */
 const initialValues = computed(() => {
   if (!props.medication) return {}
 
@@ -442,7 +469,14 @@ const resolver = zodResolver(
   }),
 )
 
+/**
+ * @description Sends a PATCH request to the backend to update the medication with the provided details.
+ * @param {Object} medicationDetails - The updated details of the medication.
+ */
 const updateMedication = async (medicationDetails) => {
+  isSubmitting.value = true
+  errorMessage.value = ''
+  
   try {
     let formattedDate = format(medicationDetails.datePrescribed, 'yyyy-MM-dd')
 
@@ -479,9 +513,16 @@ const updateMedication = async (medicationDetails) => {
     emit('close')
   } catch (error) {
     console.error('Error updating medication:', error)
+    errorMessage.value = error.response?.data?.detail || 'A apărut o eroare la actualizarea medicamentului. Vă rugăm să încercați din nou.'
+  } finally {
+    isSubmitting.value = false
   }
 }
 
+/**
+ * @description Handles the form submission event. Validates the form and calls updateMedication if valid.
+ * @param {Object} e - The form submission event object.
+ */
 const onFormSubmit = (e) => {
   // e.originalEvent: Represents the native form submit event.
   // e.valid: A boolean that indicates whether the form is valid or not.
@@ -494,10 +535,6 @@ const onFormSubmit = (e) => {
     console.error('Error updating medication: ', e.errors)
     return
   }
-
-  console.log('Form values:', e.values)
-  console.log('Form states:', e.states)
-  console.log('Initial values:', {...initialValues.value})
 
   updateMedication(e.values)
 }
