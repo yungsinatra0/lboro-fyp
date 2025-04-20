@@ -1,5 +1,5 @@
 <template>
-  <Card :pt="cardStyles" class="h-full">
+  <Card :pt="props.cardStyles" class="h-full">
     <template #title>
       <h2 class="text-xl font-bold p-4">Testele de laborator recent adaugate</h2>
     </template>
@@ -75,6 +75,14 @@
         </Column>
       </DataTable>
     </template>
+    <template #empty>
+      <div class="flex flex-col items-center justify-center h-full">
+        <i class="pi pi-exclamation-triangle text-4xl text-surface-500 dark:text-surface-400"></i>
+        <span class="text-lg text-surface-500 dark:text-surface-400"
+          >Nu există date disponibile</span
+        >
+      </div>
+    </template>
     <template #footer>
       <RouterLink to="/laborator" class="p-button p-button-text"
         >Vezi toate testele de laborator
@@ -84,19 +92,19 @@
 </template>
 
 <script setup>
+/**
+ * @file RecentLabResults.vue
+ * @description This component displays the recently added laboratory test results in a table format.
+ */
+
 import { calculateTrend } from '@/utils'
 
+/**
+ * @prop {Array} labresults - The recent laboratory results to be displayed in the table.
+ * @prop {Object} cardStyles - The styling options for the card component.
+ */
 const props = defineProps({
   labresults: Array,
+  cardStyles: Object
 })
-
-const cardStyles = {
-  body: { class: 'px-4 py-1 flex flex-col flex-1' },
-  content: { class: 'flex-1 flex flex-col' },
-  root: {
-    class:
-      'bg-surface-0 dark:bg-surface-800 text-surface-700 dark:text-surface-0 dark:border dark:border-surface-700',
-  },
-  footer: { class: 'flex mt-auto justify-center items-center' },
-}
 </script>

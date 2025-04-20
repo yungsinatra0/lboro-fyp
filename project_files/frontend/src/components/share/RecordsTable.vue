@@ -1,6 +1,22 @@
 <template>
   <div>
+    <!-- Loading state -->
+    <div v-if="loading" class="flex justify-center items-center p-6">
+      <ProgressSpinner style="width: 50px; height: 50px" />
+      <span class="ml-3">Se încarcă datele...</span>
+    </div>
+
+    <!-- Empty state when no records exist -->
+    <Message v-else-if="!arrangedRecords.length" severity="info" class="mb-4">
+      <div class="flex flex-column align-items-center p-4">
+        <i class="pi pi-inbox text-5xl mb-3 text-gray-400"></i>
+        <h3>Nu există înregistrări medicale</h3>
+        <p class="text-center">Nu au fost găsite înregistrări pentru a fi afișate sau partajate.</p>
+      </div>
+    </Message>
+
     <DataTable
+      v-else
       :value="filteredArrangedRecords"
       v-model:expandedRows="expandedRows"
       v-model:selection="selectedParentRows"
@@ -10,6 +26,7 @@
       @row-unselect-all="onParentRowUnselect"
       @row-unselect="onParentRowUnselect"
     >
+      <!-- Header part of the table with date filters -->
       <template #header>
         <div class="hidden md:flex justify-end align-items-center flex-wrap gap-2 mb-2">
           <Button
@@ -51,6 +68,16 @@
               })()
             "
           />
+          
+          <Button
+            v-if="selectedDates"
+            label="Resetare date"
+            icon="pi pi-times"
+            severity="secondary"
+            text
+            class="mr-2 text-sm"
+            @click="selectedDates = null"
+          />
 
           <DatePicker
             v-model="selectedDates"
@@ -63,7 +90,18 @@
             size="small"
           />
         </div>
+        
+        <!-- Mobile date selection -->
+        <div class="flex md:hidden justify-end align-items-center flex-wrap gap-2 mb-2">
+          <Menu ref="mobileMenu" :model="dateMenuItems" :popup="true">
+            <template #button>
+              <Button icon="pi pi-calendar" label="Filtru dată" severity="secondary" @click="mobileMenu.toggle($event)" />
+            </template>
+          </Menu>
+        </div>
       </template>
+
+      <!-- Parent rows -->
       <Column selectionMode="multiple" headerStyle="width: 3rem" />
       <Column field="type" header="Tip">
         <template #body="slotProps">
@@ -81,6 +119,8 @@
       </template>
       </Column>
       <Column expander style="width: 3em" />
+
+      <!-- Expansion data table -->
       <template #expansion="slotProps">
         <DataTable
           :value="slotProps.data.items"
@@ -98,6 +138,7 @@
           v-model:filters="filters"
           :globalFilterFields="['name', 'code', 'allergens']"
         >
+          <!-- Keyword filter -->
           <template #header>
             <div class="flex justify-end align-items-center flex-wrap gap-2 mb-2">
               <IconField>
@@ -108,12 +149,37 @@
               </IconField>
             </div>
           </template>
+
+          <!-- Empty state for filtered records -->
+          <template #empty>
+            <div class="flex flex-column align-items-center p-4">
+              <i class="pi pi-filter-slash text-3xl mb-2 text-gray-400"></i>
+              <p>Nu s-au găsit înregistrări care să corespundă filtrelor.</p>
+            </div>
+          </template>
+
+          <!-- Dynamic column generation -->
           <Column selectionMode="multiple" headerStyle="width: 3rem" />
           <template v-for="(value, key) in slotProps.data.items[0]" :key="key">
             <Column :field="key" :header="key" v-if="!excludedColumns.includes(key)" />
           </template>
         </DataTable>
       </template>
+
+      <!-- Empty state for filtered records -->
+      <template #empty>
+        <div class="flex flex-column align-items-center p-6">
+          <i class="pi pi-filter-slash text-4xl mb-3 text-gray-400"></i>
+          <h3>Nu s-au găsit rezultate</h3>
+          <p v-if="selectedDates" class="text-center">
+            Nu există înregistrări în intervalul de date selectat.
+            <Button label="Resetare filtre" text @click="selectedDates = null" class="p-button-link" />
+          </p>
+          <p v-else class="text-center">Nu există înregistrări care să corespundă criteriilor de căutare.</p>
+        </div>
+      </template>
+
+      <!-- Footer with navigation buttons -->
       <template #footer>
         <div class="flex justify-between align-items-center flex-wrap gap-2 mb-2">
           <Button label="Back" severity="secondary" icon="pi pi-arrow-left" @click="emit('back')" />
@@ -131,15 +197,34 @@
 </template>
 
 <script setup>
+/**
+ * @file RecordsTable.vue
+ * @description This component displays a table of all of the user's medical records, allowing the user to filter and select records that will be share with a doctor via the share link. 
+ */
 import { FilterMatchMode } from '@primevue/core/api'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
-const emit = defineEmits(['back', 'next'])
+/**
+ * @emit {Function} back - Emits the back event to navigate to the previous step.
+ * @emit {Function} next - Emits the next event to navigate to the next step with the selected child rows.
+ * @emit {Function} retry - Emits the retry event to attempt loading the data again.
+ */
+const emit = defineEmits(['back', 'next', 'retry'])
 
+/**
+ * @prop {Object} records - The medical records to be displayed in the table.
+ * @prop {Boolean} loading - Indicates if records are being loaded.
+ */
 const props = defineProps({
   records: Object,
+  loading: Boolean,
 })
 
+/**
+ * @description This function returns the name of the parent row based on the key.
+ * @param {string} key - The key of the parent row.
+ * @returns {string} - The name of the parent row.
+ */
 const parentName = (key) => {
   switch (key) {
     case 'vitals':
@@ -157,11 +242,64 @@ const parentName = (key) => {
   }
 }
 
-const numberCategories = ref(Object.keys(props.records).length)
+// UI state variables
+const numberCategories = ref(0)
 const allSelected = ref(false)
 const expandedRows = ref({})
 const selectedParentRows = ref([])
 const selectedChildRows = ref([])
+const mobileMenu = ref(null)
+
+// Date menu for mobile
+const dateMenuItems = [
+  {
+    label: 'Ultimele 3 luni',
+    icon: 'pi pi-calendar',
+    command: () => {
+      const now = new Date()
+      const threeMonthsAgo = new Date(now)
+      threeMonthsAgo.setMonth(now.getMonth() - 3)
+      selectedDates.value = [threeMonthsAgo, now]
+    }
+  },
+  {
+    label: 'Ultimele 6 luni',
+    icon: 'pi pi-calendar',
+    command: () => {
+      const now = new Date()
+      const sixMonthsAgo = new Date(now)
+      sixMonthsAgo.setMonth(now.getMonth() - 6)
+      selectedDates.value = [sixMonthsAgo, now]
+    }
+  },
+  {
+    label: 'Ultimul an',
+    icon: 'pi pi-calendar',
+    command: () => {
+      const now = new Date()
+      const oneYearAgo = new Date(now)
+      oneYearAgo.setFullYear(now.getFullYear() - 1)
+      selectedDates.value = [oneYearAgo, now]
+    }
+  },
+  {
+    label: 'Custom interval',
+    icon: 'pi pi-calendar-plus',
+    command: () => {
+      // Open a dialog for date range picking on mobile
+      // This would require adding a dialog component
+    }
+  },
+  {
+    label: 'Resetează',
+    icon: 'pi pi-times',
+    command: () => {
+      selectedDates.value = null
+    }
+  }
+]
+
+// Excluded columns from the table
 const excludedColumns = [
   'id',
   'date_added',
@@ -174,12 +312,37 @@ const excludedColumns = [
   'date_diagnosed',
   'is_numeric'
 ]
+
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 })
 const selectedDates = ref(null)
 
+/**
+ * Updates the number of categories when component mounts or records change
+ */
+onMounted(() => {
+  updateCategoryCount()
+})
+
+/**
+ * @description Updates the count of record categories
+ */
+const updateCategoryCount = () => {
+  if (props.records) {
+    numberCategories.value = Object.keys(props.records).length
+  }
+}
+
+/**
+ * @description 'Parent' function that arranges the records by type.
+ * @returns {Array} - The arranged records.
+ */
 const arrangedRecords = computed(() => {
+  if (!props.records || Object.keys(props.records).length === 0) {
+    return []
+  }
+  
   return Object.entries(props.records).map(([type, items]) => {
     return {
       type: parentName(type),
@@ -188,6 +351,10 @@ const arrangedRecords = computed(() => {
   })
 })
 
+/**
+ * @description Computed property that filters the arranged records based on the selected dates.
+ * @returns {Array} - The filtered arranged records.
+ */
 const filteredArrangedRecords = computed(() => {
   if (!selectedDates.value) {
     return arrangedRecords.value
@@ -198,7 +365,7 @@ const filteredArrangedRecords = computed(() => {
       const startDate = selectedDates.value[0]
       const endDate = selectedDates.value[1]
 
-      // Different date field based on record type
+      // Get different date field based on record type
       const getDateField = (item, type) => {
         switch (type) {
           case 'Semne vitale':
@@ -240,6 +407,10 @@ const filteredArrangedRecords = computed(() => {
     .filter((record) => record.items.length > 0)
 })
 
+/**
+ * @description This function is used to select rows in the table.
+ * @param {Object} event - The event object.
+ */
 const onParentRowSelect = (event) => {
   // Check if the event.data is an array or an object
   // If it's an array, all rows are selected so iterate over it and push the items to selectedChildRows
@@ -264,11 +435,12 @@ const onParentRowSelect = (event) => {
       }
     }
   }
-
-  console.log('Selected Parent Rows:', selectedParentRows.value)
-  console.log('Selected Child Rows:', selectedChildRows.value)
 }
 
+/**
+ * @description This function is used to unselect rows in the table.
+ * @param {Object} event - The event object.
+ */
 const onParentRowUnselect = (event) => {
   if (!event.data) {
     selectedChildRows.value = []
@@ -280,61 +452,76 @@ const onParentRowUnselect = (event) => {
       return !event.data.items.some((parentRow) => parentRow.id === childRow.id)
     })
   }
-
-  console.log('Selected Parent Rows:', selectedParentRows.value)
-  console.log('Selected Child Rows:', selectedChildRows.value)
 }
 
+/**
+ * @description This function is used to select child rows in the table.
+ * @param {Object} event - The event object.
+ * @param {Object} rowData - The row data object.
+ */
 const onChildRowSelect = (event, rowData) => {
+  // Save a copy of current selectedChildRows before modifications
+  const currentSelectedChildRows = [...selectedChildRows.value]
+  
   // Check if the event.data is an array or an object
-  // If it's an array, all rows are selected so iterate over it and push the items to selectedChildRows
-  // If all child rows are selected, need to select the parent row as well
   if (typeof event.data[Symbol.iterator] === 'function') {
-    selectedChildRows.value = []
+    // Add new child rows to selectedChildRows, avoiding duplicates
     for (const row of event.data) {
-      selectedChildRows.value = [...selectedChildRows.value, row]
+      if (!currentSelectedChildRows.some(item => item.id === row.id)) {
+        selectedChildRows.value.push(row)
+      }
     }
-    // Add the parent row
-    selectedParentRows.value = [...selectedParentRows.value, rowData]
   } else {
-    // Check if all child rows are selected and if so, add the parent row to selectedParentRows
-    const allChildRows = rowData.items.map((item) => item.id)
-    const selectedChildRowsIds = selectedChildRows.value.map((item) => item.id)
-    const allSelected = allChildRows.every((id) => selectedChildRowsIds.includes(id))
-    if (allSelected) {
-      selectedParentRows.value = [...selectedParentRows.value, rowData]
+    // Add single child row if not already selected
+    if (!currentSelectedChildRows.some(item => item.id === event.data.id)) {
+      selectedChildRows.value.push(event.data)
     }
   }
-
-  console.log('Selected Parent Rows:', selectedParentRows.value)
-  console.log('Selected Child Rows:', selectedChildRows.value)
+  
+  // Check if all child rows of this parent are now selected
+  const allChildRowIds = rowData.items.map(item => item.id)
+  const selectedIds = selectedChildRows.value.map(item => item.id)
+  const allChildRowsSelected = allChildRowIds.every(id => selectedIds.includes(id))
+  
+  // Add parent row to selection if all children are selected
+  if (allChildRowsSelected && !selectedParentRows.value.some(item => item.type === rowData.type)) {
+    selectedParentRows.value.push(rowData)
+  }
 }
 
+/**
+ * @description This function is used to unselect child rows in the table.
+ * @param {Object} event - The event object.
+ * @param {Object} rowData - The row data object.
+ */
 const onChildRowUnselect = (event, rowData) => {
   if (!event.data) {
-    selectedChildRows.value = []
-    selectedParentRows.value = selectedParentRows.value.filter((parentRow) => {
+    // Clear all child rows for this parent
+    selectedChildRows.value = selectedChildRows.value.filter(row => 
+      !rowData.items.some(item => item.id === row.id)
+    )
+    
+    // Remove parent row from selection
+    selectedParentRows.value = selectedParentRows.value.filter(parentRow => {
       return parentRow.type !== rowData.type
     })
   } else {
-    selectedChildRows.value = selectedChildRows.value.filter((row) => {
+    // Remove specific child row
+    selectedChildRows.value = selectedChildRows.value.filter(row => {
       return row.id !== event.data.id
     })
 
-    const allChildRows = rowData.items.map((item) => item.id)
-    const selectedChildRowsIds = selectedChildRows.value.map((item) => item.id)
-    const allSelected = allChildRows.every((id) => selectedChildRowsIds.includes(id))
-    if (!allSelected) {
-      selectedParentRows.value = selectedParentRows.value.filter((parentRow) => {
-        return parentRow.type !== rowData.type
-      })
-    }
+    // Remove parent from selection as not all children are selected anymore
+    selectedParentRows.value = selectedParentRows.value.filter(parentRow => {
+      return parentRow.type !== rowData.type
+    })
   }
-
-  console.log('Selected Parent Rows:', selectedParentRows.value)
-  console.log('Selected Child Rows:', selectedChildRows.value)
 }
 
+/**
+ * @description Computed property that counts the number of selected child rows for each parent type.
+ * @returns {Object} - The counts of selected child rows for each parent type.
+ */
 const selectedChildRowsCount = computed(() => {
   const counts = {}
   
