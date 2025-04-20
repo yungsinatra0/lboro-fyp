@@ -18,6 +18,7 @@
         class="w-full text-base"
         showButtonBar
       />
+      <!-- Global keyword search function -->
       <IconField class="w-full">
         <InputIcon>
           <i class="pi pi-search" />
@@ -62,6 +63,8 @@
           </IconField>
         </div>
       </template>
+
+      <!-- Parent table columns for each lab test -->
       <Column expander style="width: 3rem"> </Column>
       <Column field="name" header="Nume" sortable></Column>
       <Column field="code" header="Cod" class="hidden sm:table-cell"></Column>
@@ -153,10 +156,12 @@
         </template>
       </Column>
 
+      <!-- Expansion data table for child rows (lab result) for each lab test -->
       <template #expansion="slotProps">
         <div class="p-2 md:p-4">
           <h5 class="text-lg font-medium mb-3">Rezultate pentru {{ slotProps.data.name }}</h5>
-
+          
+          <!-- Mobile chart and reference interval display for each lab test (only shown when expanded) -->
           <div
             class="block lg:hidden mb-4"
             v-if="slotProps.data.results.some((result) => result.is_numeric === true)"
@@ -186,6 +191,7 @@
             scrollable
             scrollHeight="400px"
           >
+          <!-- Lab results columns -->
             <Column field="value" header="Rezultat">
               <template #body="slotProps">
                 <span>{{ slotProps.data.value }}</span>
@@ -240,13 +246,29 @@
         </div>
       </template>
 
+      <!-- Empty section in case no data is passed. Will show the empty message and error if there is -->
       <template #empty>
         <div class="p-4 text-center">
           <i class="pi pi-search text-3xl text-gray-300 dark:text-gray-600 mb-2"></i>
           <p>Nu au fost gasite rezultate care sa corespunda criteriilor de cautare.</p>
         </div>
+
+        <!-- Error message display -->
+        <Message v-if="error" severity="error" class="mx-3 md:mx-5 mb-3">
+          <template #container>
+            <div class="flex items-center justify-between">
+              <div>{{ error }}</div>
+              <Button icon="pi pi-refresh" severity="secondary" text @click="retryFetch" />
+            </div>
+          </template>
+        </Message>
       </template>
-      <template #loading> Se incarca datele. Va rugam asteptati. </template>
+
+      <!-- Loading indicator -->
+      <template #loading>
+        <ProgressSpinner v-if="loading" class="mx-auto my-5" />
+        <span> Datele se incarca...</span>
+      </template>
     </DataTable>
 
     <ShowFile
@@ -259,6 +281,10 @@
 </template>
 
 <script setup>
+/**
+ * @file LabTestView.vue
+ * @description This file contains the LabTestView component, which displays laboratory test results, alongside the recent results, reference intervals, and trends. Also shows a small sparkline chart for each test to show evolution of the results.
+ */
 import NavBar from '@/components/NavBar.vue'
 import { calculateTrend, getChartData } from '@/utils'
 import ShowFile from '@/components/medhistory/ShowFile.vue'
@@ -281,6 +307,8 @@ import {
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
 const labTests = ref([])
+const loading = ref(false)
+const error = ref(null)
 const expandedRows = ref({})
 const displayFileDialog = ref(false)
 const historyIdForFile = ref(null)
@@ -293,6 +321,9 @@ onMounted(() => {
   fetchLabTests()
 })
 
+/**
+ * Fetches laboratory test data from the API and handles loading states and error messages
+ */
 const fetchLabTests = async () => {
   try {
     const response = await api.get('/me/labtests')
@@ -304,11 +335,18 @@ const fetchLabTests = async () => {
         original_date_collection: result.date_collection,
       })),
     }))
-  } catch (error) {
-    console.error('Error fetching lab tests:', error)
+  } catch (err) {
+    console.error('Error fetching lab tests:', err)
+    error.value =
+      err.response?.data?.message || 'Nu s-au putut încărca analizele. Vă rugăm încercați din nou.'
+  } finally {
+    loading.value = false
   }
 }
-
+/**
+ * Computes filtered lab tests based on selected date range
+ * @returns {Array} Filtered lab test results
+ */
 const dateFilter = computed(() => {
   let filtered
   if (selectedDates.value) {
@@ -343,6 +381,7 @@ const dateFilter = computed(() => {
   })
 })
 
+// Chart options for desktop chart
 const chartOptions = {
   responsive: false,
   maintainAspectRatio: false,
@@ -380,7 +419,7 @@ const chartOptions = {
   },
 }
 
-// Enhanced options for mobile chart
+// Chart options for mobile chart
 const mobileChartOptions = {
   responsive: true,
   maintainAspectRatio: false,
