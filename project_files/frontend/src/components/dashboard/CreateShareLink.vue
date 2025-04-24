@@ -69,7 +69,7 @@
                 @click="
                   () => {
                     if (pinValidation.success) {
-                      apiError.value = null
+                      apiError = null
                       activateCallback('2')
                     }
                   }

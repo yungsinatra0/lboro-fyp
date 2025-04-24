@@ -30,7 +30,7 @@ class ShareToken(SQLModel, table=True):
     shared_items: dict = Field(default_factory=dict, sa_column=Column(JSON))
    
     user_id: uuid.UUID = Field(foreign_key="user.id")
-    user: "User" = Relationship(back_populates="share_tokens")  # Using Any for now
+    user: "User" = Relationship(back_populates="share_tokens")
     
 # Share Token create model, used for API requests to create a new share token
 class CreateShareToken(SQLModel):

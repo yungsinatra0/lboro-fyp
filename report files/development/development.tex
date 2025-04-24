@@ -862,7 +862,7 @@ The fifth sprint of the project was focused on adding the ability to add lab tes
 
 This feature was a continuation of the work done in the previous sprint, as the lab tests were also part of the health records feature. As such, some of the initial work was done on top of existing components, which made development easier and faster. The feature was developed as per the initially agreed requirements and wireframes, with some changes to how the lab results were displayed on the frontend.
 
-The sequence diagram for the lab tests extraction can be seen below in figure~. The diagram shows how the user interacts with the system to upload a lab test, how the system processes the file and sends it to the MLLM API, and how the response is then displayed to the user.
+The sequence diagram for the lab tests extraction can be seen below in figure~\ref{fig:sequence_lab}. The diagram shows how the user interacts with the system to upload a lab test, how the system processes the file and sends it to the MLLM API, and how the response is then displayed to the user.
 
 \begin{figure}[htbp]
   \centering
@@ -1091,8 +1091,6 @@ This idea was eventually accepted, as it would allow for a more compact view of 
 
 \FloatBarrier{}
 
-% TODO: Add screenshots and talk about the dashboard component, which I actually forgot to make
-
 \subsection{Challenges encountered}
 
 This sprint encountered less challenges than the previous ones, meaning that the work was able to be done faster than it was initially planned. However, there were still some challenges that were encountered during the development of the lab tests extraction feature.
@@ -1113,3 +1111,181 @@ The other challenge was the time pressure, as the student was nearing the deadli
 \end{itemize}
 
 \section{Sprint \#6}
+
+The last sprint of the project was focused on adding the ability to share the health records with doctors. This was one of the most important features of the system, as it allowed patients to share their medical history with doctors, which was one of the system's main goals of solving the problem of having so many different institution and systems that silo the patient information, without a way to share it. 
+
+The purpose of the share link feature was to allow doctors to access the patient's accrued medical history during consultations. It is not aimed to replace their institutions' systems, but rather as a complimentary service that would enable them to view information that might not be available to them, thus creating a more complete picture of the patient's medical history.
+
+This was the hardest feature to implement, as it would combine all the work done in the previous sprints and required designing a way to create these shareable links that would be both secure and easy to use.
+
+\subsection{Share links}
+
+In the initial discussions with stakeholders, it was quickly established that the easiest way to share medical information with healthcare practitioners would be through the use of a shareable link. Since most doctors have access to internet and a computer at their desks, it would represent the fastest and easiet way to access this system. Share links are also very versatile, as they could be sent via email, written on a paper, dictated or even generated as a QR code that can be scanned. As such, one of the first challenges was to design these shareable links so that they would be easy to transmit, but also secure and not easily guessable.
+
+Initially, the idea was to use UUID as the share code, as their length (usually around 36 characters) and randomness would make them very hard to guess. However, this would create a problem when sharing the link, as it would be extremely hard to share unless it is directly copied and pasted. As such, the decision was made to use a string of 8 randomly generated characters as the share code, which would be part of the URL. An example of a share link would be `https://example.com/share/7zSaQbBd'. The code for the share link generation and share token model can be seen below:
+
+\begin{lstlisting} [language=Python, caption=Share Link Generation]
+  # Helper function to generate random strings for share codes
+def generate_random_string(length: int) -> str:
+    characters = string.ascii_letters + string.digits
+    return ''.join(secrets.choice(characters) for _ in range(length))
+
+# Share Token model for database, used to store information about generated share tokens. Share token is the main object that is used to share health data with other doctors.
+class ShareToken(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    share_code: str = Field(index=True, unique=True, default_factory=lambda: generate_random_string(8))
+    expiration_time: datetime
+    created_at: datetime = Field(default_factory=datetime.now)
+    hashed_pin: str
+    shared_items: dict = Field(default_factory=dict, sa_column=Column(JSON))
+   
+    user_id: uuid.UUID = Field(foreign_key="user.id")
+    user: "User" = Relationship(back_populates="share_tokens")
+\end{lstlisting}
+
+To ensure the share links are secure, additional measures were also implemented. One of them was an expiration time, which by default would be set to one hour, with a maximum of 24 hours. As previously mentioned, these links' primary purpose was to complement a doctor's available information during a consultation, s3ince every institution has its own system for storing health information. As such, it was reasonable to assume that they would only be used once, during that visit. To this end, the expiration time was limited to a maximum of 24 hours to avoid share links being leaked or used by unauthorized people.
+
+The other measure was the use a user-set 6 character-long PIN code that would be separate for each share link. The patient would set this PIN when creating the share link, and the doctors would be prompted to enter whenever they wanted to access the shared information. This was added to ensure that, in the event of a share link being leaked, the information would at least be protected by the PIN code. The PIN would be hashed before stored in the database with the same algorithm used for user passwords, to ensure PINs would not be easily accessible in the database.
+
+When combined, these 3 features, randomly generated share code, expiration time and PIN would ensure a secure way to access the information: when accessed, each link's expiration time would be checked first, to ensure its validity. If the link were valid, the user would be prompted to enter the PIN code, which would be compared to the hash stored in the database. Only if the PIN is correct, the user would get access the information. An example code snippet of the share link endpoint can be seen below:
+
+\begin{lstlisting}[language=Python, caption=Share Link Endpoint]
+@router.post("/share/{share_code}/verify", status_code=status.HTTP_200_OK, response_model=ShareItemsResponse)
+@limiter.limit("5/minute")
+async def verify_share_token(
+    request: Request,
+    share_code: str,
+    pin: Annotated[str, Body(embed=True)],
+    session: Session = Depends(get_session)
+):
+    share_token = session.exec(select(ShareToken).where(ShareToken.share_code == share_code)).first()
+    
+    if not share_token:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Share token not found")
+    
+    # Check the PIN against the hashed PIN stored in the database
+    if not verify_hash(pin, share_token.hashed_pin):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid PIN")
+    
+    user = session.exec(select(User).where(User.id == share_token.user_id)).first()
+    
+    user_data = {
+        "name": user.name,
+        "dob": user.dob.strftime("%d-%m-%Y") if user.dob else None,
+    }
+    
+    # Process the shared items, which are stored as a JSON string in the database
+    items_data = get_item_data(share_token.shared_items, session)
+    
+    items_response = ShareItemsResponse(
+        expiration_time=share_token.expiration_time,
+        patient=user_data,
+        items=items_data
+    )
+    
+    return items_response
+\end{lstlisting}
+
+A sequence diagram of how the share link works, from creation to access can be seen below in figures~\ref{fig:sequence_share_updated} and~\ref{fig:sequence_share_access}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{Sequence_share_updated.png}
+  \caption{UML Sequence Diagram --- Creating share link}\label{fig:sequence_share_updated}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{Sequence_share_access.png}
+  \caption{UML Sequence Diagram --- Accessing shared link}\label{fig:sequence_share_access}
+\end{figure}
+
+\FloatBarrier{}
+
+\subsection{Frontend changes}
+
+To allow the user to create share links, a new component was created in the frontend. The component was located in the dashboard page, as this is intended to be the main and first page the user sees after logging in. The component was designed to guide the user through the main 3 stages of share link creation: first is the setting of the expiration time and PIN, next is the selection of the records to be shared and finally the confirmation and display of the share link code. The component was designed to be as simple and easy to use as possible, with clear instructions and a step-by-step approach. The component and the different stages can be seen below in figures~\ref{fig:share_create},~\ref{fig:share_records},~and~\ref{fig:share_result}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{Desktop_ShareCreate.png}
+  \caption{1st step of share link creation}\label{fig:share_create}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{Desktop_ShareRecords.png}
+  \caption{2nd step of share link creation}\label{fig:share_records}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{Desktop_ShareResult.png}
+  \caption{3rd step of share link creation}\label{fig:share_result}
+\end{figure}
+
+\FloatBarrier{}
+
+Next, the actual page that would display the shared information was created. As described in the previous section, the system would first check the expiration time of the share link, and if valid, would prompt the user to enter the PIN code. If the link would not be valid, the user would be shown an error message and offered the option to be redirected to the landing page. Both of these outcomes can be seen in figures~\ref{fig:share_invalid} and~\ref{fig:share_valid}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{Desktop_ShareValid.png}
+  \caption{PIN prompt dialog}\label{fig:share_valid}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{Desktop_ShareInvalid.png}
+  \caption{Expired link dialog}\label{fig:share_invalid}
+\end{figure}
+
+\FloatBarrier{}
+
+Finally, to wrap this feature up, the page that would display the shared information was created. Due to the amount of information that could be displayed, it was clear that the previously used tables would not suffice for this task. Since most of the information was displayed in the main system on their own, separate pages, it was important to somehow emulate the same experience without re-creating the pages again. 
+
+This is where PrimeVue's TabView component came in handy, as it added in tabs that allowed the user to switch between the different sections (or record categories), while remaining on the same page. This way, each tab could still contain the table with the records, while having the whole page to display them. The tabs and table columns were dynamically created based on the data received from the backend, in case some of the records were omitted by the user.
+
+Additionally, the page would also contain some basic user information such as the name and date of birth, with potential to add more if the user model would be expanded to contain more information. Finally, a live timer was added to the top of the page to show the time remaining until the link would expire, allowing users to understand how much time they have left to access the information. An example of how the page looks can be seen below in figure~\ref{fig:share_page}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{Desktop_ShareView.png}
+  \caption{Share page --- Desktop version}\label{fig:share_page}
+\end{figure}
+
+\FloatBarrier{}
+
+\subsection{Backend}
+
+All the backend changes in this sprint were related to the share link feature. A new model was created for the share tokens, which contains the hashed PIN, share code, expiration time and the actual shared items. 
+
+One of the challenges encountered when creating the share token model was the way to store the shared items. The initial idea was to create a new table, which would contain the share item type and their UUID.\@However, this would've added a lot of computation that needed to be done in the backend when creating the share link, as the database would need need to be queried for all items and then they would've have to be processed into their respective response models for the API.\@This would've added unncessary complexity to the system, making it less efficient and harder to maintain if new types of records would be added in the future.
+
+A solution to this problem was to use JSON fields in the database to store the shared items. One of the main reasons for using this method is the origin of the records when choosing them to be shared. Since the share creation link dialog was located in the dashboard, it used the same API response from the dashboard view, which meant that the records were already properly formatted in their respective response models. By using these pre-processed records, a whole step of processing could be avoided: records would be pulled from the dashboard API response, chosen in the share link creation dialog and then stored in the database as a big JSON object as-is. Thus, when accessing the share link, the records would be pulled from the database as a whole JSON object, some light processing done and then directly displayed in the frontend. Additionally, this would reduce the number of queries done to the database, as the items were stored in the same table as the other share token information, such as PIN, share code, etc. 
+
+The updated ERD can be seen in figure~\ref{fig:erd_s6}, making it the last update to the database schema for this project.
+
+\noindent\begin{minipage}{\textwidth}
+  \begin{center}
+      \rotatebox[origin=c]{270}{
+          \includegraphics[width=0.95\textheight,keepaspectratio]{ERD_updatedS6.png}
+      }
+      \captionof{figure}{Updated Entity Relationship Diagram \- Sprint \#6}\label{fig:erd_s6}
+  \end{center}
+\end{minipage}
+
+\subsection{Challenges encountered}
+
+The main challenge encountered in this sprint was the time pressure, as the project was nearing its deadline. This resulted in some of the features being simplified to their main functionality, without any room for much improvement or additional changes. This was especially true for the frontend part of displaying the shared information, as the amount of data and the combination of the previously added features made it hard to display everything in a single page.
+
+Another interesting challenged encountered was the differences caused by the languages used in the system. As this was a project for patients in Moldova, the frontend was developed in Romanian to accommodate the national language. However most of the code, including the database fields and other models, were written in English as the project was done as part of a degree in a UK-based university. This resulted in some interesting outcomes when data was received from the backend, with many headers being in English, while the rest of the data was in Romanian. In the previously  developed pages, it was possible to manually rename the headers to Romanian, but in the case of the share link items it was very difficult as many of the headers were dynamically created based on the data received. Considering this system was just a prototype, it was deemed acceptable, however for a production system, this issue would've had to be addressed.
+
+\subsection{Requirements completed}
+
+\begin{itemize}
+  \item The system must allow the patient to generate a shareable link to provide access to their medical records.
+  \item When creating the shareable link, the system must allow the patient to set an expiration date for the link.
+  \item When creating the shareable link, the system should allow the patient to set an access password for the link.
+  \item When creating the shareable link, the system should allow the patient to select which records to share with the doctor.
+\end{itemize}
