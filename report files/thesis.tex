@@ -46,6 +46,25 @@
     tabsize=2
 }
 
+\lstdefinelanguage{Gherkin}{
+	morekeywords = {
+		Given,
+		When,
+		Then,
+		And,
+		Scenario,
+		Feature,
+		But,
+		Background,
+		Scenario Outline,
+		Examples
+	},
+	sensitive=true,
+	morecomment=[l]{\#},
+	morestring=[b]",
+	morestring=[b]'
+}
+
 \lstset{style=mystyle}
 
 % Add images path
