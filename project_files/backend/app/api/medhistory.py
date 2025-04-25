@@ -284,7 +284,7 @@ def delete_medicalhistory(request: Request, medhistory_id: uuid.UUID, user_id: u
                 os.rmdir(folder_path)
             except PermissionError:
                 print("Error deleting folder due to Windows permissions error")
-                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An error occurred while deleting the folder")
+                # raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="An error occurred while deleting the folder")
         
     session.delete(medhistory)
     session.commit()

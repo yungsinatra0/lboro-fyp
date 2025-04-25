@@ -68,8 +68,128 @@ In addition to the test cases, a site map was created to track all the pages and
 
 \section{Backend Testing}
 
+The backend testing part was also done manually. Thankfully, the backend was less complex than the frontend, so the testing was easier and faster to do. Additionally, much of backend's functionality was already tested simultaneously with the frontend testing, as it was dependent on the backend to work properly. As such, many of the test cases were already covered in the frontend testing.
+
+However, to ensure that the backend was working as intended, additional tests were done using Postman while the API was being developed. This allowed for testing of the endpoints without relying on the frontend components being created. The tests were done by sending requests to the API and checking the responses, and comparing them with the expected results. 
+
+An example of how an endpoint was tested will be shown now. An example endpoint can be seen below:
+
+\begin{lstlisting}[language=Python, caption=Example endpoint for checking a share link for expiration time]
+    @router.get("/share/{share_code}", status_code=status.HTTP_200_OK)
+@limiter.limit("5/minute")
+async def check_share_token(
+    request: Request,
+    share_code: str,
+    session: Session = Depends(get_session)
+):
+    share_token = session.exec(select(ShareToken).where(ShareToken.share_code == share_code)).first()
+    
+    if not share_token:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Share token not found")
+    
+    if share_token.expiration_time < datetime.now():
+        raise HTTPException(status_code=status.HTTP_410_GONE, detail="Share token has expired")
+    
+    return {
+        "valid": True
+    }
+\end{lstlisting}
+
+This endpoint checks if a share link is valid and if it has expired. The endpoint takes in a share code and checks if it exists in the database. If it does, it checks if the expiration time is still valid. If both checks pass, it returns a valid response. If either check fails, it raises an HTTP exception with the appropriate status code and message.
+
+As such, for this endpoint, 3 test cases can be created: one where the share code is not valid, another where the code is valid but the expiration time is not valid and a third one where everything is valid. The test cases in Postman can be seen in figures~\ref{fig:postman1},~\ref{fig:postman2} and~\ref{fig:postman3}.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{PostmanNotFound.png}
+    \caption{Postman test --- share token not found}\label{fig:postman1}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{PostmanExpired.png}
+    \caption{Postman test --- share token expired}\label{fig:postman2}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{PostmanOK.png}
+    \caption{Postman test --- share token valid}\label{fig:postman3}
+\end{figure}
+
+\FloatBarrier{}
+
 \section{LLM Evaluation}
-% Research LLM evaluation methods
-% Talk about LLM evaluation for Gemini 2.0 Flash
+
+As previously mentioned in the Development chapter, the MLLM used in this project was Gemini 2.0 Flash. One of the main reasons for using this LLM was its generous free tier, which allowed for up to 15 requests per minute with a maximum of 1,000,000 tokens per minute. Alongside the generous free tier, the model also sported robust multimodal capabilities, which was crucial for processing lab results, which were often in PDF or image format. 
+
+However, it is also important to note that while the free tier and its multimodal capabilities were a big factor in choosing this model, it was also chosen for its performance and speed, which rivaled that of other, similarly sized models. As of writing this section, Gemini 2.0 Flash occupies a spot in the top 10 of the Chatbot Arena leaderboard for both language and vision tasks, authored by \textcite{chatbotarena}. As described by its authors, the leaderboard is an `open platform for crowdsourced AI benchmarking', which generates live leaderboards based on user feedback from comparing responses from different models. As such, it is quite likely that this leaderboard is a good indicator of the performance of the models, and good place to compare them.
+
+To ensure the MLLM was working as intended and was up to the task, the same prompt used in the actual system was used to test the model across multiple lab result documents from various institutions. Documents from different institutions such as labs and hospitals were used to ensure that the model was able to handle different formats of the document and the language used within it. The prompt can be seen below:
+
+\begin{lstlisting}
+    """
+    You have been given a document that contains lab results that is written in the Romanian language. Your job is to extract all lab results from this document in JSON format with the following fields: test_name, test_code, value, unit, reference_range, method. Sometimes the code of the test will be in the name itself, and it is your job to determine if the code is there, for example in brackets or separated by a comma, and separate the name and the code. Sometimes the lab result will not have a method specified, and in that case you return an empty string. The document is in Romanian, however the JSON keys should be in English.
+
+    EXTREMELY IMPORTANT FORMATTING INSTRUCTIONS:
+    1. Return ONLY the raw JSON array
+    2. DO NOT use code blocks, backticks, or markdown formatting
+    3. DO NOT include ```json or ``` anywhere in your response
+    4. DO NOT include any explanations or text before or after the JSON
+    5. Your response must start with the '[' character and end with the ']' character
+    6. The output should be valid JSON that can be parsed directly
+    7. Use period (.) as the decimal separator, not comma (,)
+
+    Example of how your output should look, starting from the very first character:
+    [{"test_name":"Hemoglobina","test_code":"HGB","value":"14.3","unit":"mg/dL","reference_range":"13.2-17.3", "method":"Chemiluminiscenta"}]
+
+    if there is no method specified, return an empty string:
+    [{"test_name":"Hemoglobina","test_code":"HGB","value":"14.3","unit":"mg/dL","reference_range":"13.2-17.3", "method":" "}]
+    """
+\end{lstlisting}
+
+In the end, it was possible to obtain 3 different lab results documents --- 2 from different labs and 1 from a private hospital. At the time of writing, the labs that were chosen were Alfalab and Synevo, for being one of the most popular in Moldova and having a wide network of testing sites across the whole country \parencite{alfalab, synevo}. The private hospital chosen was Medpark, which is also a popular destionation for many of Moldova's capital residents \parencite{medpark}. The anonymised documents, with the exported results alongside them can be seen in figures.
+
+The documents, along with their extracted results in the system, can be seen in the following figures:~\ref{fig:synevo},~\ref{fig:alfalab} and~\ref{fig:medpark}.
+
+\begin{figure}[ht]
+    \centering
+    \subfloat[Lab document]{%
+        \includegraphics[width=0.9\textwidth]{Synevo_edited.png}%
+    }
+    \\[\baselineskip]
+    \subfloat[Extraction result]{%
+        \includegraphics[width=0.9\textwidth]{Synevo_result.png}%
+    }
+    \caption{Synevo extraction results}\label{fig:synevo}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \subfloat[Lab document]{%
+        \includegraphics[width=0.9\textwidth]{Alfalab_edited.png}%
+    }
+    \\[\baselineskip]
+    \subfloat[Extraction result]{%
+        \includegraphics[width=0.9\textwidth]{Alfalab_result.png}%
+    }
+    \caption{Alfalab extraction results}\label{fig:alfalab}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \subfloat[Lab document]{%
+        \includegraphics[width=0.9\textwidth]{Medpark_edited.png}%
+    }
+    \\[\baselineskip]
+    \subfloat[Extraction result]{%
+        \includegraphics[width=0.9\textwidth]{Medpark_result.png}%
+    }
+    \caption{Medpark extraction results}\label{fig:medpark}
+\end{figure}
+
+\FloatBarrier{}
+
+As it can be seen by the results, the model was able to extract the lab results and their details such as code, reference range, unit and even method. These excellent results were achieved with a single, common prompt and delivered consistent results across all 3 documents, whether they were edited in any way or not. In conclusion, the model seemed to be an excellent choice for the task at hand, and these results confirmed that Gemini 2.0 Flash was indeed a suitable choice for extracting lab results from documents.
 
 \section{Client feedback}
