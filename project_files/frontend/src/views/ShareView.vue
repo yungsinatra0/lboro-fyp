@@ -9,6 +9,7 @@
     modal
     header="Verificare PIN"
     @hide="displayPINCheck = false"
+    class="w-full md:w-1/3"
   >
     <div class="flex flex-col items-center justify-center gap-4">
       <h1 class="font-bold">Introdu PIN-ul pentru a verifica link-ul de partajare</h1>
@@ -17,9 +18,15 @@
       <Message v-if="pinValidation.error" severity="error" variant="simple" size="small">{{
         pinValidation.error
       }}</Message>
+
+      <Message severity="info" icon="pi pi-info-circle" size="small">
+        <span class="text-sm font-bold">
+        Atentie! Informatia partajata a fost introdusa si selectata de catre pacient pentru a fi vizualizata de Dvs., iar noi nu ne asumam responsabilitatea pentru exactitatea si caracterul complet al acesteia.
+      </span>
+      </Message>
     </div>
     <div class="flex justify-center mt-4">
-      <Button label="Verifica" @click="checkPin" class="w-full" :loading="loading" />
+      <Button label="Verifica" @click="checkPin" class="w-1/2" :loading="loading" />
     </div>
   </Dialog>
 
