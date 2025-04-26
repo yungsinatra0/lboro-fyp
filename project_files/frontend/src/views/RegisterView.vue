@@ -112,12 +112,47 @@
             </ul>
           </Message>
         </div>
-        <Button 
-          type="submit" 
-          severity="secondary" 
-          label="Inregistrare" 
-          :loading="isLoading" 
-          :disabled="isLoading" 
+        <div class="flex flex-col gap-1">
+          <CheckboxGroup name="terms" class="flex flex-col gap-2">
+            <div class="flex items-start gap-2">
+              <Checkbox inputId="terms" value="terms"/>
+              <label for="terms" class="text-surface-600 dark:text-surface-200 text-sm">
+              Accept <a href="#" class="text-primary-500 hover:underline">termenii si conditiile</a> de utilizare a
+              aplicatiei.
+              </label>
+            </div>
+
+            <div class="flex items-start gap-2">
+              <Checkbox inputId="privacy" value="privacy" />
+              <label for="privacy" class="text-surface-600 dark:text-surface-200 text-sm">
+              Accept <a href="#" class="text-primary-500 hover:underline">politica de confidentialitate</a>.
+              </label>
+            </div>
+
+            <div class="flex items-start gap-2">
+              <Checkbox inputId="processing" value="processing" />
+              <label for="processing" class="text-surface-600 dark:text-surface-200 text-sm">
+              Accept datele mele medicale sa fie procesate si stocate conform <a href="#" class="text-primary-500 hover:underline">politicii de
+              procesare a datelor</a>.
+              </label>
+            </div>
+          </CheckboxGroup>
+          <Message
+            v-if="$form.terms?.invalid"
+            severity="error"
+            size="small"
+            variant="simple"
+            class="text-rose-600 text-sm"
+          >
+            {{ $form.terms.error.message }}
+          </Message>
+        </div>
+        <Button
+          type="submit"
+          severity="secondary"
+          label="Inregistrare"
+          :loading="isLoading"
+          :disabled="isLoading"
         />
       </Form>
     </div>
@@ -127,7 +162,7 @@
 <script setup>
 /**
  * @file RegisterView.vue
- * 
+ *
  * @description This file handles the registration process for a new user.
  */
 import { Form } from '@primevue/forms'
@@ -143,15 +178,17 @@ const initialValues = ref({
   name: '',
   surname: '',
   dob: null,
+  terms: [],
 })
 
 const maxDate = ref(new Date())
 const isLoading = ref(false)
 const registerError = ref(null)
+const terms = ref([])
 
 /**
  * @description The resolver is used to validate the form fields using Zod schema.
- */
+**/
 const resolver = zodResolver(
   z.object({
     email: z
@@ -177,6 +214,7 @@ const resolver = zodResolver(
       .refine((value) => value < new Date(), {
         message: 'Data nasterii nu poate fi in viitor',
       }),
+    terms: z.array(z.string()).min(3, { message: 'Toti termenii trebuie acceptati pentru a continua.' }),
   }),
 )
 
@@ -188,7 +226,7 @@ const resolver = zodResolver(
 async function register(credentials) {
   isLoading.value = true
   registerError.value = null
-  
+
   try {
     await api.post('/register', {
       name: credentials.name + ' ' + credentials.surname,
@@ -198,12 +236,12 @@ async function register(credentials) {
     })
     router.push('/login')
   } catch (error) {
-    
+
     if (!error.response) {
       registerError.value = 'Nu s-a putut conecta la server. Verificați conexiunea la internet.'
     } else {
       const status = error.response.status
-      
+
       if (status === 409) {
         registerError.value = 'Această adresă de email este deja înregistrată.'
       } else if (status >= 500) {

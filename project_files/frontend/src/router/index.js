@@ -113,8 +113,11 @@ router.beforeEach(async (to) => {
     if (!authStore.isAuthenticated) {
       return { name: 'Login' } // Redirect to login if not authenticated
     }
-  } else if (authStore.isAuthenticated && to.name !== 'Share' && to.name == 'Login' || to.name == 'Register') {
-    return { name: 'Dashboard' } // Redirect to dashboard if authenticated and going to login or register
+  } else if (authStore.isAuthenticated && to.name !== 'Share') {
+    // If user is authenticated and trying to access login or register pages
+    if (to.name === 'Login' || to.name === 'Register') {
+      return { name: 'Dashboard' } // Redirect to dashboard
+    }
   }
 
   return true // Continue to requested route if no conditions are met
