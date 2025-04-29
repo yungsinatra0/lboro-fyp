@@ -125,30 +125,9 @@ As previously mentioned in the Development chapter, the MLLM used in this projec
 
 However, it is also important to note that while the free tier and its multimodal capabilities were a big factor in choosing this model, it was also chosen for its performance and speed, which rivaled that of other, similarly sized models. As of writing this section, Gemini 2.0 Flash occupies a spot in the top 10 of the Chatbot Arena leaderboard for both language and vision tasks, authored by \textcite{chatbotarena}. As described by its authors, the leaderboard is an `open platform for crowdsourced AI benchmarking', which generates live leaderboards based on user feedback from comparing responses from different models. As such, it is quite likely that this leaderboard is a good indicator of the performance of the models, and good place to compare them.
 
-To ensure the MLLM was working as intended and was up to the task, the same prompt used in the actual system was used to test the model across multiple lab result documents from various institutions. Documents from different institutions such as labs and hospitals were used to ensure that the model was able to handle different formats of the document and the language used within it. The prompt can be seen below:
+To ensure the MLLM was working as intended and was up to the task, the same prompt used in the actual system was used to test the model across multiple lab result documents from various institutions. Documents from different institutions such as labs and hospitals were used to ensure that the model was able to handle different formats of the document and the language used within it. 
 
-\begin{lstlisting}
-    """
-    You have been given a document that contains lab results that is written in the Romanian language. Your job is to extract all lab results from this document in JSON format with the following fields: test_name, test_code, value, unit, reference_range, method. Sometimes the code of the test will be in the name itself, and it is your job to determine if the code is there, for example in brackets or separated by a comma, and separate the name and the code. Sometimes the lab result will not have a method specified, and in that case you return an empty string. The document is in Romanian, however the JSON keys should be in English.
-
-    EXTREMELY IMPORTANT FORMATTING INSTRUCTIONS:
-    1. Return ONLY the raw JSON array
-    2. DO NOT use code blocks, backticks, or markdown formatting
-    3. DO NOT include ```json or ``` anywhere in your response
-    4. DO NOT include any explanations or text before or after the JSON
-    5. Your response must start with the '[' character and end with the ']' character
-    6. The output should be valid JSON that can be parsed directly
-    7. Use period (.) as the decimal separator, not comma (,)
-
-    Example of how your output should look, starting from the very first character:
-    [{"test_name":"Hemoglobina","test_code":"HGB","value":"14.3","unit":"mg/dL","reference_range":"13.2-17.3", "method":"Chemiluminiscenta"}]
-
-    if there is no method specified, return an empty string:
-    [{"test_name":"Hemoglobina","test_code":"HGB","value":"14.3","unit":"mg/dL","reference_range":"13.2-17.3", "method":" "}]
-    """
-\end{lstlisting}
-
-In the end, it was possible to obtain 3 different lab results documents --- 2 from different labs and 1 from a private hospital. At the time of writing, the labs that were chosen were Alfalab and Synevo, for being one of the most popular in Moldova and having a wide network of testing sites across the whole country \parencite{alfalab, synevo}. The private hospital chosen was Medpark, which is also a popular destionation for many of Moldova's capital residents \parencite{medpark}. The anonymised documents, along with their extracted results in the system, can be seen in the following figures:~\ref{fig:synevo},~\ref{fig:alfalab} and~\ref{fig:medpark}.
+Three different documents were used for evaluation --- 2 from labs and 1 from a private hospital. The labs and the hospital were chosen for their popularity and a wide network of testing sites across the whole country \parencite{alfalab, synevo, medpark}. The anonymised documents, alongside their extracted results, can be seen in the following figures:~\ref{fig:synevo},~\ref{fig:alfalab} and~\ref{fig:medpark}.
 
 \begin{figure}[ht]
     \centering
@@ -191,3 +170,20 @@ In the end, it was possible to obtain 3 different lab results documents --- 2 fr
 As it can be seen by the results, the model was able to extract the lab results and their details such as code, reference range, unit and even method. These excellent results were achieved with a single, common prompt and delivered consistent results across all 3 documents, whether they were edited in any way or not. In conclusion, the model seemed to be an excellent choice for the task at hand, and these results confirmed that Gemini 2.0 Flash was indeed a suitable choice for extracting lab results from documents.
 
 \section{Stakeholders feedback}
+
+To finish up this section but also the development of the system as a whole, feedback was collected from involved stakeholders regarding the performance and usability of the system. The feedback was collected through virtual meetings, where the system was presented in a live demo format. After the presentation, stakeholders were allowed to asked any further questions and at the end they were asked to provide feedback on the developed system and its future potential in the digital healthcare space in the Republic of Moldova. 
+
+There was no formal feedback collection process, nor a structured questionnaire, with stakeholders being encouraged to express their opinions in a free format. Some feedback excerpts can be seen below, with the names of the stakeholders anonymised. The full feedback can be found in the appendix~\ref{sec:full_feedback}.
+
+
+Feedback 1, from a medical doctor specialised in digital healthcare applications:
+
+\begin{quotation}
+    `I appreciated the concept of the project and the way all essential components of a Personal Health Record were integrated: general, clinical, and paraclinical data, consultations, physician access, and data security. The platform is strongly patient-centered, enhancing access to personal medical data and significantly contributing to patient empowerment\dots From my perspective as a medical doctor specialized in public health and an expert in digital transformation of healthcare, I see great potential in this project and I am committed to offering the necessary support for its further development'
+\end{quotation}
+
+Feedback 2, from a patient and healthcare user:
+
+\begin{quotation}
+    `I was really impressioned with the application on the digital health records book you have developed and presented to me. As a BA you have managed to capture the most important needs and then translated them into useful features included in the solution developed\dots By developing this solution you have given a new opportunity to Moldova to make one big step forward to the digitisation, and hope it will be largely used by moldovans as the country offers them also other related nice opportunities like high speed internet access and good coverage by 5G network'
+\end{quotation}
