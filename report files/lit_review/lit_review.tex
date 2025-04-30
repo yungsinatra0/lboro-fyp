@@ -340,37 +340,6 @@ Few-shot prompting are techniques where the LLM learns how to complete a task ba
 
 \FloatBarrier{}
 
-\subsubsection{Thought Generation Prompting}
-
-Thought generation are techniques where the prompt encourages the LLM to explain its reasoning process while solving a given problem \parencite{prompt1}.
-
-\begin{table}[h!]
-    \centering
-    \begin{tabular}{p{3cm} p{8cm} p{2cm}}
-        \toprule
-        \textbf{Technique} & \textbf{Description} & \textbf{Source} \\
-        \midrule
-        \raggedright
-        Chain-of-Thought (CoT) & Adding a phrase like `Let's think step by step' at the end of the prompt to encourage the LLM to describe its thought process before offering a final answer. & \textcite{cot} \\
-        \hline
-        \raggedright
-        Contrastive CoT & Using CoT and also adding both incorrect and correct examples in order to provide the LLM a more diverse example set.  & \textcite{contrastive-cot} \\
-        \hline
-        \raggedright
-        Auto-CoT & Using CoT with another LLM to automatically generate CoT examples that can be used to create few-shot CoT prompts for other LLMs. &  \textcite{auto-cot} \\
-        \hline
-        \raggedright
-        Least-to-Most & Starts with asking the model to break down a problem into sub-problems without solving them. Afterwards, it solves them one by one, appending the result each time, until it arrives at the answer. & \textcite{least-most} \\
-        \hline
-        \raggedright
-        Tree-of-Thought (ToT) & Starts with an initial problem and then generates multiple possible steps by using CoT. Then, it evaluates each step, decides which one to take and creates more thoughts until it reaches an answer. & \textcite{treeofthought} \\
-        \bottomrule
-    \end{tabular}
-    \caption{Thought Generation Prompt Techniques}\label{tab:thought_gen}
-\end{table}
-
-\FloatBarrier{}
-
 \subsubsection{Multimodal and Multilingual Prompting}
 
 Multimodal and multilingual prompting are techniques which aim to improve an LLM's performance by leveraging multiple modalities or languages in the prompt \parencite{prompt1}.
@@ -391,41 +360,10 @@ Multimodal and multilingual prompting are techniques which aim to improve an LLM
         JSON/XML output formatting & Asking the LLM to format the response in a JSON or XML format and providing the expected schema has been found to improve the accuracy of LLM outputs  & \textcite{jsonllm} \\
         \hline
         \raggedright
-        Multimodal CoT & Similar to the textual CoT, this technique encourages the model to solve a given image-based problem step by step by step. & \textcite{multimodal-cot} \\
-        \hline
-        \raggedright
         Image-as-Text & Generating or writing a textual description of an image that can then be included in a text-based prompt. & \textcite{images-as-text} \\
-        \hline
-        \raggedright
-        Chain-of-Images (CoI) & Using the CoT process to generate images as part of its thought process to reason visually. & \textcite{coi} \\
         \bottomrule
     \end{tabular}
     \caption{Multimodal and Multilingual Techniques}\label{tab:multi_prompt}
-\end{table}
-
-\FloatBarrier{}
-
-\subsubsection{Agents}
-
-Agents are techniques which encourage LLMs to use external tools or resources to complete a task \parencite{prompt1}.
-
-\begin{table}[h!]
-    \centering
-    \begin{tabular}{p{3cm} p{8cm} p{2cm}}
-        \toprule
-        \textbf{Technique} & \textbf{Description} & \textbf{Source} \\
-        \midrule
-        \raggedright
-        Program-aided Language Model (PAL) & Using the LLM to translate a problem into code, which can then be sent to an interpreter to generate an answer. & \textcite{pal} \\
-        \hline
-        \raggedright
-        ReAct & Firstly, the model generates a thought based on the input. Then, the model takes an action and observes the result. This process is repeated until the model arrives at an answer. & \textcite{react-llm} \\
-        \hline
-        \raggedright
-        Retrieval Augmented Generation (RAG) & This technique involves retrieval of information from an external source and inserting it into the prompt. & \textcite{rag} \\
-        \bottomrule
-    \end{tabular}
-    \caption{LLM Agent Techniques}\label{tab:agents}
 \end{table}
 
 \FloatBarrier{}
