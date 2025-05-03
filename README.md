@@ -43,9 +43,11 @@ pip install -r requirements.txt
 
 ```
 DATABASE_URL=postgresql://username@localhost/dbname
-FILE_KEY=your_file_encryption_key
+FILE_KEY=your_file_encryption_key 
 API_KEY=your_llm_api_key
 ```
+
+NOTE: Make sure you generate a symmetric key with AES and insert it manually into the .env file!
 
 4. Start the backend server:
 
