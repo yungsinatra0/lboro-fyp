@@ -20,7 +20,7 @@ Personal Health Record (PHR) System - A web application that allows patients to 
 
 ### Prerequisites
 Before starting, ensure you have the following installed:
-- **Python 3.8+** - [Download Python](https://www.python.org/downloads/)
+- **Python 3.13** - [Download Python](https://www.python.org/downloads/)
 - **Node.js and npm** - [Download Node.js](https://nodejs.org/)
 - **PostgreSQL** - [Download PostgreSQL](https://www.postgresql.org/download/)
 
@@ -50,7 +50,7 @@ API_KEY=your_llm_api_key
 4. Start the backend server:
 
 ```bash
-uvicorn main --reload
+uvicorn app.main:app --reload
 ```
 
 #### Frontend Setup
