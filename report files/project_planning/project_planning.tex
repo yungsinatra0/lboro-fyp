@@ -1,12 +1,13 @@
 \chapter{Project Planning and Design}
 
+This chapter will outline the project planning and system design process, which will include discussions on the chosen project management methodology, the system architecture, the tech stack that will be used during development and the user interface design illustrated by using wireframes.
+
 \section{UML Diagrams}
 
-UML, or Unified Modeling Language, is a standardised modeling language that consists of a set of diagrams used for modeling business processes and documenting software systems \parencite{uml}. It helps to better communicate potential designs and architectural decisions. The most common UML diagram types include:
+UML, or Unified Modeling Language, is a standardised modeling language that consists of a set of diagrams used for documenting software systems \parencite{uml}. It enables better communication potential of designs and architectural decisions. Common UML diagram types include:
 
 \begin{itemize}
-    \item \textbf{Use Case Diagram} --- Illustrates the system's intended functionality in terms of actors, use cases, and their relationships, showing how the system delivers value to users. The diagram can also be accompanied by a use case specifications document, which provides a detailed description of each use case.
-    \item \textbf{Class Diagram} --- Depicts the structure of the system by showing classes, attributes, operations, and static relationships between classes.
+    \item \textbf{Use Case Diagram} --- Illustrates the system's intended functionality in terms of actors, use cases, and their relationships. It can be accompanied by a use case specifications document, which provides a description of each use case.
     \item \textbf{Sequence Diagram} --- Demonstrates how objects interact in a particular, timed sequence scenario, focusing on the messages passed between objects.
     \item \textbf{Activity Diagram} --- Represents the workflow of a target use case or business process through a series of activities, emphasizing steps, choices, iterations, and concurrency.
 \end{itemize}
@@ -145,16 +146,6 @@ Steps & 1. User selects the profile section \newline
 \FloatBarrier{}
 \clearpage
 
-% \subsection{Class Diagram}
-% \begin{figure}[htbp]
-%     \centering
-%     \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{Class_diagram.png}
-%     \caption{UML Class Diagram}\label{fig:uml_class}
-% \end{figure}
-
-% \FloatBarrier{}
-% \clearpage
-
 \subsection{Sequence Diagrams}
 \begin{figure}[htbp]
     \centering
@@ -205,7 +196,7 @@ Steps & 1. User selects the profile section \newline
 
 \section{Wireframes}
 
-Wireframes have been used to provide a high-level overview of how the web application would look like and present some of its key functionalities. They have been created using Figma and later shown to key stakeholders. Based on the feedback received, the wireframes have been adjusted and some examples can be seen below in figures~\ref{fig:dashboard},~\ref{fig:medhistory} and~\ref{fig:lab}, while the full set of wireframes can be found in appendix~\ref{sec:wireframes}.
+Wireframes were used to provide a high-level overview of the application's design and present some of its key functionalities. These have been created using Figma and presented to key stakeholders during virtual meetings. Based on the feedback received, the wireframes have been adjusted and some examples can be seen in figures~\ref{fig:dashboard},~\ref{fig:medhistory} and~\ref{fig:lab}. The full set of wireframes can be found in appendix~\ref{sec:wireframes}.
 
 \begin{figure}[ht]
     \centering
@@ -255,7 +246,7 @@ Based on the research conducted in sections~\ref{sec:database},~\ref{sec:backend
 
 \subsection{Frontend}
 
-For the frontend Vue was used, which is a JavaScript framework for building single-page applications (SPAs) \parencite{vue}. Its strengths lie in the ease of use and flexibility, with features like components, element reactivity and Single File Components (SFCs) that allows HTML, CSS and JS to be used in a single \lstinline{.vue} file. Vue also boasts a large and active community, with many libraries and guides available for developers. Previous experience working with Vue made it an ideal choice for this project. Diagram~\ref{fig:frontend} showcases how different elements of the frontend interact. The next subsections will briefly discuss each.
+Vue was chosen for the frontend, as it is a JavaScript framework used for building single-page applications (SPAs) known for its ease of use and flexibility \parencite{vue}. It is powered by components, element reactivity and Single File Components (SFCs) that enable HTML, CSS and JS to be used in a single \lstinline{.vue} file. Vue also boasts a large and active community, with many libraries and guides available for developers. Previous experience with Vue made it a suitable choice for this project. Diagram~\ref{fig:frontend} showcases how different elements of the frontend interact. The next subsections will briefly discuss each.
 
 \begin{figure}[htbp]
     \centering
@@ -278,15 +269,15 @@ Axios is a promise-based HTTP client for the browser and Node.js \parencite{axio
 
 \subsubsection{Vue views and components}
 
-Vue components and views represent the foundation of the frontend. Views represent the different pages of the application, which can be navigated to using the Vue Router.Components allow to break down the UI into independent and reusable elements \parencite{vuecomponents}. Each component can be stored in a separate \lstinline{.vue} file and imported within a view/page or another component.
+Vue components and views are the foundation of the frontend. Views represent the different pages of the application, which can be navigated to using the Vue Router. Components allow to break down the UI into independent and reusable elements \parencite{vuecomponents}. Each component can be stored in a separate \lstinline{.vue} file and imported when necessary.
 
 \subsubsection{PrimeVue and TailwindCSS}
 
-PrimeVue is a component library for Vue, which provides a set of pre-built components that can be used to easily create the frontend of the application \parencite{primevue}. TailwindCSS is a CSS framework that provides many classes that can be used to style different elements of the application \parencite{tailwind}. When combined, PrimeVue provides the basic components like buttons, forms, and tables, while TailwindCSS is used to style these components.
+PrimeVue is a component library for Vue, which provides a set of pre-built components that can be used to easily create the frontend of the application \parencite{primevue}. TailwindCSS is a CSS framework that provides a multitude of classes that can be applied to style application elements \parencite{tailwind}. When combined, PrimeVue provides the basic building blocks such as buttons, forms, and tables, while TailwindCSS styles these components.
 
 \subsection{Backend}
 
-For the backend, FastAPI was chosen as the main framework. It is a modern framework used in building APIs with Python \parencite{fastapi}. Based on the research, FastAPI seemed to be a good choice due to its ease of use, simplicity and documentation available. Previous experience with Python made a Python-based framework an easy choice for this project. Finally, a separate backend framework allows for more flexibility in the future, as it can be developed independently from the frontend and be re-used for different platforms, such as mobile. Diagram~\ref{fig:backend} shows how different components of the backend will interact with each other.
+FastAPI was chosen as the backend framework. It is a modern framework used in building APIs with Python, chosen due to its ease of use, simplicity and heaps of documentation available \parencite{fastapi}. Previous experience with Python made this framework an accessible choice for this project. A separate backend would also allow for future flexibility --- its independence from the frontend enables it to be re-used for other platforms, such as mobile. Diagram~\ref{fig:backend} shows how different components of the backend will interact with each other.
 
 \begin{figure}[htbp]
     \centering
@@ -298,7 +289,7 @@ For the backend, FastAPI was chosen as the main framework. It is a modern framew
 
 \subsection{Database}
 
-PostgreSQL was the database of choice, a relational database system that boasts a good reputation for its reliability, wide feature set and performance \parencite{postgres}. It supports a wide range of data types, including JSON and UUID, which are important for this project. Similarly, PostgreSQL offers robust security features like an access-control system or column And row-level security. 
+PostgreSQL was the database of choice, which is a relational database system that boasts a good reputation for its reliability, wide feature set and performance \parencite{postgres}. It supports a wide range of data types, including JSON and UUID, which are important for this project. Similarly, PostgreSQL offers robust security features like an access-control system or column and row-level security. 
 
 SQLModel, a Python library built on top of SQLAlchemy and Pydantic, will be used to interact with the database. SQLModel provides a way to define database tables using classes, which are then used to interact with the database \parencite{sqlmodel}.
 
@@ -306,25 +297,25 @@ SQLModel, a Python library built on top of SQLAlchemy and Pydantic, will be used
 
 \subsection{Methodology and Tools}
 
-Based on the research in section~\ref{sec:methodologies}, a hybrid approach has been chosen, with Waterfall as the main methodology for planning and managing the initial part of the project, such as requirements gathering and the design of the system. The development part of the project will be done using a more Agile approach. There are several reasons for this choice:
+Based on the research in section~\ref{sec:methodologies}, a hybrid project management approach has been adopted, with Waterfall as the main methodology covering the initial phases of the project that transitions to Agile during the development phase.
 
 \begin{enumerate}
-    \item The nature of the project --- the project has a limited timeframe (about 6--7 months) and is on a smaller scale. 
-    \item Documentation requirements --- the project progress needs to be documented in this report, including the requirements gathered, design considerations and implementation decisions and outcomes.
-    \item Customer involvement --- development will be done closely with stakeholders, who will be providing feedback throughout the project.
+    \item \textbf{The nature of the project:} The limited timeframe and resources required using a flexible approach to ensure a viable prototype is delivered.
+    \item \textbf{Documentation requirements:} The academic nature of this project calls for extensive documentation of requirements, design choices and implementation decisions. 
+    \item \textbf{Stakeholder engagement:} The development will require continuous stakeholder feedback to ensure the solution meets stakeholder needs.
 \end{enumerate}
 
-Notion will be used as the project management tool, which allows for task management, documentation and knowledge sharing. It provides a wide range of features, including templates for Agile project management, creation of user stories, backlogs, sprints and boards \parencite{notion}. 
+Notion will be used as the project management tool. It allows for easy task management and documentation, providing a wide range of templates for Gantt charts, user stories, backlogs, sprints and Kanban boards \parencite{notion}. 
 
 \subsection{Sprint planning}
 
-Based on the time remaining after the completion of previous project phases, it was decided that only 6 sprints will be able to be run before the deadline. The sprints will be planned as follows:
+Following the completion of the initial project phases, the development phase will be divided into 6 sprints. Each sprint will last 2 weeks, with a total of 12 weeks allocated. The sprints will be planned as follows:
 
 \begin{itemize}
-    \item \textbf{Sprint 1} --- Will focus on installing the necessary tools, frameworks and setting up initial project files. Additionally, a basic frontend and backend will be created, with a focus on basic functionalities like user authentication and registration.
-    \item \textbf{Sprint 2} --- Will focus on the patient profile, vaccines, allergies, medications and health data. The dashboard will also be created, with a basic layout and design.
-    \item \textbf{Sprint 3} --- Will focus on finishing the main dashboard, adding the upload feature and medical history.
-    \item \textbf{Sprint 4} --- Will focus on processing lab results with the MLLM API and displaying them in tabular or graphical format.
-    \item \textbf{Sprint 5} --- Will focus on sharing records with doctors through various methods like email, share links or QR codes.
-    \item \textbf{Sprint 6} --- Will address any missing features or functionalities that need to be added, as well as final testing.
+    \item \textbf{Sprint 1} --- Will configure the development environment, frameworks, database and implement core functionalities like user authentication and registration.
+    \item \textbf{Sprint 2} --- Will implement the vaccines, allergies, medications and health data sections alongside the a basic layout of the dashboard.
+    \item \textbf{Sprint 3} --- Will complete the main dashboard and implement the document upload feature alongside the medical history section.
+    \item \textbf{Sprint 4} --- Will integrate the MLLM and implement the automated lab test extraction feature.
+    \item \textbf{Sprint 5} --- Will develop the record sharing feature via a shareable link, as well as the doctor view of the records.
+    \item \textbf{Sprint 6} --- Will address any identified remaining gaps, such as missing features, as well as final testing processes.
 \end{itemize}
