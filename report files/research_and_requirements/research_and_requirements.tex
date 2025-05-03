@@ -1,25 +1,21 @@
 \chapter{Research and Requirements}
 
-To gain a more complete understanding of the current situation in Moldova, the existing problems and possible needs of the people involved, it is important to start with an analysis to identify the possible key stakeholders for this project. As previously mentioned in the literature review, a diverse group of stakeholders is essential to ensure that the currrent situation is reviewed from multiple perspectives. 
-
-Afterwards, the next step is to utilise the chosen stakeholders to gather as much information as possible from various perspective to ensure that the project is aligned with the needs of both patients and healthcare professionals in Moldova and solves the existing problems.
+This chapter will outline the stakeholder analysis process, followed by requirements gathering. A diverse group of stakeholders was chosen to ensure multiple perspectives of the healthcare sector are represented and so that a comprehensive list of requirements is created. At the of this chapter, a list of the most important requirements will be presented.
 
 \section{Stakeholder Analysis}
 
-The student has identified the following possible stakeholders for the project:
+The initial stakeholders identified included:
 
 \begin{itemize}
     \item Doctors and other medical staff working in hospitals
-    \item Department head in a hospital
+    \item Department head of a republican hospital
     \item IT staff members in hospitals
-    \item Staff members at CNAM (National Health Insurance Company)
-    \item Staff members at the Ministry of Health 
+    \item National Health Insurance Company (CNAM) staff members
+    \item Ministry of Health staff
     \item Patients 
 \end{itemize}
 
-These stakeholders have been identified so that they can provide a wider picture on the needs and requirements of the project, and to ensure that the project is aligned with the expectations of workers within the healthcare industry in Moldova from multiple perspectives. 
-
-The stakeholders have also been placed in the stakeholder influence-interest grid (which will be discussed in section~\ref{sec:stakeholders}) to help the student understand the level of influence and interest that each stakeholder has in the project:
+These stakeholders were mapped on an influence-interest grid (which will be discussed in section~\ref{sec:stakeholders}) to help better understand the level of influence and interest that each stakeholder has in the project and prioritise the engagement with them. The grid can be seen in figure~\ref{fig:stakeholder_analysis1}.
 
 \begin{figure}[ht]
     \centering
@@ -29,29 +25,27 @@ The stakeholders have also been placed in the stakeholder influence-interest gri
 
 \subsection{Current situation analysis}
 
-Following the analysis, the student has conducted several exploratory interviews with the chosen stakeholders to gather insights into current issues with the IT systems used in Moldova's healthcare sector. The student was able to reach out to every stakeholder, except for staff members at CNAM and the Ministry of Health. 
-
-After the conclusion of the interviews, three main issues and potential solutions have been identified:
+Following the analysis, exploratory interviews were conducted with available stakeholders, excluding CNAM and Ministry of Health staff members who were not available for interviews. These discussions revealed three main challenges in Moldova's healthcare sector:
 
 \begin{enumerate}
-    \item Current EHR system is outdated and only accessible via Internet Explorer or legacy version of Microsoft Edge. A potential solution is to develop a new, modernized version of the existing system (retaining the core functionality) that is accessible via modern browsers, is more user friendly and has future upgrade capabilities.
-    \item Lack of interoperability between medical institutions due to a lack of a nationally-wide integrated system. A potential solution is to create a new system that acts as a patient history archive, where patients can upload their own medical records (such as lab tests, previous medical history, etc) and share them with any medical practitioner, regardless of the institution they work at. 
-    \item Lack of digitalizion for some systems that still rely on paper-based records or very rudimentary data structures, such as the national transplant registry. A potential solution is digitalized of said system, as is in the case of the transplant registry, that can be accessed by any medical practitioner in Moldova.
+    \item The current EHR system is outdated and only accessible via Internet Explorer or legacy version of Microsoft Edge. A potential solution was proposed to develop a modernised version of the existing system, retaining the core functionality. 
+    \item The lack of interoperability between medical institutions due to an absence of a nationally-wide integrated system. A potential solution was proposed to create a digital patient archive, where users can upload their own medical records (such as lab tests, previous medical history, etc) and share them with any healthcare practitioner. 
+    \item The lack of digitalisation of systems that still rely on paper-based records, such as the national transplant registry. A potential solution was proposed to create a digital transplant registry, that can be accessed by any healthcare practitioner in Moldova.
 \end{enumerate}
 
-Analysing the current issues and potential solutions, the student has determined that the solutions for issues \#1 and \#3 are too complex, as they require a complete overhaul and integration with existing systems. As such, the student has decided to focus on issue \#2, as it is the most feasible and an MVP can be develop within the timeframe of the project. 
+After evaluating the feasibility of the proposed solutions, it was decided for the project to focus on issue \#2, as the other two solutions were determined to be too complex for the constraints of an academic project. The decision was supported by the fact that the chosen solution would be independent from existing healthcare systems, allowing for a more straightforward and less complex implementation. 
 
 Consequently, the stakeholder list has been updated to reflect the changed focus of the project:
 \begin{itemize}
     \item Doctors working in hospitals and clinics
-    \item Staff members at the Ministry of Health
-    \item Staff members at CNAM
-    \item Patients that are using both public and private healthcare institutions
-    \item Other medical staff members (nurses, pharmacists, etc)
-    \item Staff members at CNPDCP (National Center for Personal Data Protection)
+    \item Ministry of Health staff
+    \item CNAM staff
+    \item Patients
+    \item Other medical staff members
+    \item National Center for Personal Data Protection (CNPDCP) staff
 \end{itemize}
 
-At the same time, the stakeholder influence-interest grid has been updated to reflect the changes in the project focus:
+At the same time, the stakeholder influence-interest grid has been updated to reflect the changes in the project focus, which is illustrated in figure~\ref{fig:stakeholder_analysis2}.
 
 \begin{figure}[ht]
     \centering
@@ -63,9 +57,9 @@ At the same time, the stakeholder influence-interest grid has been updated to re
 
 \section{Requirements}
 
-After the new stakeholders were identified, additional interviews were conducted to focus on the requirements for the chosen solution and enough information was gathered from the other stakeholders to identify the main requirements for the project. The student was unable to reach out to the staff members at CNAM, the Ministry of Health and CNDCP --- instead legislation and regulations on their websites were reviewed \parencite{CNAM,CNPDCP,ministry}. 
+Additional interviews were conducted to focus on specific requirements for the chosen solution. Enough information was gathered from the other stakeholders to identify the core requirements for the project. Staff members at CNAM, the Ministry of Health and CNDCP were still not available for interviews, so instead legislation and regulations on their websites will be reviewed \parencite{CNAM,CNPDCP,ministry}. 
 
-All of the gathered requirements can be found in the appendix (section~\ref{sec:requirements}), but the most important requirements have been summarized in the table below:
+All of the gathered requirements can be found in appendix~\ref{sec:requirements}, but the most important ones have been summarised in the table below:
 
 \begin{table}[h!]
     \centering

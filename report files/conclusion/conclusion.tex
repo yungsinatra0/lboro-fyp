@@ -1,91 +1,166 @@
 \chapter{Conclusion and Future Work}
 
-The last chapter of this report will touch upon the conclusion of the project, discussing areas of improvement, future opportunities to further develop this system, lessons learned from all the stages of the work done, and final thoughts on the final year project experience.
+The final chapter of this report will reflect potential system improvements, explore further development opportunities, analyse key lessons learned and assess the objectives set at the beginning of the project.
 
 \section{Areas of Improvement}
 
-As it can be seen by the length of the report, the amount of sections written and the number of features that were implemented, the system created is quite complex. Although the feedback received was mainly positive, due to lack of time or experience, some areas were still in need of improvement. The next subsections will briefly touch upon these areas and how they can be improved in the future.
+Despite overwhelming stakeholder feedback, several areas were identified to benefit from further improvement before any real-world deployment. These areas include security, compliance, auditing and user experience. The following subsections will briefly discuss these areas and how they can be improved in the future.
 
 \subsection{Security and data encryption}
 
-One of the main area that was of concern were the security measures within the system. Even though some measures were already implemented, as discussed in the development chapter, it was definitely not enough for a live product. 
+In its current state, the application incorporates only basic security measures, which would be considered insufficient for a live product. As such, the system would benefit from the following security improvements:
 
-One of the biggest issue with the security of the system was the storage of data at rest. All of the patient data is currently stored in a PostgreSQL database and in a plaintext format. If access to the database was compromised, all of the data would be easily exposed. As the data used is medical in nature, encrypting the data before being stored in the database would be crucial and non-negotiable first step to improve the security of the system. However, this would come with other issues, such as needing to decrypt the data everytime it is accessed or even limiting some querying or other operations on the data. Another solution would be to secure the database itself by encrypting the database file or using a more secure database, such as AWS S3 or other cloud storage.
-
-Another issue is the authentication method. The system currently uses a basic session-based authentication method, which may not be secure enough for a deployed system. Better options could include using a series of JWT tokens, or even using a secure 3rd party such as Auth0 or Mpass for authentication \parencite{auth0, mpass}. This would also allow for better user management and access control, as well as better security measures such as 2FA or passwordless authentication. 
-
-Finally, data in transit is also a crucial area that needs to be considered. Since the system was never deployed, it was not possible to generate an SSL certificate and enable HTTPS for secure API communication. While not as hard to implement as the other potential security improvements, in a real-life deployment scenario this would be one of the first things to do.
+\begin{enumerate}
+    \item \textbf{Data at rest encryption:} Currently, all patient information is stored in a plaintext format in the PostgreSQL database. A real-world implementation would require, at a minimum, field-level encryption of sensitive data. If required, additional options such as disk or database-level encryption could be considered.
+    \item \textbf{Authentication system enhancements:} The current session-based authentication method would benefit from replacement with a more robust solution, such as a combination of JWT tokens. This could improve security, ensure mobile application compatility and even enable integration with third-party authentication providers like Auth0 or Mpass, which can offer advanced security features like two-factor authentication. 
+    \item \textbf{Data in transit encryption:} HTTPS implementation with proper SSL certificate configuration will be an essential step to take before deploying the system to ensure secure communication between the client and server.
+\end{enumerate}
 
 \subsection{Logging and monitoring}
 
-One area that was not touched upon at all during development was logging and monitoring of system events. While it allows for better debugging and error handling, a more important role it would play would be in the auditing, security and compliance of the system. By having proper logging in place, it would be possible to track all changes made to any patient data, which is a critical element when dealing with such sensitive data. This would ensure that regardless of who made a change, whether that is a doctor, a patient or even a company employee, the change would be logged and allow for better accountability and auditing. Finally, it would also allow for better tracking of user activity, making it easier to spot any suspicious or malicious activity.
+The current system implementation lacks any monitoring capabilities. Thus, the integration of a logging system will be a crucial feature for the following reasons:
 
-\subsection{Legal and compliance}
+\begin{enumerate}
+    \item \textbf{Error handling:} Logs can be an invaluable resource when it comes to debugging and error handling. This in turn may aid in development and testing efforts, ensuring increased quality of the system.
+    \item \textbf{Auditing:} Audit trails are essential for tracking access and changes to sensitive data, such as medical records. This is particularly critical when patients share and potentially edit their data before doctor consultations, ensuring accountability and data integrity.
+    \item \textbf{Compliance:} Proper logging and monitoring can help ensure compliance with data protection regulations by providing a clear record of data access and modifications. 
+    \item \textbf{Anomaly detection:} Monitoring allows the detection of anomalies in system or user behaviour, which could imply potential security incidents or breaches.
+\end{enumerate}
 
-Any system that works with senstive data, especially medical data, needs to comply with a series of complex legal requirements and regulations. It is totally a different beast to tackle, and was not considered during development due to the lack of knowledge in the field and the prototype nature of the system. However, if idea were to be pursued, it would be crucial to ensure that the system complies with necessary regulations, both from the Republic of Moldova but also the EU, such as GDPR\@. This would not only involve writing extensive policies that show how the data is used, stored, processed and many other aspects, but it would also mean actually implementing them and being subject to regular audits and checks. 
+\subsection{Legal and regulatory compliance}
 
-Usage of MLLMs within the system may also raise legal, compliance and even ethical issues of how the patient data is processed and used. As such, it may be necessary to consider whether using a 3rd party MLLM is even possible or if it would be necessary to use a locally hosted MLLM, which may add additional complexity and cost to the release of the system.
+Processing of medical data will require the application to comply with a series of legal and compliance requirements, depending on the user base and system location. At a minimum, a production system will need to ensure the following:
 
-\subsection{User experience and interface design}
+\begin{enumerate}
+    \item Compliance with Moldova's data protection and healthcare regulations
+    \item Alignment with GDPR (if used by EU citizens)
+    \item Creation of a privacy and data protection policy, which will outline how the system collects, uses, stores and processes data
+    \item Execution of regular audits and checks to ensure compliance with the above policies and regulations
+\end{enumerate}
 
-The final area that was not fully addressed during the development of this project was the interface and user experience design. This was primarily due to the prototype nature of the project, but also the limited resources and time available that limited the time that could be dedicated to this area. It is an important area to consider, as it is very likely to have a big impact on users' first impression and experience. For a final product, it would be necessary for the system to be available in multiple formats, which includes web for both desktop and mobile devices, as well as a native mobile application for both iOS and Android. This would allow for better accessibility and usability of the system, as well as better user experience. Accessibility needs should also be addressed in the final system, to ensure it can be used by all users, regardless of their abilities.
+Additionally, the use of a cloud-based MLLM may introduce additional legal and compliance considerations regarding data processing and storage practices. This may in turn require a transition to locally-hosted models to reduce the risk of data misuse, which may add complexity and cost to the system.
 
-\section{Potential additions}\label{sec:future_work}
+\subsection{User experience improvements}
 
-While the previous section discussed general areas of improvement for existing features within the system, this section will instead focus on specific additions that were either proposed by the stakeholders or were considered during the development process but not added. These features would mainly serve as additional quality of life improvement for the system by making it easier to use and improving the overall experience of the users.
+The current implementation of the user interface prioritised functionality over design and user experience. As such, the system would benefit from a retrofit of the user interface to improve usability and accessibility. This could include:
+
+\begin{enumerate}
+    \item \textbf{Native mobile applicationL} In its current state, the system is only available as a web application. A native mobile application would greatly improve accessibility and expand the potential user base, considering Moldova's extensive network coverage \parencite{network}.
+    \item \textbf{Accessibility:} Implementation of accessibility features to ensure the system can be used by all users, regardless of their abilities. This could include support for screen readers, keyboard navigation and other assistive technologies.
+    \item \textbf{User interface redesign}: While functional, the current user interface lacks a modern design. A redesign could improve the overall user experience, making it more intuitive and user-friendly.
+\end{enumerate}
+
+\section{Potential feature expantions}\label{sec:future_work}
+
+Beyond refinement of existing features, the application could significantly benefit from extending its functionality. This section will explore potential additions to the system that could enhance its capabilities and improve the overall user experience. These features were either proposed by stakeholders or considered during the development process but not implemented. 
 
 \subsection{Mpass integration}
 
-While extensively discussed in multiple sections of the report, the system would greatly benefit from implementing Mpass as an authentication method. This would not only provide better authentication and user management, but it will also allow to use patient information that is already stored in government databases, as Mpass is closely linked to other government services. This would open up many possibilities for future integration with government services and greatly simplify the process of creating and accessing an account. 
+Integration with Moldova's governmental electronic authentication and authorization system, Mpass, could provide multiple benefits:
+
+\begin{enumerate}
+    \item Simplified user registration and authentication process by reusing existing government-based digital identities
+    \item Access to patient demographic information from government databases
+    \item Enhanced security through existing identity verification processes, such as electronic signatures
+    \item Potential for future integration with other government services
+\end{enumerate}
 
 \subsection{Expanding AI features}
 
-It may be possible to further extend the existing AI features of the system. For example, the medical history record creation process could be further automated by eliminating the manual input of information by allowing the patient to just upload the file, which would then process the document, extract the relevant information and label it accordingly. The user would only need to confirm and edit the information, if necessary, at the end. This would greatly improve the user experience and make it easier to use the system.
+The current MLLM implementation is limited to only extracting lab results information from uploaded files. Potential additions that would improve user experience with minimal AI intervention could include:
+
+\begin{enumerate}
+    \item Automated processing of uploaded medical files, requiring minimal user input to create a medical history record
+    \item Intelligent categorisation of documents based on their content, allowing for smarter organisation of medical records
+    \item Intelligent comments and notes generation based on extracted information, providing patients with additional context and insights into their medical history 
+\end{enumerate}
 
 \subsection{Integration with lab providers}
 
-The current system expects the user to manually upload the file and create a new record instance to extract and store the lab results. This could be avoided by integrating directly with lab providers, which could send the results directly to the system. This would allow for much more accurate and faster processing of the results. One way thi could be achieved is by creating a custom mailbox for each patient, which they can use with the lab provider to send the results. However, this might create additional attack vectors for malicious actors, as they would be able to send emails to the system and potentially exploit it. Another solution would be to integrate via the lab provider's API and allow them to send the results directly to the system. This would be a more secure solution, but it would require a lot of work and effort to implement, as well as the cooperation of the lab providers.
+The lab results extraction feature currently involves manual uploading of files by the user. A more direct integration with lab providers could streamline this process, allowing for faster and more accurate processing of results. This could be achieved through creating separate, secure email channels or even direct API integration with lab systems. Either option would bring significant benefits, such as:
+
+\begin{enumerate}
+    \item Automated results retrieval and delivery to the systems
+    \item Elimination of manual entry and file uploads, reducing the risk of human error
+    \item Reduced latency between test completion and results availability
+\end{enumerate}
 
 \subsection{Enhanced doctor-patient communication}
 
-One feature requested by one the stakeholders during the final presentation was to add the ability for doctors to create a new records and add notes, comments when viewing the patient's records. This proposal was intended to reduce the likelihood of patients misunderstanding doctor diagnoses or directions during the consultations, allowing doctors direct input to ensure accuracy and clarity. This may also open up future possibilities for the system, where doctors and patients could communicate directly through the system, further reducing any friction in the process of consultation or treatment.
+Late stakeholder feedback identified a potential opportunity to implement a direct communication channel between doctors and patients. Expanding the application with this feature could enable doctors to create new records or add notes to existing records, which would be visible to patients. This would bring the following benefits:
+
+\begin{enumerate}
+    \item Reduced risk of miscommunication between doctors and patients during or after consultations
+    \item Improved patient engagement and understanding of their medical history and treatment plans
+    \item Future potential for telemedicine features, through messages or video consultations
+\end{enumerate}
 
 \subsection{Integration with 3rd party providers}
 
-Some of the existing features in the system could be improved by integrating 3rd party providers. An example would be the vitals data tracking, where currently users have to manually input any data. This could be improved by integrating with health tracker apps such as Google Fit, allowing for automatic syncing of relevant data. Another exampel of 3rd party integration could be the display of imaging results, such as X-rays or MRIs, which usually use different unconventional formats such as DICOM\@. This would allow for better display and management of the imaging results, as well as better integration with the rest of the system.
+Finally, the system could benefit from integration with 3rd party providers that specialise in health-related services. This could include:
+
+\begin{enumerate}
+    \item \textbf{Health tracker apps:} Integration with health tracker applications, such as Google Fit or Apple Health, could allow for automatic syncing of relevant data, providing a more comprehensive view of the patient's medical history.
+    \item \textbf{Medical imaging:} Special formats, such as DICOM, are commonly used for medical imaging. As the system currently does not support these formats, integration with specific providers could allow to display X-rays, MRIs and other digital results directly in the application.
+\end{enumerate}
 
 \section{Lessons Learned and Reflections}
 
-The previous two sections of this chapter focused more on future technical considerations for this project. On the other hand, this section will more focus on the lessons learned based on the experience worked on this project. This will include both technical and non-technical aspects of the project, as well as the overall experience of working on a final year project.
+This section will focus on the valuable insights provided by the project experience that could be applicable to similar initiatives in the future. The lessons learned include key technical and non-technical takeaways from the project, as well as reflections on the overall experience of working on a final year project.
 
-\subsection{Prioritisation and time management}
+\subsection{Task prioritisation and time management}
 
-One the key lessons learned for this project is how important prioritisation of work and time management for complex projects is. This was a lesson learned the hard way, which was only realised towards the end of the project. A clear example of this was the improper prioritisation done for the project requirements, mainly the lack of priority order for the system features. As such, features like vaccines, allergies and medication were implemented first, when it was clear that the most important features were the medical history, lab extraction and sharing features. As such, the prototype could've been created without the vaccines, allergies and medication features, which could've been added later due to their simplicity and thus would have allowed for more time to be spent on the other elements, such as increased security, better user experience and interface design, as well as better testing and documentation.
+A critical lesson learned was the importance of prioritising tasks and managing time effectively, especially on projects with multiple components. The issue occured when the project requirements were not properly prioritised, leading to establishing of a wrong order of implementation. As a result, development began with less critical features, such as vaccines, allergies and medication, rather than the core features like lab extraction or record sharing. This misalignment of priorities resulted in wasted time and resources on less impactful elements, creating time pressure towards the end of the project and limiting the ability to expand the application in areas that required more attention, such as security.
 
-The improper prioritisation also lead to worse time management, as there was too much time spent un unnecessary features, and too little time was allocated for the more complex ones, but also for testing, deploying and other similarly important elements of the project. 
-
-As such, the lesson learned here is that prioritsation must be done properly, and it must be constantly revisited to ensure that the priorities remain the same throughout the project. Prioritisation does not mean just using a framework such as MoSCoW, but it also may mean ordering things in an order of importance or at least order of implementation, which must be agreed by all stakeholders. 
-
-An example of this can be seen in Scrum, which uses Product Backlogs to ensure all the requirements are properly prioritised in their correct order. Scrum also employs Backlog Refinement to ensure the requirements and their priority are constantly revisited and updated. 
+To address this issue in future projects, the following recommendations will be considered:
+\begin{enumerate}
+    \item Regular priority re-evaluation with team members and stakeholders to ensure a shared understanding of the the future direction of the project
+    \item Utilising prioritisation methods such as backlog refinement from Scrum together with priority categorisation approaches like MoSCoW
+    \item Aligning initial priorities with stakeholders at the beginning of a project
+\end{enumerate}
 
 \subsection{Importance of the team}
 
-Speaking of stakeholders, another key lesson learned was how important a team and its diverse roles and members are for the success of a project, especially for one as complex as the one in this report. Even in the beginning, it was becoming clear how useful a separate roles would lessen the burden of the various tasks for this project --- a Business Analyst to manage the requirements, a Designer to manage the user interface and experience, a QA engineer to manage the testing, and many other roles that are present in a team.
+Working independently has highlighted the value of teamwork and collaboration in software development. It quickly became apparent that the project would have benefitted from a team of individuals with diverse skills and expertise, such as:
 
-The lesson learned in this case was to respect all and any roles within a team that does software development. Each role and person has its importance and brings value in its own way, even though sometimes it may not be as clear or easily seen. Working together as a team will always bring better results than working alone, so it is important to have good teamworking and communications skill to ensure that the team can work together and achieve its goals.
+\begin{itemize}
+    \item A dedicated business analyst to manage requirements, stakeholder communication and project documentation
+    \item A design specialist to optimise the user experience and user interface
+    \item A quality assurance engineer to ensure the system's functionality and reliability
+    \item A project manager to oversee the project's progress and ensure alignment with timelines and goals
+\end{itemize}
+
+This experience has reinforced the importance of collaboration, communication and cross-functional teamwork in software development. While the project was successfully completed, it would have greatly benefitted from the input and expertise of a team of individuals with diverse skills and backgrounds.
 
 \subsection{Agile \& Documentation}
 
-To finish this section on a more positive note, this lesson was not something learned the hard way or something that created issues during the project. Instead, it was more an observation that was made many times during the project, especially the development phase. 
+Finally, the project very well illustrated the evolution of documentation in software development, especially in the context of Agile methodologies. Most documents created during the project planning phase experienced significant changes throughout the project due to emerging stakeholder feedback and evolving requirements. This was particularly evident in the UML diagrams, which underwent multiple revisions to reflect the most up-to-date state of the application. It could be said that the documents were `alive', constantly evolving as the project progressed.
 
-The lesson learned here is how different Agile and more traditional methodologies are in terms of documentation. This can be clearly seen when comparing the project planning and development chapters of this report --- the first contains multiple diagrams, wireframes, and other diagrams, whereas the development chapter cotains noticeably less. This was a result of a more Agile approach used in the development phase, which involved iterations and changes based on constant stakeholder feedback. This resulted in less documentation such as diagrams made, as it was redundant due to constant changes made to the system. 
+As such, this project has demonstrated that effective documentation in software development project should be:
 
-However, one thing was clear --- the documents that were used during the project could be described as `alive'. They were constantly changing and evolving as the project progressed. This can be clearly seen in some of the UML diagrams created, such as the ERD diagram or even some sequence diagrams, which are very different to their first version during the project planning.
+\begin{itemize}
+    \item Adaptable, allowing for changes and updates as the project evolves
+    \item Regularly updated to reflect the current state of the application
+    \item Collaborative, involving input from all team members and stakeholders
+    \item Accessible, ensuring that all team members can easily access and understand the documentation
+\end{itemize}
 
-As such, an important lesson learned here is that documents should not be seen as static, where they are created once and forgotten. Instead, they should always be revisited and ensured they reflect the most up to date state of the system and project. This is especially important in today's world, where software development is often done in an Agile way, where requirements, designs and other elements are constantly changing and evolving.
+\section{Objective assessment}
+
+In the introduction, a set of objectives was established to guide the project. The list can be found in section~\ref{sec:objectives}. This section will assess the extent to which these objectives were met and the overall success of the project.
+
+\begin{enumerate}
+    \item Three stakeholders were identified for this project --- 2 healthcare practitioners and 1 patient. Their feedback and previous experience with Moldova's healthcare system was used to inform the design and development of the system.
+    \item Initial interviews were conducted with the stakeholders to guide the project's direction. As the project progressed, constant communication was maintained to align with their expectations and requirements.
+    \item Three different PHR systems were explored, which provided valuable insights into industry trends and best practices. 
+    \item A working web application prototype was developed, which included core features such as lab results extraction, medical record sharing and management.
+    \item The final prototype was presented to the client, who expressed interest in creating a start up to further develop the idea. The client also expressed a desire to continue collaborating with the student on this project, which is a positive outcome.
+\end{enumerate}
 
 \section{Final Thoughts}
 
-In conclusion, this project was a great experience that allowed for a lot of learning and growth. As a student that is doing a course that combines both Computer Science and Business elements, it was a great opportunity to apply the knowledge gained in the past 4 years. Additionally, it also served as a great practical example of how a real-life projects would be done, especially when working on real problems and with real stakeholders. 
+In conclusion, this project provided invaluable practical experience in software development, project and requirements management. It offered a great exposure to the complete software development lifecycle and the challenges that arise at each stage. Additionally, working towards improving the healthcare system in Moldova was a rewarding experience, as it allowed for the application of technical skills to address real-world problems. 
 
-Going forward, this experience will be invaluable, as it had provided both a high and low level overview of most of the stages of a software development project. Considering my next role is in Product Management, this experience will allow me to better understand the technical aspects of the role, better communicate with team members and understand the challenges and issues that any member may face during the project. I will gladly take this experience with me in my future career and I hope to be able to apply the lessons learned in my future projects.
+The stakeholder feedback has been praticularly encouraging, with most of them expressing their interest in the continuation and expansion of the project idea. Their offer of continued collaboration presents a future opportunity to transform this project into a real-world solution that could meaningfully improve existing healthcare systems in Moldova.
+
+On a personal level, this experience has been particularly relevant to my future career, providing me with a solid foundation in both technical and non-technical aspects of software development. It has allowed me to developed a transferable skillset, which can be directly applicable to upcoming projects and challenges. As an ITMB student, I feel more prepared than ever to bridge the gap between technology and business, manage complex implementation processes and contribute to the success of any team I may be a part of. 
