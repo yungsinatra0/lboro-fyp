@@ -15,7 +15,7 @@ This chapter will provide a review of the existing literature, which will be use
 
 \subsection{The software development life cycle}
 
-The software development life cycle (SDLC) is a process used to guide the development of software applications or systems \parencite{sdlc1}. The SDLC consists of multiple phases, each with its own set of activities and deliverables.`\ '\textcite{sdlc2} outline the phases of the SDLC as following:
+The SDLC is a process used to guide the development of software applications or systems \parencite{sdlc1}. It consists of multiple phases, each with its own set of activities and deliverables.`\ '\textcite{sdlc2} outline the phases of the SDLC as following:
 \begin{enumerate}
     \item \textbf{Requirement gathering and analysis phase} --- the requirements are gathered saved in a document. Based on the requirements gathered, a development plan is created.
     \item \textbf{Design phase} --- requirements are written in a more technical manner and system desings are created. 
@@ -32,7 +32,7 @@ The software development life cycle (SDLC) is a process used to guide the develo
 \begin{figure}[ht]
     \centering
     \includegraphics[scale=0.7]{SDLC.png}
-    \caption{Software Development Life Cycle}\label{fig:sdlc}
+    \caption{The Software Development Life Cycle}\label{fig:sdlc}
 \end{figure}
 
 \newpage
@@ -59,7 +59,7 @@ On the other hand, one of Waterfall's main weaknesses is its lack of flexibility
 
 Another well-known model is Agile. It has multiple frameworks, with Scrum and Kanban being the most popular ones. Scrum is a framework where the project is divided into sprints, each lasting between 2--4 weeks, that aim on delivering value to the customer through incremental software features \parencite{scrumban, agile}. Kanban focuses on visualising the project workflow by using a visual board with columns, cards and swimlanes. It uses column limits and a pull system to make the flow of work through the system more efficient \parencite{agile}.
 
-Agile has some drawbacks --- its lack of documentation and formal planning, especially in the early stages of the project, may not be suitable for large scale projects \parencite{agile, sdlc2}. Similarly, lack of knowledge on how to use the frameworks may be a barrier for some teams \parencite{waterfallno, sdlc2}.
+Agile has some drawbacks --- its less formal and detail documentation and planning, especially in the early stages of the project, may not be suitable for large scale projects \parencite{agile, sdlc2}. Similarly, lack of knowledge on how to use the frameworks may be a barrier for some teams \parencite{waterfallno, sdlc2}.
 
 Nowadays, the combined use of Scrum and Kanban is becoming quite popular, with many teams employing both frameworks in their projects, allowing them to adopt the appropriate practices and adapt them accordingly based on their needs \parencite{scrumban}.
 
@@ -221,13 +221,13 @@ Table~\ref{tab:frontend} will use the information from \textcite{react,angular,v
 
 \section{Large Language Models (LLMs)}
 
-Large language models (LLMs) are artificial intelligence systems that are used for natural language processing (NLP) tasks such as text generation, translation, summarisation and question answering \parencite{llm2,llm_healthcare}. Additionally, LLMs have been found to have emergent capabilities, like reasoning, planning, decision-making and in-contenxt learning \parencite{llm2}. These extraordinary capabilities are achieved through extensive training on large corpus of text data, high parameter count (in the billions) and usage of techniques such as fine-tuning or prompt engineering to improve their performance \parencite{llm2,llm_healthcare}.
+LLMs are artificial intelligence systems that are used for NLP tasks such as text generation, translation, summarisation and question answering \parencite{llm2,llm_healthcare}. Additionally, LLMs have been found to have emergent capabilities, like reasoning, planning, decision-making and in-contenxt learning \parencite{llm2}. These extraordinary capabilities are achieved through extensive training on large corpus of text data, high parameter count (in the billions) and usage of techniques such as fine-tuning or prompt engineering to improve their performance \parencite{llm2,llm_healthcare}.
 
 LLMs are built on the transformer architecture, which allows them to understand text by learning and remembering the relationships between words \parencite{llm}. These models are first pre-trained on large amounts of unlabeled data using, allowing them to excel in a wide variety of tasks \parencite{foundation, llm2}. These pre-trained models, known as foundation models such as the GPT or Llama families, can then be fine-tuned for specific tasks, improving their performance and accuracy even further \parencite{gpt4,llama3,llm2}.
 
 \subsection{Multimodal LLMs}
 
-One advancement in the field of LLMs has been the addition of multimodal abilities, allowing them to process, understand and generate text and images, audio or videos \parencite{mllm, mllm2}. These new multimodal LLMs (MLLMs) utilise existing reasoning capabilities of LLMs, which are connected to an encoder that can processes images, audio or videos and a generator that helps with generating multimodal outputs \parencite{mllm}. This integration of new modalities allows MLLMs to become versatile tools, expanding their possible use cases and bridging the gap between human and machine interaction \parencite{llm_healthcare}.
+One advancement in the field of LLMs has been the addition of multimodal abilities, allowing them to process, understand and generate text and images, audio or videos \parencite{mllm, mllm2}. These new multimodal LLMs utilise existing reasoning capabilities of LLMs, which are connected to an encoder that can processes images, audio or videos and a generator that helps with generating multimodal outputs \parencite{mllm}. This integration of new modalities allows MLLMs to become versatile tools, expanding their possible use cases and bridging the gap between human and machine interaction \parencite{llm_healthcare}.
 
 \subsubsection{API model providers}
 
@@ -278,7 +278,7 @@ One application of MLLMs is in healthcare, where the growing volume and complexi
     \item \textbf{Improving medical diagnosis:} By combining patient records, existing symptoms, and medical history, LLMs can use their reasoning capabilities and memory to assist in diagnosing or preventing health conditions \parencite{llm_healthcare,llm_healthcare3,llm_healthcare4}.
     \item \textbf{Medical Imaging and Multimodal Capabilities:} In diagnostic imaging, multimodal models can assess both text and images (such as X-rays and MRIs) to offer comprehensive analysis. Clinicians can input medical images and contextual information, making MLLMs valuable assistants in the real-time diagnostic processes \parencite{llm_healthcare3}.
     \item \textbf{Virtual Health Assistants:} LLMs can also be deployed as virtual assistants, helping patients with personalised care and general health inquiries \parencite{llm_healthcare,llm_healthcare3}. Patients in areas with limited healthcare access can benefit from these assistants, which also supports healthcare providers by lightening their workloads.
-    \item \textbf{Administrative Support:} LLMs can assist in generating Electronic Health Records (EHRs), allowing healthcare providers to focus more on patient interaction \parencite{llm_healthcare4}. Additionally, they can also help translate complex medical terms into more simple language, assist in administrative tasks, and more.
+    \item \textbf{Administrative Support:} LLMs can assist in generating EHRs, allowing healthcare providers to focus more on patient interaction \parencite{llm_healthcare4}. Additionally, they can also help translate complex medical terms into more simple language, assist in administrative tasks, and more.
 \end{itemize}
 
 \subsection{Prompt engineering}\label{sec:prompt}
@@ -383,8 +383,7 @@ While LLMs bring many benefits when applied to the healthcare domain, it is impo
 
 \section{PHR Systems}
 
-A Personal Health Record (PHR) is an electronic resource
-used by patients to manage their own health information \parencite{phrsecurity,phrlist}. PHRs are different from Electronic Health Records (EHRs) and Electronic Medical Records (EMRs) which are inter-organisational or internal systems to organise patient health records \parencite{phrdiff,phrlist}. Three different types of PHRs are described by \textcite{phrsecurity}: stand-alone, which require manual entry to update the records; instituion-specific, which are connected to a specific healthcare institution; and integrated, which can connect to multiple healthcare systems to aggregate data from multiple sources. 
+PHR is an electronic resource used by patients to manage their own health information \parencite{phrsecurity,phrlist}. PHRs are different from EHRs and EMRs which are inter-organisational or internal systems to organise patient health records \parencite{phrdiff,phrlist}. Three different types of PHRs are described by \textcite{phrsecurity}: stand-alone, which require manual entry to update the records; instituion-specific, which are connected to a specific healthcare institution; and integrated, which can connect to multiple healthcare systems to aggregate data from multiple sources. 
 
 Usage of PHRs can bring many benefits to patients, such as: empowering patients to manage their health, improving patient outcomes, decreasing the cost of healthcare and improving the taking of medication \parencite{phrsecurity}.
 

@@ -1,10 +1,10 @@
-\chapter{Project Planning and Design}
+\chapter{Solution Planning and Design}
 
-This chapter will outline the project planning and system design process, which will include discussions on the chosen project management methodology, the system architecture, the tech stack that will be used during development and the user interface design illustrated by using wireframes.
+This chapter will outline the solution planning and system design process, which will include discussions on the chosen project management methodology, the system architecture, the tech stack that will be used during development and the user interface design illustrated by using wireframes.
 
 \section{UML Diagrams}
 
-UML, or Unified Modeling Language, is a standardised modeling language that consists of a set of diagrams used for documenting software systems \parencite{uml}. It enables better communication potential of designs and architectural decisions. Common UML diagram types include:
+UML is a standardised modeling language that consists of a set of diagrams used for documenting software systems \parencite{uml}. It enables better communication potential of designs and architectural decisions. Common UML diagram types include:
 
 \begin{itemize}
     \item \textbf{Use Case Diagram} --- Illustrates the system's intended functionality in terms of actors, use cases, and their relationships. It can be accompanied by a use case specifications document, which provides a description of each use case.
@@ -246,7 +246,7 @@ Based on the research conducted in sections~\ref{sec:database},~\ref{sec:backend
 
 \subsection{Frontend}
 
-Vue was chosen for the frontend, as it is a JavaScript framework used for building single-page applications (SPAs) known for its ease of use and flexibility \parencite{vue}. It is powered by components, element reactivity and Single File Components (SFCs) that enable HTML, CSS and JS to be used in a single \lstinline{.vue} file. Vue also boasts a large and active community, with many libraries and guides available for developers. Previous experience with Vue made it a suitable choice for this project. Diagram~\ref{fig:frontend} showcases how different elements of the frontend interact. The next subsections will briefly discuss each.
+Vue was chosen for the frontend, as it is a JavaScript framework used for building SPAs known for its ease of use and flexibility \parencite{vue}. It is powered by components, element reactivity and SFCs that enable HTML, CSS and JS to be used in a single \lstinline{.vue} file. Vue also boasts a large and active community, with many libraries and guides available for developers. Previous experience with Vue made it a suitable choice for this project. Diagram~\ref{fig:frontend} showcases how different elements of the frontend interact. The next subsections will briefly discuss each.
 
 \begin{figure}[htbp]
     \centering
@@ -273,7 +273,7 @@ Vue components and views are the foundation of the frontend. Views represent the
 
 \subsubsection{PrimeVue and TailwindCSS}
 
-PrimeVue is a component library for Vue, which provides a set of pre-built components that can be used to easily create the frontend of the application \parencite{primevue}. TailwindCSS is a CSS framework that provides a multitude of classes that can be applied to style application elements \parencite{tailwind}. When combined, PrimeVue provides the basic building blocks such as buttons, forms, and tables, while TailwindCSS styles these components.
+PrimeVue is a component library for Vue, which provides a set of pre-built components that can be used to easily create the frontend of the application \parencite{primevue}. TailwindCSS is a CSS framework that provides a multitude of utility classes that can be applied to style application elements \parencite{tailwind}. When combined, PrimeVue provides the basic building blocks such as buttons, forms, and tables, while TailwindCSS styles these components.
 
 \subsection{Backend}
 

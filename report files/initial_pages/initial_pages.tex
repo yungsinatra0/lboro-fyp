@@ -27,7 +27,7 @@ F011321
 \vspace*{\fill}
 
 %replace by your Project title
-\Large{\textbf{EHR System Modernization \\
+\Large{\textbf{EHR System Modernisation \\
 in the Republic of Moldova}}
 
 \vspace*{\fill}
@@ -66,9 +66,9 @@ May 2025
 % Abstract
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
-This project addresses a key issue in Moldova's healthcare sector: the fragmentation of patient data across multiple healthcare institutions. The lack of a nationally-wide integrated system has resulted in overreliance of paper-based and manual processes, leading to reduced patient care quality and incomplete medical histories. Following initial stakeholder consultations and a review of the relevant literature, the project proposed a patient-focused prototype  that allowed users to collect and manage their patient data. The solution enables document uploading and record creation, automated lab result extraction with multimodal large language models and a controlled sharing mechanism with healthcare practitioners. The prototype was implemented using a Vue frontend and FastAPI backend as a web application that demonstrates the feasibility of a patient-focused solution in Moldova's healthcare sector. Stakeholder feedback was collected throughout the whole development process through a series of live demonstrations, allowing for iterative improvements to the application. Final stakeholder feedback confirms the application's potential to enhance care quality and introduce a patient-centric approach to healthcare in Moldova. Overall, this project aims to contribute to Moldova's digital healthcare transformation and hopes to serve as a foundation for future development and implementation of a real-world service.
+This report outlines the result of a project that addresses a key issue in Moldova's healthcare sector: fragmentation of patient data across multiple healthcare institutions. The lack of a nationally-wide integrated system has resulted in overreliance of paper-based and manual processes, leading to reduced patient care quality and incomplete medical histories. Following initial stakeholder consultations and a review of the relevant literature, the project proposed a patient-focused prototype  that allowed users to collect and manage their patient data. The solution enables document uploading and record creation, automated lab result extraction with multimodal large language models and a controlled sharing mechanism with healthcare practitioners. The prototype was implemented using a Vue frontend and FastAPI backend as a web application that demonstrates the feasibility of a patient-focused solution in Moldova's healthcare sector. Stakeholder feedback was collected throughout the whole development process through a series of live demonstrations, allowing for iterative improvements to the application. Final stakeholder feedback confirms the application's potential to enhance care quality and introduce a patient-centric approach to healthcare in Moldova. Overall, this project aims to contribute to Moldova's digital healthcare transformation and hopes to serve as a foundation for future development and implementation of a real-world service.
 
-\textbf{Keywords:} Personal Health Record, Moldova, Data Fragmentation, Multimodal Large Language Models, Patient-Centric Healthcare
+\textbf{Keywords:} Personal Health Record, Republic of Moldova, Data Fragmentation, Multimodal Large Language Models, Patient-Centric Healthcare
 
 % Acknowledgements
 \chapter*{Acknowledgements}
@@ -81,18 +81,70 @@ Next, I would like to extend my appreciation to the Loughborough University staf
 
 Finally, I would like to thank my family and friends, who have always been encouraging me during this project. Their belief in my abilities and support have been a source of motivation and inspiration.
 
-I'd like to dedicate this project to my late grandfather, who was a well-known doctor in Moldova. His devotion to this field and commitment to saving patient lives have always been a source of inspiration for our family. Even though I'm not pursuing a career in medicine, I hope to honour his legacy by contributing to the improvement of healthcare in Moldova through this project. I hope that my work will help to create a better healthcare system for future generations, just as he did for his patients.
+I'd like to dedicate this project to my late grandfather, Ion Corcimaru, who was a well-known doctor in Moldova. His devotion to this field and commitment to saving patient lives have always been a source of inspiration for our family. Even though I'm not pursuing a career in medicine, I hope to honour his legacy by contributing to the improvement of healthcare in Moldova through this project. I hope that my work will help to create a better healthcare system for future generations, just as he did for his patients.
 
 
 % Set the depth for your table of content
 % Currently set at 2 (Chapter, Section, Subsection)
 \setcounter{tocdepth}{2}
 
-% Include a table of figures
-\listoffigures
-
 % Include a table of content
 \tableofcontents
+\addcontentsline{toc}{chapter}{Table of Contents}
 
-% Set page numbering to arabic for body of Thesis
-\pagenumbering{arabic}
+% Include a table of figures
+\listoffigures
+\addcontentsline{toc}{chapter}{List of Figures}
+
+% Include a table of tables
+\listoftables
+\addcontentsline{toc}{chapter}{List of Tables}
+
+% List of abbreviations
+\chapter*{List of Abbreviations}
+\addcontentsline{toc}{chapter}{List of Abbreviations}
+
+\begin{tabular}{p{0.2\textwidth} p{0.7\textwidth}}
+API & Application Programming Interface \\
+CNAM & Centrul Național de Asigurări în Medicină (National Health Insurance Company) \\
+CNPDCP & Centrul Național pentru Protecția Datelor cu Caracter Personal (National Center for Personal Data Protection) \\
+EHR & Electronic Health Record \\
+EMR & Electronic Medical Record \\
+HTTP & Hypertext Transfer Protocol \\
+HTTPS & Hypertext Transfer Protocol Secure \\
+JSON & JavaScript Object Notation \\
+JWT & JSON Web Token \\
+LLM & Large Language Model \\
+MLLM & Multimodal Large Language Model \\
+MFA & Multi-Factor Authentication \\
+NLP & Natural Language Processing \\
+ORM & Object-Relational Mapping \\
+PHR & Personal Health Record \\
+SDLC & Software Development Life Cycle \\
+SFC & Single File Component \\
+SIA AMS & Sistemul informațional automatizat „Asistența Medicală Spitalicească” \\
+SPA & Single Page Application \\
+SSL & Secure Sockets Layer \\
+UML & Unified Modeling Language \\
+USMF & Universitatea de Stat de Medicină și Farmacie (State University of Medicine and Pharmacy) \\
+UUID & Universally Unique Identifier \\
+\end{tabular}
+
+% Glossary
+\chapter*{Glossary}
+\addcontentsline{toc}{chapter}{Glossary}
+
+\begin{description}
+    \item[Application Programming Interface (API)] A set of protocols and tools that allow different software applications to communicate with each other.
+    \item[Authentication] The process of verifying the identity of a user.
+    \item[Authorisation] The process of determining whether a user has permission to access a resource or perform an action.  
+    \item[Backend] The server-side of an application that handles business logic, database operations and API requests.
+    \item[Dependency injection] A software engineering design pattern where a function receives the object it depends on from an external source rather than creating it itself.
+    \item[Entity-Relationship Diagram (ERD)] A visual representation of the database structure, showing the relationships between different entities.
+    \item[Frontend] The client-side of an application that users interact with by using a user interface. 
+    \item[Hallucination] A phenomenon in which a large language model generates information that appears to be factual but is incorrect or completety made up.
+    \item[Javascript Object Notation (JSON)] An interchange format for structured data representation, often used in APIs to exchange data between a client and a server.
+    \item[Object Relational Mapping (ORM)] A programming technique that allows developers to interact with a database by mapping database tables to classes and rows to objects.
+    \item[Republican hospital] A tertiary healthcare institution in Moldova that serves as the highest level of specialised medical care in the country.
+    \item[Single Page Application (SPA)] A web application that loads a single page and dynamically updates the content as the user interacts with the app.
+\end{description}

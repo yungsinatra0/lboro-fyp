@@ -4,11 +4,11 @@ This chapter discussses the development process of the project, structured on a 
 
 \section{Sprint \#1}
 
-The first sprint focused on establishing the foundation for this system. Its main objectives involved setting up the database schema, creating the authentication API endpoints, basic authentication flow and the frontend of the application.
+The first sprint focused on establishing the foundation for this system. Its main objectives involved setting up the database, creating the authentication API endpoints, basic authentication flow and the frontend of the application.
 
-\subsection{SQLModel Schemas \& Database creation}
+\subsection{SQLModel Models \& Database creation}
 
-\begin{lstlisting}[language=Python, caption=SQLModel User Schema]
+\begin{lstlisting}[language=Python, caption=SQLModel User Model]
     class DateFormattingModel(SQLModel):
         dob: date | None = None
         @field_serialiser('dob')
@@ -21,9 +21,9 @@ The first sprint focused on establishing the foundation for this system. Its mai
         hashed_password: str
 \end{lstlisting}
 
-SQLModel played a pivotal role in creating the database tables. The code above is an example of a schema that was used to create the User table in the database. It was also used to create specific models for the endpoints to validate the incoming or outgoing data. The following snippet is an example of a model that was used to validate the data that was being sent to the register endpoint.
+SQLModel played a pivotal role in creating the database tables. The code above is an example of a model that was used to create the User table in the database. It was also used to create specific models for the endpoints to validate the incoming or outgoing data. The following snippet is an example of a model that was used to validate the data that was being sent to the register endpoint.
 
-\begin{lstlisting}[language=Python, caption=SQLModel Auth Schema]
+\begin{lstlisting}[language=Python, caption=SQLModel Authenticatio Model]
     class UserAuth(SQLModel):
         email: EmailStr
         password: str
@@ -180,7 +180,7 @@ The second sprint focused on implementing system functionality, specifically man
 
 \subsection{Vaccines, allergies and medication management}
 
-Database schemas were first created for vaccines, allergies and medcations by using SQLModel, followed by corrensponding API endpoints to add, update, delete and view the data. The frontend development used Vue components to create reusable elements, that would be used to display the user added records. These components used other Vue features such as props and emits to pass data and events between elements. An example of the Vaccine Card can be seen below:
+Database models were first created for vaccines, allergies and medcations by using SQLModel, followed by corrensponding API endpoints to add, update, delete and view the data. The frontend development used Vue components to create reusable elements, that would be used to display the user added records. These components used other Vue features such as props and emits to pass data and events between elements. An example of the Vaccine Card can be seen below:
 
 \begin{lstlisting}[language=HTML, caption=Vue Vaccine Card Component Example]
 <Card class="w-full" :pt="cardStyles">
@@ -326,7 +326,7 @@ This sprint encountered its share of challenges. However, tackling them showed t
 
 \subsubsection{New functionality integration}
 
-Introducing new functionality in the system, while ensuring compatibility with both the frontend and backend, was the main challenge this sprint. Additional complexity was added by changing existing code or database schemas to accommodate the new features, which required careful planning and testing to ensure that the new features did not break any existing functionality.
+Introducing new functionality in the system, while ensuring compatibility with both the frontend and backend, was the main challenge this sprint. Additional complexity was added by changing existing code or database models to accommodate the new features, which required careful planning and testing to ensure that the new features did not break any existing functionality.
 
 \subsubsection{File Uploads}
 
@@ -701,7 +701,7 @@ The primary challenge encountered during this sprint was, interestingly enough, 
 
 \section{Sprint \#5}
 
-The fifth sprint focused on implementing an automated lab test data extraction system that utilised a multimodal LLM to process uploaded lab result documents. This feature represented an incredible innovation within this application, as it enabled automatic extraction of test results from documents, with minimal manual intervention. Being a continuation of the work done in the previous sprint, some of the initial work required for the implementation of this feature was already completed. This allowed for easier and faster development of the lab extraction functionality, which was completed as per the initially agreed requirements and wireframes, with minor changes to how the lab results were displayed on the frontend. 
+The fifth sprint focused on implementing an automated lab test data extraction system that utilised a MLLM to process uploaded lab result documents. This feature represented an incredible innovation within this application, as it enabled automatic extraction of test results from documents, with minimal manual intervention. Being a continuation of the work done in the previous sprint, some of the initial work required for the implementation of this feature was already completed. This allowed for easier and faster development of the lab extraction functionality, which was completed as per the initially agreed requirements and wireframes, with minor changes to how the lab results were displayed on the frontend. 
 
 The sequence diagram for the lab tests extraction process can be seen in figure~\ref{fig:sequence_lab}. It displays how a user would interact with the system when uploading a lab result document, how the system processes the filem sends it to the MLLM API, and how the response is then received and displayed to the user.
 
@@ -729,7 +729,7 @@ The implementation of initial lab extraction steps leveraged previously added co
 
 \FloatBarrier{}
 
-Google's Gemini 2.0 Flash was selected as the application's multimodal LLM, based on research of available free tiers with API access from table~\ref{tab:llm_apis}. However, it was noted that a local MLLM could've also been used for the project, a point which will be discussed in more detail in section~\ref{sec:future_work}. The MLLM implementation mainly involved using Prompt Engineering techniques to provide explicit instructions and format the output consistently. Prompting techniques from section~\ref{sec:prompt} were used to write the following prompt, which is passed alongside the file to the API:
+Google's Gemini 2.0 Flash was selected as the application's MLLM, based on research of available free tiers with API access from table~\ref{tab:llm_apis}. However, it was noted that a local MLLM could've also been used for the project, a point which will be discussed in more detail in section~\ref{sec:future_work}. The MLLM implementation mainly involved using Prompt Engineering techniques to provide explicit instructions and format the output consistently. Prompting techniques from section~\ref{sec:prompt} were used to write the following prompt, which is passed alongside the file to the API:
 
 \begin{lstlisting}[language=Python, caption=Prompt for Lab Results Extraction]
 def extract_with_llm(file_content: bytes, file_type: str):
@@ -804,7 +804,7 @@ The extracted lab results also leverage DataTable's dynamic column generation fe
 
 \subsubsection{Backend changes}
 
-To accommodate the new lab extraction feature, the database was extended with two new tables: LabTest, which contained the core test metadata (name and code) and LabResult, which contained individual test results with values, units and reference ranges. A dual table approach was chosen to prevent data duplication and facilitate historical tracking by allowing to associate multiple results to one test type. The updated database schema can be seen in figure~\ref{fig:erd_s5}. The new database schema includes a direct patient-result relationship to optimise queries for cases when retrieving all lab results for a patient is necessary, as is the case for the dashboard.
+To accommodate the new lab extraction feature, the database was extended with two new tables: LabTest, which contained the core test metadata (name and code) and LabResult, which contained individual test results with values, units and reference ranges. A dual table approach was chosen to prevent data duplication and facilitate historical tracking by allowing to associate multiple results to one test type. The updated database can be seen in figure~\ref{fig:erd_s5}. It includes a direct patient-result relationship to optimise queries for cases when retrieving all lab results for a patient is necessary, as is the case for the dashboard.
 
 A code snippet of the endpoint that handles the processing of lab results can be seen below:
 
